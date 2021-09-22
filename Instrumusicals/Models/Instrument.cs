@@ -35,7 +35,7 @@ namespace Instrumusicals.Models
         public IEnumerable<Review> Reviews { get; set; }
         public IEnumerable<Order> Orders { get; set; }
 
-        [Range( 0, int.MaxValue, ErrorMessage = "{0} field must be between {1} and {2}" )]
+        [Range( 1, int.MaxValue, ErrorMessage = "{0} field must be between {1} and {2}" )]
         public int Quantity { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "{0} field must be between {1} and {2}")]

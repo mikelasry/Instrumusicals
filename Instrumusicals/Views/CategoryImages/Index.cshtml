@@ -25,10 +25,14 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.Id)
+                @Html.DisplayFor(modelItem => item.Category.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Image)
+                @if(item.Image != null)
+                {
+                    string img = Convert.ToBase64String(item.Image);
+                    <img src="data:img/png;base64,@img" height="50px" width="50px"/>
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

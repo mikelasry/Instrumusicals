@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
+using System.IO;
 
 namespace Instrumusicals.Controllers
 {
@@ -48,7 +49,7 @@ namespace Instrumusicals.Controllers
         // GET: CategoryImages/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id");
+            ViewData["CategoryId"] = new SelectList(_context.Category.Where(c => c.CategoryImage.Image == null), nameof(Category.Id), nameof(Category.Name));
             return View();
         }
 
@@ -57,10 +58,16 @@ namespace Instrumusicals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CategoryId,Image")] CategoryImage categoryImage)
+        public async Task<IActionResult> Create([Bind("Id,CategoryId,ImageFile")] CategoryImage categoryImage)
         {
             if (ModelState.IsValid)
             {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    categoryImage.ImageFile.CopyTo(ms);
+                    categoryImage.Image = ms.ToArray();
+                }
+
                 _context.Add(categoryImage);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -77,12 +84,12 @@ namespace Instrumusicals.Controllers
                 return NotFound();
             }
 
-            var categoryImage = await _context.CategoryImage.FindAsync(id);
+            var categoryImage = await _context.CategoryImage.Include(ci=> ci.Category).SingleOrDefaultAsync(ci => ci.Id == id);
             if (categoryImage == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id", categoryImage.CategoryId);
+            ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name), categoryImage.CategoryId);
             return View(categoryImage);
         }
 

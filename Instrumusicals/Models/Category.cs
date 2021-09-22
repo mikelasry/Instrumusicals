@@ -16,6 +16,7 @@ namespace Instrumusicals.Models
 
         public IEnumerable<Instrument> Instruments { get; set; }
 
+        [Display(Name = "Category Image")]
         public CategoryImage CategoryImage { get; set; }
     }
 }

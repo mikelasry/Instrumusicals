@@ -4,23 +4,26 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>Category Image Details</h1>
 
 <div>
-    <h4>CategoryImage</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Category)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.Id)
+            @Html.DisplayFor(model => model.Category.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Image)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
+        <dd class="col-sm-10">
+            @if (Model.Image != null)
+            {
+                string img = Convert.ToBase64String(Model.Image);
+                <img src="data:img/png;base64,@img" height="50px" width="50px" />
+            }
         </dd>
     </dl>
 </div>
