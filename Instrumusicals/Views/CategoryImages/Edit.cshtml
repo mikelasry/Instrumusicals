@@ -8,20 +8,24 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                
-                @*<select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>*@
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
                 @if (Model.Image != null)
                 {
                     string img = Convert.ToBase64String(Model.Image);
-                    <img src="data:img/png;base64,@img" height="50px" width="50px" />
+                    <img src="data:img/png;base64,@img" height="300" width="300" style="border-radius:30px" />
                 }
+                <hr />
+                <input asp-for="ImageFile" class="form-control" accept="image/*" style="padding-bottom:35px"/>
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+            <div style="visibility:hidden" class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select  asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId" ></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

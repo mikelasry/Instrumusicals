@@ -22,7 +22,7 @@
             @if (Model.Image != null)
             {
                 string img = Convert.ToBase64String(Model.Image);
-                <img src="data:img/png;base64,@img" height="50px" width="50px" />
+                <img src="data:img/png;base64,@img" height="500px" style="border-radius:100px" />
             }
         </dd>
     </dl>

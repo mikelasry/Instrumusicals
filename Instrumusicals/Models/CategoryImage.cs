@@ -16,6 +16,7 @@ namespace Instrumusicals.Models
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 
+        [Required]
         [NotMapped]
         [Display(Name = "Image File")]
         public IFormFile ImageFile { get; set; }

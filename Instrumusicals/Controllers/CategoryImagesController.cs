@@ -98,7 +98,7 @@ namespace Instrumusicals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,Image")] CategoryImage categoryImage)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,ImageFile")] CategoryImage categoryImage)
         {
             if (id != categoryImage.Id)
             {
@@ -107,6 +107,12 @@ namespace Instrumusicals.Controllers
 
             if (ModelState.IsValid)
             {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    categoryImage.ImageFile.CopyTo(ms);
+                    categoryImage.Image = ms.ToArray();
+                }
+
                 try
                 {
                     _context.Update(categoryImage);
@@ -125,7 +131,7 @@ namespace Instrumusicals.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id", categoryImage.CategoryId);
+            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Name", categoryImage.CategoryId);
             return View(categoryImage);
         }
 

@@ -22,7 +22,7 @@ namespace Instrumusicals.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Category.ToListAsync());
+            return View(await _context.Category.Include( c => c.CategoryImage ).ToListAsync());
         }
 
         // GET: Categories/Details/5
@@ -33,7 +33,7 @@ namespace Instrumusicals.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Category
+            var category = await _context.Category.Include(c => c.CategoryImage)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (category == null)
             {
@@ -73,7 +73,7 @@ namespace Instrumusicals.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Category.FindAsync(id);
+            var category = await _context.Category.Include(c => c.CategoryImage).FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)
             {
                 return NotFound();
