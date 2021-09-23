@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
+using System.IO;
 
 namespace Instrumusicals.Controllers
 {
@@ -48,7 +49,7 @@ namespace Instrumusicals.Controllers
         // GET: Instruments/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id");
+            ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name));
             return View();
         }
 
@@ -57,15 +58,23 @@ namespace Instrumusicals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Brand,CategoryId,Image,Description,Quantity,Sold,Price")] Instrument instrument)
+        public async Task<IActionResult> Create([Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
         {
             if (ModelState.IsValid)
             {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    instrument.ImageFile.CopyTo(ms);
+                    instrument.Image = ms.ToArray();
+                }
+
+                instrument.Sold = 0;
+
                 _context.Add(instrument);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id", instrument.CategoryId);
+            ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name), instrument.CategoryId);
             return View(instrument);
         }
 
@@ -82,7 +91,7 @@ namespace Instrumusicals.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id", instrument.CategoryId);
+            ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name), instrument.CategoryId);
             return View(instrument);
         }
 
@@ -91,7 +100,7 @@ namespace Instrumusicals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Brand,CategoryId,Image,Description,Quantity,Sold,Price")] Instrument instrument)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
         {
             if (id != instrument.Id)
             {
@@ -100,6 +109,14 @@ namespace Instrumusicals.Controllers
 
             if (ModelState.IsValid)
             {
+                if (instrument.ImageFile != null)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        instrument.ImageFile.CopyTo(ms);
+                        instrument.Image = ms.ToArray();
+                    }
+                }
                 try
                 {
                     _context.Update(instrument);

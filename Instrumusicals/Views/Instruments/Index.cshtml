@@ -49,10 +49,14 @@
                 @Html.DisplayFor(modelItem => item.Brand)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.Id)
+                @Html.DisplayFor(modelItem => item.Category.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Image)
+                @if( item.Image != null)
+                {
+                    string img = Convert.ToBase64String(item.Image);
+                    <img src="data:image/png;base64,@img" style="height:100px; width:100px; border-radius:100px" />
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
