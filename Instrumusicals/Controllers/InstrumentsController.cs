@@ -27,6 +27,13 @@ namespace Instrumusicals.Controllers
             return View(await instrumusicalsContext.ToListAsync());
         }
 
+        public async Task<IActionResult> Search(string Name)
+        {
+            /*var instrumusicalsContext = _context.Instrument.Include(i => i.Category);*/
+            var instrumusicalsContext = _context.Instrument.Include(i => i.Category).Where( i => i.Name.Contains(Name));
+            return View("Index", await instrumusicalsContext.ToListAsync());
+        }
+
         // GET: Instruments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -64,8 +71,11 @@ namespace Instrumusicals.Controllers
             {
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    instrument.ImageFile.CopyTo(ms);
-                    instrument.Image = ms.ToArray();
+                    if (instrument.ImageFile != null)
+                    {
+                        instrument.ImageFile.CopyTo(ms);
+                        instrument.Image = ms.ToArray();
+                    }
                 }
 
                 instrument.Sold = 0;

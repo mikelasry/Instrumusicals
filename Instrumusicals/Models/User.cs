@@ -10,9 +10,11 @@ namespace Instrumusicals.Models
     {
         public int Id { get; set; }
         
+        [Required]
         [MinLength(5)]
         [MaxLength(64)]
         public string Email { get; set; }
+
 
         [MinLength(2)]
         [MaxLength(32)]

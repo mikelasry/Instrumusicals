@@ -3,12 +3,15 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<h1>Index</h1>
-
+<form asp-action="Search">
+    <input name="Name" placeholder="Enter Instrument Name" />
+    <input type="submit" value="Search" />
+    <a asp-action="Index">Clear Search</a>
+</form>
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
