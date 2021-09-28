@@ -24,10 +24,17 @@ a {
   border-color: #1861ac;
 }
 
+.nav-link {
+    border-radius: 100px;
+    border: solid 2px;
+    margin-right: 5px;
+}
+
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 @media (min-width: 768px) {
   html {

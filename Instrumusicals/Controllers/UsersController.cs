@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
+using System.Security.Cryptography;
 
 namespace Instrumusicals.Controllers
 {
@@ -43,18 +44,48 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
+        // GET: Users/Register
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        // POST: Users/Register
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register([Bind("Email,FirstName,LastName,Address,Password")] User user)
+        {
+            if (ModelState.IsValid)
+            {
+                if(_context.User.FirstOrDefault(x => x.Email.ToLower() == user.Email.ToLower()) != null)
+                {
+                    ViewData["Error"] = "Email already in use.\nIf you forgot your password, IT'S YOUR PROBLEM.";
+                    return View(user);
+                }
+
+                string salt = SecurityManager.GenrateSalt(70);
+                string hash = SecurityManager.HashPassword(user.Password, salt, 100000, 70);
+                
+                user.Salt = salt;
+                user.Hash = hash;
+                
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(user);
+        }
+
         // GET: Users/Create
-        public IActionResult Create()
+        public IActionResult Login()
         {
             return View();
         }
 
         // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
+        public async Task<IActionResult> Login([Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -82,8 +113,6 @@ namespace Instrumusicals.Controllers
         }
 
         // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
