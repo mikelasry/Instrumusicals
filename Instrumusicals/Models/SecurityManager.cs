@@ -8,9 +8,9 @@ namespace Instrumusicals.Models
 {
     public class SecurityManager
     {
-        public static string GenrateSalt(int nSalt)
+        public static string GenerateSalt()
         {
-            var saltBytes = new byte[nSalt];
+            var saltBytes = new byte[64];
 
             using (var provider = new RNGCryptoServiceProvider())
             {
@@ -21,13 +21,31 @@ namespace Instrumusicals.Models
         }
 
 
-        public static string HashPassword(string _Password, string _Salt, int nIterations, int nHash)
+        public static string HashPassword(string _Password, string _Salt)
         {
             var saltBytes = Convert.FromBase64String(_Salt);
-            using ( var rfc2898DeriveBytes = new Rfc2898DeriveBytes(_Password, saltBytes, nIterations))
+            using ( var rfc2898DeriveBytes = new Rfc2898DeriveBytes(_Password, saltBytes, 100000))
             {
-                return Convert.ToBase64String(rfc2898DeriveBytes.GetBytes(nHash));
+                return Convert.ToBase64String(rfc2898DeriveBytes.GetBytes(64));
             }
+        }
+
+        public static bool Validate(User user, string givenPassword)
+        {
+            return user.Hash == HashPassword(givenPassword, user.Salt);
+        }
+
+        public static bool test()
+        {
+            string pw = "1111";
+            string salt = GenerateSalt();
+            string hash1 = HashPassword(pw, salt);
+            string hash2 = HashPassword(pw, salt);
+            bool test = hash1 == hash2;
+            int i = 0;
+            while (i < 10)
+                i++;
+            return test;
         }
     }
 }

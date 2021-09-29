@@ -11,19 +11,13 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-info border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand text-light bg-secondary border-light p-2" style="border-radius:100px; border: solid 2px" asp-area="" asp-controller="Home" asp-action="Index">Instrumusicals</a>
+                <a class="navbar-brand text-danger bg-dark border-da p-2" style="border-radius:100px; border: solid 2px" asp-area="" asp-controller="Home" asp-action="Index">Instrumusicals</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-light bg-success border-warning" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light bg-primary border-warning" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
                         </li>
@@ -34,19 +28,22 @@
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Instruments" asp-action="Index">Instruments</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light border-warning" asp-area="" asp-controller="Orders" asp-action="Index">Orders</a>
+                            <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Orders" asp-action="Index">Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light border-warning" asp-area="" asp-controller="Reviews" asp-action="Index">Reviews</a>
+                            <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Reviews" asp-action="Index">Reviews</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light border-warning" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
+                            <a class="nav-link text-light bg-primary border-dark" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light border-warning" asp-area="" asp-controller="Users" asp-action="Register">Register</a>
+                            <a class="nav-link text-light bg-success border-dark" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Register">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white bg-transparent border-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
                 </div>
