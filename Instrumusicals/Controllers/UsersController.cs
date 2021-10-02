@@ -63,11 +63,8 @@ namespace Instrumusicals.Controllers
                     return View(user);
                 }
 
-                string salt = SecurityManager.GenerateSalt();
-                user.Salt = salt;
-
-                string hash = SecurityManager.HashPassword(user.Password, user.Salt);
-                user.Hash = hash;
+                user.Salt = SecurityManager.GenerateSalt();
+                user.Hash = SecurityManager.HashPassword(user.Password, user.Salt);                
 
                 _context.Add(user);
                 await _context.SaveChangesAsync();
@@ -92,21 +89,26 @@ namespace Instrumusicals.Controllers
             if (userFromDB == null)
                 return View(user);
 
-            SecurityManager.test();
+            /*SecurityManager.test();*/
 
             if (!SecurityManager.Validate(userFromDB, user.Password))
             {
                 ViewData["Error"] = "Credentials mismatch. Please try again";
                 return View(user);
             }
-            return RedirectToAction(nameof(Profile));
+            return RedirectToAction(nameof(Profile), new { id = userFromDB.Id });
 
         }
 
         // GET: Users/Login
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile(int id)
         {
-            return View();
+            User user = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
+            if(user == null)
+            {
+                return NotFound(user);
+            }
+            return View(user);
         }
 
         // GET: Users/Edit/5
