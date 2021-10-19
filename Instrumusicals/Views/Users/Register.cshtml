@@ -39,6 +39,21 @@
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
             <div class="form-group">
+                @{ if (ViewBag.Areas != null)
+                    {
+
+                        <label class="control-label">Choose your state area</label>
+                        <select asp-items="ViewBag.Areas"></select>
+                    }
+                    else
+                    {
+                        <span>Please include your area with one of the following:
+                        <br/>
+                        "Center", "North", "East", "South" or "West" </span>
+                    }
+                }
+            </div>
+            <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>

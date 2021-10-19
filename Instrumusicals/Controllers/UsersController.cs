@@ -11,6 +11,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Instrumusicals.Controllers
 {
@@ -20,25 +21,42 @@ namespace Instrumusicals.Controllers
         private List<string> adminsEmails;
         private string ERR, CREDS_ERR, USERNAME, NAVA_UN_ERR;
 
+        private string mikesMail, shirsMail, dansMail;
 
         public UsersController(InstrumusicalsContext context)
         {
             _context = context;
 
-            ERR       = "Error";
-            USERNAME  = "username";
+            ERR = "Error";
+            USERNAME = "username";
             CREDS_ERR = "Credentials mismatch. Please try again";
             NAVA_UN_ERR = "Email already in use. If you forgot your password, IT'S YOUR PROBLEM.";
 
+            mikesMail = "mikelasry123@gmail.com";
+            shirsMail = "shirboxer@gmail.com";
+            dansMail = "dshmirer@gmail.com";
+
             adminsEmails = new List<string>();
-            adminsEmails.Add("mikelasry123@gmail.com");
-            adminsEmails.Add("shirboxer@gmail.com");
-            adminsEmails.Add("dshmirer@gmail.com");
+            adminsEmails.Add(mikesMail);
+            adminsEmails.Add(shirsMail);
+            adminsEmails.Add(dansMail);
+
         }
 
         public async Task<IActionResult> Index()
         {
             return View(await _context.User.ToListAsync());
+        }
+
+        public async Task<IActionResult> AccessDenied()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Admin()
+        {
+            return View();
         }
 
         // GET: Users/Details/5
@@ -62,6 +80,16 @@ namespace Instrumusicals.Controllers
         // GET: Users/Register
         public IActionResult Register()
         {
+            IEnumerable<SelectListItem> areas = new SelectList(new[] {
+                        new SelectListItem{Selected = true, Text =  "Center", Value = "c"},
+                        new SelectListItem{Selected = false, Text = "North", Value = "n"},
+                        new SelectListItem{Selected = false, Text = "East", Value = "e"},
+                        new SelectListItem{Selected = false, Text = "South", Value = "s"},
+                        new SelectListItem{Selected = false, Text = "West", Value = "w"}
+                    }
+                );
+
+            ViewData["Areas"] = areas;
             return View();
         }
 
@@ -86,24 +114,27 @@ namespace Instrumusicals.Controllers
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 logUser(user);
-                return RedirectToAction(nameof(Login));
+                return RedirectToAction(nameof(Index), "Home");
+
             }
             return View(user);
         }
 
         // GET: Users/Login
-        public IActionResult Login()
+        public IActionResult Login(String ReturnUrl)
         {
-            if (HttpContext.Session.GetString(USERNAME) != null)
+            if ( !String.IsNullOrEmpty(HttpContext.User.Identity.Name) )
                 return RedirectToAction(nameof(Profile));
-            
+
+            if (!String.IsNullOrEmpty(ReturnUrl))
+                ViewData["ReturnUrl"] = ReturnUrl;
             return View();
         }
 
         // POST: Users/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([Bind("Id,Email,Password")] User user)
+        public async Task<IActionResult> Login([Bind("Id,Email,Password")] User user, String ReturnUrl)
         {
             User userFromDB = await _context.User.FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == user.Email.Trim().ToLower());
             if (userFromDB == null)
@@ -120,7 +151,10 @@ namespace Instrumusicals.Controllers
             }
 
             logUser(userFromDB);
-            return RedirectToAction(nameof(Profile), new { id = userFromDB.Id });
+            //return RedirectToAction(nameof(Profile), new { id = userFromDB.Id });
+
+
+            return ReturnUrl == null ? RedirectToAction(nameof(Index), "Home") : LocalRedirect(ReturnUrl);
          }
 
         private async void logUser(User user)
@@ -157,7 +191,7 @@ namespace Instrumusicals.Controllers
         public IActionResult Logout()
         {
             logUser(null);
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction(nameof(Index), "Home");
         }
 
         // GET: Users/Profile

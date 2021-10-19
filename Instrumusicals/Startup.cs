@@ -41,6 +41,7 @@ namespace Instrumusicals
                 {
                     options.LoginPath = "/Users/Login";
                     options.AccessDeniedPath = "/Users/AccessDenied";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
                 });
         }
 

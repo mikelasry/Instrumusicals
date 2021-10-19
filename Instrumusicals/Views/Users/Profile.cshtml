@@ -2,11 +2,14 @@
 
 @{
     ViewData["Title"] = "Profile";
-    byte[] b = new byte[64];
-    
-    string name = System.Text.Encoding.Default.GetString(b);
 }
 
-<h1>Hello @Context.User.Identity.Name</h1>
-<a asp-action="Logout">Logout</a>
+<h1>Hello @Context.User.Identity.Name!</h1>
+<div class="btn-group" role="group" aria-label="Basic example">
+    <button type="button" class="btn btn-secondary">Profile</button>
+    <button type="button" class="btn btn-secondary">Cart</button>
+    <button type="button" class="btn btn-secondary">Orders</button>
+    <button type="button" class="btn btn-secondary">Reviews</button>
+    <button type="button" class="btn btn-secondary">Security & Privacy</button>
+</div>
 
