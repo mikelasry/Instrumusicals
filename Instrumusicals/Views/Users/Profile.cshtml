@@ -1,8 +1,12 @@
 ﻿@model Instrumusicals.Models.User
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Profile";
+    byte[] b = new byte[64];
+    
+    string name = System.Text.Encoding.Default.GetString(b);
 }
 
-<h1>@Model.FirstName's profile </h1>
+<h1>Hello @Context.User.Identity.Name</h1>
+<a asp-action="Logout">Logout</a>
 

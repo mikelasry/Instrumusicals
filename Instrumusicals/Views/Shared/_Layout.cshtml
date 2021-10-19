@@ -22,7 +22,7 @@
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="CategoryImages" asp-action="Index">Category Images</a>
+                            <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="CategoryImages" asp-action="Index">CI</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Instruments" asp-action="Index">Instruments</a>
@@ -36,22 +36,40 @@
                         <li class="nav-item">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light bg-primary border-dark" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light bg-success border-dark" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Register">Register</a>
-                        </li>
+
+                        @{
+                            if ((Context != null) && (Context.User != null) && (!String.IsNullOrEmpty(Context.User.Identity.Name)))
+                            { // User is logged
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark bg-danger border-dark" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger bg-light border-danger" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Profile">Profile</a>
+                                </li>
+                            }
+                            else
+                            { // no logged user
+                                <li class="nav-item">
+                                    <a class="nav-link text-light bg-primary border-dark" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light bg-success border-dark" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Register">Register</a>
+                                </li>
+                            }
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-white bg-transparent border-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+
                     </ul>
                 </div>
+                @if ((Context != null) && (Context.User != null) && (!String.IsNullOrEmpty(Context.User.Identity.Name)) )
+                    {<div class="block justify-content-center text-center">Hello, @Context.User.Identity.Name</div>}
             </div>
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-3 ">
             @RenderBody()
         </main>
     </div>

@@ -1,16 +1,22 @@
 ﻿@model Instrumusicals.Models.User
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Login";
     Layout = "_LoginLayout";
 }
 
-<h1>Login!</h1>
+<div style="height:100px;"></div>
 
+<h1 class="text-center">Login!</h1>
 <hr />
-<div class="row">
+
+<div style="height:70px;">
+    <h5> We've missed you </h5>
+</div>
+
+<div class="row justify-content-center" >
     <div class="col-md-4">
-        <form asp-action="Login">
+        <form asp-action="Login" class="card pt-2 pr-4 pl-4 pb-1">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
@@ -22,22 +28,32 @@
                 <input asp-for="Password" class="form-control" />
             </div>
             <hr />
-            @if(ViewBag.Error != null)
-            {
-                <div class="text-danger">
-                    @ViewBag.Error
-                </div>
-            }
+            <div style="height:50px">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="text-danger">
+                        @ViewBag.Error!
+                    </div>
+                }
+                else
+                {
+                    <div class="text-success">
+                        WELCOME BACK!
+                    </div>
+                }
+            </div>
             <div class="form-group" style="display:flex; justify-content:space-between;">
-                <input type="submit" value="Login!" class="btn btn-primary" />
-                <a asp-action="Register" class="text-secondary">Register Here!</a>
+                <input type="submit" value="Login!" class="btn btn-primary" style="width:100%" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="text-center">
+    <br />
+    <a asp-action="Register" >Register Here!</a>
+    <br />
+    <a asp-action="Index" asp-controller="Home" class="text-secondary">Back to Home Page</a>
 </div>
 
 @section Scripts {

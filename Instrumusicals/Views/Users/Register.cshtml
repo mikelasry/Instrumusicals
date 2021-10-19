@@ -6,12 +6,17 @@
 
 }
 
-<h1>New to Instrumusicals? Register!</h1>
+<div style="height:80px;"></div>
 
+<h3>New to Instrumusicals? </h3>
+<h1>Register!</h1>
 <hr />
-<div class="row">
+
+<div style="height:50px;"></div>
+
+<div class="row justify-content-center">
     <div class="col-md-4">
-        <form asp-action="Register">
+        <form asp-action="Register" class="card pt-2 pr-4 pl-4 pb-1">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
@@ -39,7 +44,7 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="SIGN UP" class="btn btn-primary" style="width:100%" />
             </div>
             @if (!String.IsNullOrEmpty(ViewBag.Error))
             {
@@ -50,7 +55,8 @@
 </div>
 
 <div>
-    Already a member? <a asp-action="Login">Click here</a> to Login!
+    <h5>Already a member?</h5>
+    <h6><a asp-action="Login">Click here</a> to Login!</h6>
 </div>
 
 @section Scripts {
