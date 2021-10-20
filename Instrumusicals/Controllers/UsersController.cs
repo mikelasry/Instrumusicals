@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Instrumusicals.Controllers
 {
+    [Authorize]
     public class UsersController : Controller
     {
         private readonly InstrumusicalsContext _context;
@@ -48,6 +49,7 @@ namespace Instrumusicals.Controllers
             return View(await _context.User.ToListAsync());
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> AccessDenied()
         {
             return View();
@@ -59,7 +61,7 @@ namespace Instrumusicals.Controllers
             return View();
         }
 
-        // GET: Users/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -67,6 +69,7 @@ namespace Instrumusicals.Controllers
                 return NotFound();
             }
 
+            // TODO: check if authenticated user is authorized (self or admin)
             var user = await _context.User
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
@@ -77,7 +80,7 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
-        // GET: Users/Register
+        [AllowAnonymous]
         public IActionResult Register()
         {
             IEnumerable<SelectListItem> areas = new SelectList(new[] {
@@ -93,8 +96,8 @@ namespace Instrumusicals.Controllers
             return View();
         }
 
-        // POST: Users/Register
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([Bind("Email,FirstName,LastName,Address,Password")] User user)
         {
@@ -120,19 +123,17 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
-        // GET: Users/Login
-        public IActionResult Login(String ReturnUrl)
+        [AllowAnonymous]
+        public IActionResult Login()
         {
             if ( !String.IsNullOrEmpty(HttpContext.User.Identity.Name) )
                 return RedirectToAction(nameof(Profile));
 
-            if (!String.IsNullOrEmpty(ReturnUrl))
-                ViewData["ReturnUrl"] = ReturnUrl;
             return View();
         }
 
-        // POST: Users/Login
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([Bind("Id,Email,Password")] User user, String ReturnUrl)
         {
@@ -194,8 +195,11 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index), "Home");
         }
 
-        // GET: Users/Profile
-        [Authorize]
+        public IActionResult Cart()
+        {
+            return View();
+        }
+        
         public async Task<IActionResult> Profile(int? id)
           {
             string cookieIdentifier = HttpContext.User.Identity.Name;
@@ -206,13 +210,15 @@ namespace Instrumusicals.Controllers
             return (user == null) ? NotFound(user) : View(user);
         }
 
-        // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+
+            // TODO: check if authenticated user is authorized (self or admin)
+            // if not so, retrun redirect AccessDenied
 
             var user = await _context.User.FindAsync(id);
             if (user == null)
@@ -222,7 +228,6 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
-        // POST: Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
@@ -255,13 +260,15 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
-        // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+
+            // TODO: check if authenticated user is authorized (self or admin)
+            // if not so, retrun redirect AccessDenied
 
             var user = await _context.User
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -273,7 +280,6 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
-        // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -27,12 +27,6 @@
                 <label asp-for="Password" class="control-label"></label>
                 <input asp-for="Password" class="form-control" />
             </div>
-            <div>
-                @if ( !String.IsNullOrEmpty(ViewBag.ReturnUrl) )
-                {
-                    <span name="ReturnUrl" value="@ViewBag.ReturnUrl"></span>
-                }
-            </div>
             <hr />
             <div style="height:50px">
                 @if (ViewBag.Error != null)

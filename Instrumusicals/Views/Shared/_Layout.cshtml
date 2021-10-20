@@ -37,7 +37,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark bg-transparent border-danger" style="font-weight: bold; font-size:large" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
                                 </li>
-                                @if ( Context.User.IsInRole("Admin") )
+                                @if (Context.User.IsInRole("Admin"))
                                 {
                                     <li class="nav-item">
                                         <a class="nav-link text-dark bg-danger border-dark" style="font-weight:bold ;" asp-area="" asp-controller="Users" asp-action="Admin">Admin's Panel</a>
@@ -54,16 +54,21 @@
                                     <a class="nav-link text-light bg-success border-dark" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Register">Register</a>
                                 </li>
                             }
+
+                            <li class="nav-item">
+                                <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Users" asp-action="Cart">Cart</a>
+                            </li>
+
                         }
 
 
                     </ul>
                 </div>
-                @if ((Context != null) && (Context.User != null) && (!String.IsNullOrEmpty(Context.User.Identity.Name)) )
-                    {@*<div class="block justify-content-center text-center">Hello, @Context.User.Identity.Name</div>*@}
+                @if ((Context != null) && (Context.User != null) && (!String.IsNullOrEmpty(Context.User.Identity.Name)))
+                {@*<div class="block justify-content-center text-center">Hello, @Context.User.Identity.Name</div>*@}
             </div>
         </nav>
-        <hr/>
+        <hr />
     </header>
     <div class="container">
         <main role="main" class="pb-3 ">

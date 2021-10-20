@@ -4,4 +4,69 @@
     ViewData["Title"] = "Admin's Panel";
 }
 
-<h1>Admin's Panel</h1>
+<div class="text-center text-">
+    <h1>Admin's Panel</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Instruments
+                </th>
+                <th>
+                    Categories
+                </th>
+                <th>
+                    Orders
+                </th>
+                <th>
+                    Users
+                </th>
+                <th>
+                    Reviews
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <a class="text-danger" asp-controller="Instruments" asp-action="Index">Show All Instruments</a>
+                </td>
+                <td>
+                    <a class="text-danger" asp-controller="Categories" asp-action="Index">Show All Categories</a>
+                </td>
+                <td>
+                    <a class="text-danger" asp-controller="Orders" asp-action="Index">Show All Orders</a>
+                </td>
+                <td>
+                    <a class="text-danger" asp-controller="Users" asp-action="Index">Show All Users</a>
+                </td>
+                <td>
+                    <a class="text-danger" asp-controller="Reviews" asp-action="Index">Show All Reviews</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a class="text-danger" asp-controller="Instruments" asp-action="Create">Create a new Instrument</a>
+                </td>
+                <td>
+                    <a class="text-danger" asp-controller="Categories" asp-action="Create">Create a new Category</a>
+                </td>
+                <td>
+                    <a class="text-danger" asp-controller="Orders" asp-action="Create">Create a new Order</a>
+                </td>
+                <td>
+                    <a class="text-danger" asp-controller="Users" asp-action="Register">Register a User</a>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br />
+    <br />
+    <h2>Instrumusical Statistics</h2>
+    <h2>.</h2>
+    <h2>.</h2>
+    <h2>.</h2>
+</div>

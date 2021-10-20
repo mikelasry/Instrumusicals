@@ -8,9 +8,6 @@
     <input type="submit" value="Search" />
     <a asp-action="Index">Clear Search</a>
 </form>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 
 <table class="table">
     <thead>
@@ -22,19 +19,10 @@
                 @Html.DisplayNameFor(model => model.Brand)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Image)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sold)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Price)
@@ -44,15 +32,18 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+        <tr >
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            <td>
+            <td class="justify-content-center">
                 @Html.DisplayFor(modelItem => item.Brand)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)$
             </td>
             <td>
                 @if( item.Image != null)
@@ -60,23 +51,13 @@
                     string img = Convert.ToBase64String(item.Image);
                     <img src="data:image/png;base64,@img" style="height:100px; width:100px; border-radius:100px" />
                 }
+                else
+                {
+                    <span class="text-danger">No available image</span>
+                }
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Sold)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.Id">ABOUT</a> 
             </td>
         </tr>
 }

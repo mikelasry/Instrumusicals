@@ -4,10 +4,8 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
-
 <div>
-    <h4>Instrument</h4>
+    <h4>@Html.DisplayFor(model => model.Name)</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -34,23 +32,26 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Sold)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Sold)
-        </dd>
+        @if (Context != null && Context.User != null && Context.User.Identity.Name != null && Context.User.IsInRole("Admin")) 
+        { 
+            <dt class="col-sm-2 text-danger">
+                @Html.DisplayNameFor(model => model.Quantity)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Quantity)
+            </dd>
+            <dt class="col-sm-2 text-danger">
+                @Html.DisplayNameFor(model => model.Sold)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Sold)
+            </dd>
+        }
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Price)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)
+            @Html.DisplayFor(model => model.Price)$
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Image)
@@ -65,6 +66,16 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to List</a> |
+    <a asp-action="Index">Back to Homepage</a>
+
+    <br />
+
+    @if (Context != null && Context.User != null && Context.User.Identity.Name != null && Context.User.IsInRole("Admin"))
+    {
+        <span>Admin's options: </span>
+        <a class="text-danger" asp-action="Edit" asp-route-id="@Model.Id">Edit</a><span> or </span> 
+        <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a> 
+
+    }
 </div>
