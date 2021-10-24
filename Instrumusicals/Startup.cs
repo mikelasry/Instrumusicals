@@ -36,7 +36,7 @@ namespace Instrumusicals
                options.IdleTimeout = TimeSpan.FromMinutes(10);
            });
 
-            services.AddAuthentication( CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
                 options =>
                 {
                     options.LoginPath = "/Users/Login";
@@ -73,7 +73,8 @@ namespace Instrumusicals
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Instruments}/{action=Details}/{id=4}"
+                );
             });
         }
     }

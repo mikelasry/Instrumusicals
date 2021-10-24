@@ -83,23 +83,20 @@ namespace Instrumusicals.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
-            IEnumerable<SelectListItem> areas = new SelectList(new[] {
+            ViewData["Areas"] = new SelectList(new[] {
                         new SelectListItem{Selected = true, Text =  "Center", Value = "c"},
                         new SelectListItem{Selected = false, Text = "North", Value = "n"},
                         new SelectListItem{Selected = false, Text = "East", Value = "e"},
                         new SelectListItem{Selected = false, Text = "South", Value = "s"},
                         new SelectListItem{Selected = false, Text = "West", Value = "w"}
-                    }
-                );
-
-            ViewData["Areas"] = areas;
+                    }, "Value", "Text");
             return View();
         }
 
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([Bind("Email,FirstName,LastName,Address,Password")] User user)
+        public async Task<IActionResult> Register([Bind("Email,FirstName,LastName,Address,Password")] User user, String area)
         {
             if (ModelState.IsValid)
             {
@@ -109,9 +106,12 @@ namespace Instrumusicals.Controllers
                     return View(user);
                 }
 
+
+                user.Address += getDirectionSuffix(area);
+
                 user.Salt = SecurityManager.GenerateSalt();
                 user.Hash = SecurityManager.HashPassword(user.Password, user.Salt);
-                user.UserType = adminsEmails.Contains(user.Email) ? 
+                user.UserType = adminsEmails.Contains(user.Email) ?
                                     UserType.Admin : UserType.Client;
 
                 _context.Add(user);
@@ -123,10 +123,23 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
+        private string getDirectionSuffix(String area)
+        {
+            switch (area)
+            {
+                case "e": return ", East";
+                case "w": return ", West";
+                case "s": return ", South";
+                case "n": return ", North";
+                case "c": return ", Center";
+                default: return ", NA";
+            }
+        }
+
         [AllowAnonymous]
         public IActionResult Login()
         {
-            if ( !String.IsNullOrEmpty(HttpContext.User.Identity.Name) )
+            if (!String.IsNullOrEmpty(HttpContext.User.Identity.Name))
                 return RedirectToAction(nameof(Profile));
 
             return View();
@@ -156,11 +169,11 @@ namespace Instrumusicals.Controllers
 
 
             return ReturnUrl == null ? RedirectToAction(nameof(Index), "Home") : LocalRedirect(ReturnUrl);
-         }
+        }
 
         private async void logUser(User user)
         {
-            if ( user == null )
+            if (user == null)
             {
                 //HttpContext.Session.Clear();
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -199,9 +212,9 @@ namespace Instrumusicals.Controllers
         {
             return View();
         }
-        
+
         public async Task<IActionResult> Profile(int? id)
-          {
+        {
             string cookieIdentifier = HttpContext.User.Identity.Name;
             User user = (id == null) ?
                 (await _context.User.FirstOrDefaultAsync(u => u.Email == cookieIdentifier)) :

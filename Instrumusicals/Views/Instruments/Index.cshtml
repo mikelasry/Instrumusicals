@@ -3,11 +3,21 @@
 @{
     ViewData["Title"] = "Index";
 }
-<form asp-action="Search">
+@* TODO: transform search to async method using ajax *@
+@*<form asp-action="Search">
     <input name="Name" placeholder="Enter Instrument Name" />
     <input type="submit" value="Search" />
     <a asp-action="Index">Clear Search</a>
-</form>
+</form>*@
+
+<div>
+    Search by: <input name="Name" placeholder="Name" />
+    <button id="btnSearch" class="btn btn-primary">Search</button>
+    <div class="spinner-border p-2 text-info float-right d-none" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+    <hr />
+</div>
 
 <table class="table">
     <thead>
@@ -63,3 +73,31 @@
 }
     </tbody>
 </table>
+
+
+<script type="text/template" id="rowTemplate">
+    <tr>
+        <td>
+            ${name}
+        </td>
+        <td>
+            ${brand}
+        </td>
+        <td>
+            ${image}
+        </td>
+        <td>
+            ${description}
+        </td>
+        <td>
+            ${price}
+        </td>
+        <td>
+            <a href="/Instruments/Details/${id}">ABOUT</a>
+        </td>
+    </tr>
+</script>
+
+@section Scripts{
+    <script src="~/js/Instruments/Search.js"></script>
+}

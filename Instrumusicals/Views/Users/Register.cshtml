@@ -41,9 +41,8 @@
             <div class="form-group">
                 @{ if (ViewBag.Areas != null)
                     {
-
                         <label class="control-label">Choose your state area</label>
-                        <select asp-items="ViewBag.Areas"></select>
+                        <select name="area" asp-items="ViewBag.Areas"></select>
                     }
                     else
                     {

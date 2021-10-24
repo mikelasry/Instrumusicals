@@ -28,20 +28,16 @@ namespace Instrumusicals.Controllers
             return View(await instrumusicalsContext.ToListAsync());
         }
 
-        public async Task<IActionResult> Search(string Name)
+        
+
+        public async Task<IActionResult> SearchJson(String name)
         {
-            /*Filter with Entity framework (Where method)*/
-            /*var instrumusicalsContext = _context.Instrument.Include(i => i.Category).Where( i => i.Name.Contains(Name));*/
+            var q = from instrument in _context.Instrument
+                    where instrument.Name.Contains(name)
+                    orderby instrument.Name
+                    select instrument;
 
-            /*Filter with LinQ*/
-            var instrumusicalsContext = from instrument in _context.Instrument
-                                        /*join category in _context.Category*/
-                                        /*group by ... ??? */
-                                        /*orderby instrument.Id descending*/
-                                        where instrument.Name.Contains(Name)
-                                        select instrument;
-
-            return View("Index", await instrumusicalsContext.ToListAsync());
+            return Json(await q.ToListAsync());
         }
 
         // GET: Instruments/Details/5
