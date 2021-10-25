@@ -73,7 +73,7 @@ namespace Instrumusicals
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Instruments}/{action=Index}/{id?}"
+                    pattern: "{controller=Instruments}/{action=Details}/{id=4}"
                 );
             });
         }

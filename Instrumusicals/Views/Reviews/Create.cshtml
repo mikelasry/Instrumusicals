@@ -4,32 +4,31 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Review</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="InstrumentId" class="control-label"></label>
-                <select asp-for="InstrumentId" class ="form-control" asp-items="ViewBag.InstrumentId"></select>
+                
+                @if (ViewBag.Instrument != null)
+                    {<h3>Review @ViewBag.Instrument.Name</h3>}
+                
             </div>
+
             <div class="form-group">
-                <label asp-for="Created" class="control-label"></label>
-                <input asp-for="Created" class="form-control" />
-                <span asp-validation-for="Created" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastUpdate" class="control-label"></label>
-                <input asp-for="LastUpdate" class="form-control" />
-                <span asp-validation-for="LastUpdate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
+                <input asp-for="Content" class="form-control" multiple placeholder="Write your review here ... "/>
                 <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @if (ViewBag.InstrumentId != null)
+                {
+                    <input class="form-group d-none" name="instrument" value="@ViewBag.InstrumentId" />
+                }
+                else
+                {
+                    <span class="text-danger">No instrument identifier to refer!</span>
+                }
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

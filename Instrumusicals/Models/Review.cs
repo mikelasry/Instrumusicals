@@ -13,6 +13,9 @@ namespace Instrumusicals.Models
         public int InstrumentId { get; set; }
         public Instrument Instrument { get; set; }
 
+        public int UserId { get; set; }
+        public User User { get; set; }
+
         public DateTime Created { get; set; } = DateTime.Now;
         public DateTime LastUpdate { get; set; }
 

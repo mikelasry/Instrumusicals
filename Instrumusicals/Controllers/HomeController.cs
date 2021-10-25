@@ -23,6 +23,11 @@ namespace Instrumusicals.Controllers
             return View();
         }
 
+        public IActionResult Malfunction()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

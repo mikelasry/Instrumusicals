@@ -4,7 +4,7 @@
     ViewData["Title"] = "Profile";
 }
 
-<h1>Hello @Context.User.Identity.Name!</h1>
+<h1>Hello @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()!</h1>
 <div class="btn-group" role="group" aria-label="Basic example">
     <button type="button" class="btn btn-secondary">Profile</button>
     <button type="button" class="btn btn-secondary">Cart</button>

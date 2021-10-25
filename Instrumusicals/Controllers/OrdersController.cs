@@ -19,19 +19,17 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        // GET: Orders
         public async Task<IActionResult> Index()
         {
             var instrumusicalsContext = _context.Order.Include(o => o.User);
             return View(await instrumusicalsContext.ToListAsync());
         }
 
-        // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             var order = await _context.Order
@@ -39,28 +37,25 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             return View(order);
         }
 
-        // GET: Orders/Create
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id");
             return View();
         }
 
-        // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UserId,Address,TotalPrice,Create,LastUpdate")] Order order)
         {
             if (ModelState.IsValid)
             {
+                order.Id = 0;
                 _context.Add(order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -69,18 +64,17 @@ namespace Instrumusicals.Controllers
             return View(order);
         }
 
-        // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             var order = await _context.Order.FindAsync(id);
             if (order == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id", order.UserId);
             return View(order);
@@ -95,7 +89,7 @@ namespace Instrumusicals.Controllers
         {
             if (id != order.Id)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             if (ModelState.IsValid)
@@ -109,7 +103,7 @@ namespace Instrumusicals.Controllers
                 {
                     if (!OrderExists(order.Id))
                     {
-                        return NotFound();
+                        return RedirectToAction("Malfunction","Home");
                     }
                     else
                     {
@@ -127,7 +121,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             var order = await _context.Order
@@ -135,7 +129,7 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             return View(order);

@@ -20,15 +20,11 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        // GET: Instruments
         public async Task<IActionResult> Index()
         {
-            /* Get instruments WITH CATEGORIES (Include method)*/
             var instrumentsContext = _context.Instrument.Include(i => i.Category);
             return View(await instrumentsContext.ToListAsync());
         }
-
-        
 
         public async Task<IActionResult> SearchJson(bool all, String name)
         {
@@ -49,33 +45,26 @@ namespace Instrumusicals.Controllers
         
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return RedirectToAction("Malfunction","Home");
+            
+            var instrument = await _context.Instrument.Include(i => i.Reviews).Include(i => i.Category).FirstOrDefaultAsync(m => m.Id == id);
+            if (instrument == null) return RedirectToAction("Malfunction", "Home");
 
-            var instrument = await _context.Instrument
-                .Include(i => i.Reviews)
-                .Include(i => i.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (instrument == null)
-            {
-                return NotFound();
+            ViewData["Reviews"] = await _context.Review.Include(r => r.User).Where(r => r.InstrumentId == id).ToListAsync();
+            if( HttpContext.User != null && HttpContext.User.Identity != null) {
+                User u = await _context.User.Where(u => u.Email == HttpContext.User.Identity.Name).FirstOrDefaultAsync();
+                ViewData["UserId"] = u != null ? u.Id : u;
             }
 
             return View(instrument);
         }
 
-        // GET: Instruments/Create
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name));
             return View();
         }
 
-        // POST: Instruments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
@@ -101,33 +90,30 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
-        // GET: Instruments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             var instrument = await _context.Instrument.FindAsync(id);
             if (instrument == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
+
             ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name), instrument.CategoryId);
             return View(instrument);
         }
 
-        // POST: Instruments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
         {
             if (id != instrument.Id)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             if (ModelState.IsValid)
@@ -149,7 +135,7 @@ namespace Instrumusicals.Controllers
                 {
                     if (!InstrumentExists(instrument.Id))
                     {
-                        return NotFound();
+                        return RedirectToAction("Malfunction","Home");
                     }
                     else
                     {
@@ -162,12 +148,11 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
-        // GET: Instruments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             var instrument = await _context.Instrument
@@ -175,13 +160,12 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (instrument == null)
             {
-                return NotFound();
+                return RedirectToAction("Malfunction","Home");
             }
 
             return View(instrument);
         }
 
-        // POST: Instruments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

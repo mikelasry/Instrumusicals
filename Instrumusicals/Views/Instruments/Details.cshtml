@@ -5,15 +5,17 @@
 }
 
 <div>
-    <h4>@Html.DisplayFor(model => model.Name)</h4>
+    <div class="text-center">
+        <h1>@Html.DisplayFor(model => model.Name)</h1>
+        <hr />
+        @if (Model.Image != null)
+        {
+            string img = Convert.ToBase64String(Model.Image);
+            <img src="data:image/png;base64,@img" style="width:500px; border-radius:30px" />
+        }
+    </div>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Brand)
         </dt>
@@ -53,19 +55,9 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Price)$
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class="col-sm-2">
-            @if (Model.Image != null)
-            {
-                string img = Convert.ToBase64String(Model.Image);
-                <img src="data:image/png;base64,@img" style="width:500px; border-radius:30px" />
-            }
-        </dd>
     </dl>
 </div>
-<div>
+<div class="text-center">
     <a asp-action="Index">Back to List</a> |
     <a asp-action="Index">Back to Homepage</a>
 
@@ -76,46 +68,46 @@
         <span>Admin's options: </span>
         <a class="text-danger" asp-action="Edit" asp-route-id="@Model.Id">Edit</a><span> or </span>
         <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
-
     }
 </div>
-<hr/>
-<div class="text-center"><h2>Reviews</h2></div>
-<div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingOne">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Accordion Item #1
-            </button>
-        </h2>
-        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-            </div>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingTwo">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Accordion Item #2
-            </button>
-        </h2>
-        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-            </div>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingThree">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                Accordion Item #3
-            </button>
-        </h2>
-        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-            </div>
-        </div>
-    </div>
+<hr />
+<div class="text-center">
+    <h2>
+        @if (ViewBag.Reviews != null)
+        {@ViewBag.Reviews.Count}
+    else
+    {<span>Problem with</span>}
+        Reviews
+    </h2>
 </div>
+<hr />
+<a asp-action="Create" asp-controller="Reviews" asp-route-inst="@Model.Id" class="btn btn-primary w-100">Add a Review</a>
+
+<hr />
+
+@foreach (var item in Model.Reviews)
+{
+    <div class="card border-dark mb-3 w-100">
+        <div class="card-header bg-secondary text-light w-100">
+            <h5 class="card-title d-inline"><cite>@item.User.LastName @item.User.FirstName</cite></h5>
+            @if ((ViewBag.UserId != null && ViewBag.UserId == item.UserId) || Context.User.IsInRole("Admin"))
+            {
+                <div class="d-inline m-2">
+                    <a type="button" asp-action="Edit" asp-controller="Reviews" asp-route-id="@item.Id" class="btn btn-warning text-warning bg-dark">Edit</a>
+                    <a type="button" asp-action="Delete" asp-controller="Reviews" asp-route-id="@item.Id" class="btn btn-danger text-danger bg-dark">Delete</a>
+                </div>
+            }
+
+
+            <span class="w-25 d-inline float-right">Last Updated: @item.LastUpdate</span>
+        </div>
+        <div class="card-body text-dark">
+            <p class="card-text">@item.Content</p>
+        </div>
+        <hr />
+        <footer class="blockquote-footer">
+            @item.Instrument.Name, @item.Instrument.Category.Name
+            <span class="float-right">Created: @item.Created &nbsp;</span>
+        </footer>
+    </div>
+}
