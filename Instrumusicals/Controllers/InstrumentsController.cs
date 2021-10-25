@@ -24,14 +24,20 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> Index()
         {
             /* Get instruments WITH CATEGORIES (Include method)*/
-            var instrumusicalsContext = _context.Instrument.Include(i => i.Category);
-            return View(await instrumusicalsContext.ToListAsync());
+            var instrumentsContext = _context.Instrument.Include(i => i.Category);
+            return View(await instrumentsContext.ToListAsync());
         }
 
         
 
-        public async Task<IActionResult> SearchJson(String name)
+        public async Task<IActionResult> SearchJson(bool all, String name)
         {
+
+            if (all)
+            {
+                return Json(await _context.Instrument.ToListAsync());
+            }
+
             var q = from instrument in _context.Instrument
                     where instrument.Name.Contains(name)
                     orderby instrument.Name

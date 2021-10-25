@@ -1,25 +1,20 @@
 ﻿@model IEnumerable<Instrumusicals.Models.Instrument>
 
 @{
-    ViewData["Title"] = "Index";
+ViewData["Title"] = "Index";
 }
-@* TODO: transform search to async method using ajax *@
-@*<form asp-action="Search">
-    <input name="Name" placeholder="Enter Instrument Name" />
-    <input type="submit" value="Search" />
-    <a asp-action="Index">Clear Search</a>
-</form>*@
 
 <div>
-    Search by: <input name="Name" placeholder="Name" />
+    Search by:
+    <input id="nameInput" name="Name" placeholder="Name" />
     <button id="btnSearch" class="btn btn-primary">Search</button>
-    <div class="spinner-border p-2 text-info float-right d-none" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
-    <hr />
+    <div id="searchLoader" class="spinner-border p-2 text-info float-right d-none" role="status"></div>
+    <div id="btnClear" class="btn btn-secondary bg-dark text-danger">Clear</div>
 </div>
 
-<table class="table">
+<hr />
+
+<table class="table text-center">
     <thead>
         <tr>
             <th>
@@ -41,8 +36,8 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr >
+        @foreach (var item in Model) {
+        <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
@@ -58,46 +53,47 @@
             <td>
                 @if( item.Image != null)
                 {
-                    string img = Convert.ToBase64String(item.Image);
-                    <img src="data:image/png;base64,@img" style="height:100px; width:100px; border-radius:100px" />
+                string img = Convert.ToBase64String(item.Image);
+                <img src="data:image/png;base64,@img" style="height:100px; width:100px; border-radius:100px" />
                 }
                 else
                 {
-                    <span class="text-danger">No available image</span>
+                <span class="text-danger">No image yet.</span>
                 }
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.Id">ABOUT</a> 
+                <a asp-action="Details" asp-route-id="@item.Id">ABOUT</a>
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>
 
 
 <script type="text/template" id="rowTemplate">
-    <tr>
-        <td>
-            ${name}
-        </td>
-        <td>
-            ${brand}
-        </td>
-        <td>
-            ${image}
-        </td>
-        <td>
-            ${description}
-        </td>
-        <td>
-            ${price}
-        </td>
-        <td>
-            <a href="/Instruments/Details/${id}">ABOUT</a>
-        </td>
-    </tr>
+
+<tr>
+    <td>
+        ${name}
+    </td>
+    <td>
+        ${brand}
+    </td>
+    <td>
+        ${image}
+    </td>
+    <td>
+        ${description}
+    </td>
+    <td>
+        ${price}
+    </td>
+    <td>
+        <a href="/Instruments/Details/${id}">ABOUT</a>
+    </td>
+</tr>
 </script>
 
 @section Scripts{
-    <script src="~/js/Instruments/Search.js"></script>
+<script src="~/js/Instruments/Search.js"></script>
 }

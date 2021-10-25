@@ -106,7 +106,6 @@ namespace Instrumusicals.Controllers
                     return View(user);
                 }
 
-
                 user.Address += getDirectionSuffix(area);
 
                 user.Salt = SecurityManager.GenerateSalt();
@@ -165,8 +164,7 @@ namespace Instrumusicals.Controllers
             }
 
             logUser(userFromDB);
-            //return RedirectToAction(nameof(Profile), new { id = userFromDB.Id });
-
+            
 
             return ReturnUrl == null ? RedirectToAction(nameof(Index), "Home") : LocalRedirect(ReturnUrl);
         }
@@ -216,7 +214,7 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> Profile(int? id)
         {
             string cookieIdentifier = HttpContext.User.Identity.Name;
-            User user = (id == null) ?
+            User user = (id == null || id == 0) ?
                 (await _context.User.FirstOrDefaultAsync(u => u.Email == cookieIdentifier)) :
                     (await _context.User.FirstOrDefaultAsync(u => u.Id == id));
 

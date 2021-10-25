@@ -3,53 +3,64 @@
 
 /*$(document).ready(function () {
     // ... do some code here ...
-}); => equivalkent to: */
+}); => equivalent to: */
+
 
 $(function () {
 
     // consts
-    const NO_RESULTS = "<h2>No results found.</h2>";
+    const NO_RESULTS_HEADING = "<h2>No results found.</h2>";
     const DISPLAY_NONE = 'd-none';
+    const IMAGE = "image";
+    const EMPTY = "";
     const SEARCH_JSON_URL = "/Instruments/SearchJson";
 
     // elements
     var btnSearch = $('#btnSearch');
-    var loader = btnSearch.next();
-    var nameInput = btnSearch.prev();
-    var tableBody = $('tbody');
-    var rowTemplateHTML = $('#rowTemplate').html();
+    var btnClear = $('#btnClear');
+    var loader = $('#searchLoader');
+    var nameInput = $('#nameInput');
 
-    btnSearch.click(function () {
-
-
-        let instrumentName = nameInput.val().trim();
-        
+    function renderInstrumentsTable(dataDict) {
         loader.removeClass(DISPLAY_NONE);
-        $.ajax({
-            url: SEARCH_JSON_URL,
-            data: { name: nameInput.val().trim() }
-        }).done(function (result) {
+        let tableBody = $('tbody');
 
+        $.ajax({ url: SEARCH_JSON_URL, data: dataDict }).done(function (result) {
             tableBody.html('');
             let resLen = result != null ? result.length : 0;
+            if (resLen != null && resLen > 0) {
 
-            if (resLen > 0) {
-                $.each(result, function (_, instrument) {
-                    let template = rowTemplateHTML;
+                $.each(result, function (_ix, _instrument) {
+                    let template = $('#rowTemplate').html();
 
-                    $.each(instrument, function (property, value) {
-                        if (property == "image") {
-                            template = (value != null) ?
-                                template.replace('${' + property + '}', '<img src="data:image/png;base64,' + value + '" style="height:100px; width:100px; border-radius:100px" />') :
-                                    template.replace('${' + property + '}', '<span class="text-danger">No available image</span>');
-                        } else template = template.replaceAll('${' + property + '}', value);
+                    $.each(_instrument, function (_property, _value) {
+                        if (_property == IMAGE) {
+                            template = (_value != null) ?
+                                template.replace('${' + _property + '}', '<img src="data:image/png;base64,' + _value + '" style="height:100px; width:100px; border-radius:100px" />') :
+                                template.replace('${' + _property + '}', '<span class="text-danger">No image yet.</span>');
+                        }
+                        else template = template.replaceAll('${' + _property + '}', _value);
                     });
                     tableBody.append(template);
                 });
-            } else tableBody.html(NO_RESULTS);
+
+            } else tableBody.html(NO_RESULTS_HEADING);
 
             loader.addClass(DISPLAY_NONE);
         });
+    }
 
+    btnSearch.click(function () {
+        renderInstrumentsTable({
+            all: nameInput.val().trim() == EMPTY ? true : false,
+            name: nameInput.val().trim()
+        });
+    });
+
+    btnClear.click(function () {
+        renderInstrumentsTable({ all: true, name: EMPTY });
+        nameInput.val(EMPTY);
     });
 });
+
+
