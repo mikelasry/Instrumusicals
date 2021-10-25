@@ -46,7 +46,7 @@ namespace Instrumusicals.Controllers
             return Json(await q.ToListAsync());
         }
 
-        // GET: Instruments/Details/5
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -55,6 +55,7 @@ namespace Instrumusicals.Controllers
             }
 
             var instrument = await _context.Instrument
+                .Include(i => i.Reviews)
                 .Include(i => i.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (instrument == null)

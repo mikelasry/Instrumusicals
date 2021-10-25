@@ -45,7 +45,7 @@ namespace Instrumusicals.Controllers
             return View(review);
         }
 
-        // GET: Reviews/Create
+        
         public IActionResult Create()
         {
             ViewData["InstrumentId"] = new SelectList(_context.Instrument, "Id", "Name");

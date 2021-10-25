@@ -4,12 +4,17 @@
 ViewData["Title"] = "Index";
 }
 
-<div>
-    Search by:
-    <input id="nameInput" name="Name" placeholder="Name" />
-    <button id="btnSearch" class="btn btn-primary">Search</button>
-    <div id="searchLoader" class="spinner-border p-2 text-info float-right d-none" role="status"></div>
-    <div id="btnClear" class="btn btn-secondary bg-dark text-danger">Clear</div>
+<div style="display:flex; justify-content:space-around; ">
+    
+    Search by: &nbsp;
+    <input id="nameInput" name="Name" placeholder="Name" class="m-1"/>
+    <button id="btnSearch" class="btn btn-primary m-1">Search</button>
+    <div id="btnClear" class="btn btn-secondary bg-dark text-danger m-1">Clear</div>
+    
+    <div style="width:50px;">
+        <div id="searchLoader" class="spinner-border p-2 text-success float-right d-none" role="status" ></div>
+    </div>
+    
 </div>
 
 <hr />
