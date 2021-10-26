@@ -5,8 +5,22 @@
 }
 
 <div>
-    <div class="text-center">
+    <div class="text-center" id="header">
         <h1>@Html.DisplayFor(model => model.Name)</h1>
+        <h5>@Html.DisplayFor(model => model.Description)</h5>
+
+        <div class="text-center mt-3" id="ctrlButtons">
+            <a asp-action="Index">Instruments</a> |
+            <a asp-action="Index">Homepage</a>
+
+            @if (Context != null && Context.User != null && Context.User.Identity.Name != null && Context.User.IsInRole("Admin"))
+            {
+                <span> | </span>
+                <a class="text-danger" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                <span> | </span>
+                <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+            }
+        </div>
         <hr />
         @if (Model.Image != null)
         {
@@ -15,61 +29,47 @@
         }
     </div>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Brand)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Brand)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Category.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        @if (Context != null && Context.User != null && Context.User.Identity.Name != null && Context.User.IsInRole("Admin"))
-        {
-            <dt class="col-sm-2 text-danger">
-                @Html.DisplayNameFor(model => model.Quantity)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Quantity)
-            </dd>
-            <dt class="col-sm-2 text-danger">
-                @Html.DisplayNameFor(model => model.Sold)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Sold)
-            </dd>
-        }
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)$
-        </dd>
-    </dl>
-</div>
-<div class="text-center">
-    <a asp-action="Index">Back to List</a> |
-    <a asp-action="Index">Back to Homepage</a>
+    <table class="table text-center">
+        <thead>
+            <tr>
+                <th>
+                    Brand
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Price
+                </th>
+                @if (Context != null && Context.User != null && Context.User != null && Context.User.IsInRole("Admin"))
+                {
+                    <th class="text-danger">Quantity</th>
+                    <th class="text-danger">Sold</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @Html.DisplayFor(model => model.Brand)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.Category.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.Price)
+                </td>
+                @if (Context != null && Context.User != null && Context.User != null && Context.User.IsInRole("Admin"))
+                {
+                    <td>@Html.DisplayFor(model => model.Quantity)</td>
 
-    <br />
-
-    @if (Context != null && Context.User != null && Context.User.Identity.Name != null && Context.User.IsInRole("Admin"))
-    {
-        <span>Admin's options: </span>
-        <a class="text-danger" asp-action="Edit" asp-route-id="@Model.Id">Edit</a><span> or </span>
-        <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
-    }
+                    <td>@Html.DisplayFor(model => model.Sold)</td>
+                }
+            </tr>
+        </tbody>
+    </table>
 </div>
+
 <hr />
 <div class="text-center">
     <h2>
@@ -77,37 +77,37 @@
         {@ViewBag.Reviews.Count}
     else
     {<span>Problem with</span>}
-        Reviews
+        Reviews -
     </h2>
 </div>
 <hr />
 <a asp-action="Create" asp-controller="Reviews" asp-route-inst="@Model.Id" class="btn btn-primary w-100">Add a Review</a>
 
 <hr />
-
-@foreach (var item in Model.Reviews)
+@if (ViewBag.Reviews != null)
 {
-    <div class="card border-dark mb-3 w-100">
-        <div class="card-header bg-secondary text-light w-100">
-            <h5 class="card-title d-inline"><cite>@item.User.LastName @item.User.FirstName</cite></h5>
-            @if ((ViewBag.UserId != null && ViewBag.UserId == item.UserId) || Context.User.IsInRole("Admin"))
-            {
-                <div class="d-inline m-2">
-                    <a type="button" asp-action="Edit" asp-controller="Reviews" asp-route-id="@item.Id" class="btn btn-warning text-warning bg-dark">Edit</a>
-                    <a type="button" asp-action="Delete" asp-controller="Reviews" asp-route-id="@item.Id" class="btn btn-danger text-danger bg-dark">Delete</a>
-                </div>
-            }
-
-
-            <span class="w-25 d-inline float-right">Last Updated: @item.LastUpdate</span>
+    foreach (var item in ViewBag.Reviews)
+    {
+        <div class="card border-dark mb-3 w-100">
+            <div class="card-header bg-secondary text-light w-100">
+                <h5 class="card-title d-inline"><cite>@item.User.LastName @item.User.FirstName</cite></h5>
+                @if ((ViewBag.UserId != null && ViewBag.UserId == item.UserId) || Context.User.IsInRole("Admin"))
+                {
+                    <div class="d-inline m-2">
+                        <a type="button" asp-action="Edit" asp-controller="Reviews" asp-route-id="@item.Id" class="btn btn-warning text-warning bg-dark">Edit</a>
+                        <a type="button" asp-action="Delete" asp-controller="Reviews" asp-route-id="@item.Id" class="btn btn-danger text-danger bg-dark">Delete</a>
+                    </div>
+                }
+                <span class="w-25 d-inline float-end">Last Updated: @item.LastUpdate</span>
+            </div>
+            <div class="card-body text-dark">
+                <p class="card-text">@item.Content</p>
+            </div>
+            <hr />
+            <footer class="blockquote-footer">
+                @item.Instrument.Name, @item.Instrument.Category.Name
+                <span class="float-end">Created: @item.Created &nbsp;</span>
+            </footer>
         </div>
-        <div class="card-body text-dark">
-            <p class="card-text">@item.Content</p>
-        </div>
-        <hr />
-        <footer class="blockquote-footer">
-            @item.Instrument.Name, @item.Instrument.Category.Name
-            <span class="float-right">Created: @item.Created &nbsp;</span>
-        </footer>
-    </div>
+    }
 }

@@ -35,12 +35,12 @@
                                     <a class="nav-link text-light bg-primary border-light" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Profile" asp-route-id="0">My Profile</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark bg-transparent border-danger" style="font-weight: bold; font-size:large" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
+                                    <a class="nav-link text-dark bg-transparent border-danger" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
                                 </li>
                                 @if (Context.User.IsInRole("Admin"))
                                 {
                                     <li class="nav-item">
-                                        <a class="nav-link text-dark bg-danger border-dark" style="font-weight:bold ;" asp-area="" asp-controller="Users" asp-action="Admin">Admin's Panel</a>
+                                        <a class="nav-link text-dark bg-danger border-dark" style="font-weight:bold ;" asp-area="" asp-controller="Users" asp-action="Admin">Admin</a>
                                     </li>
                                 }
 

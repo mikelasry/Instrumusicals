@@ -47,11 +47,14 @@ namespace Instrumusicals.Controllers
         {
             if (id == null) return RedirectToAction("Malfunction","Home");
             
-            var instrument = await _context.Instrument.Include(i => i.Reviews).Include(i => i.Category).FirstOrDefaultAsync(m => m.Id == id);
+            var instrument = await _context.Instrument.Include(i => i.Reviews)
+                                .Include(i => i.Category).FirstOrDefaultAsync(m => m.Id == id);
             if (instrument == null) return RedirectToAction("Malfunction", "Home");
 
-            ViewData["Reviews"] = await _context.Review.Include(r => r.User).Where(r => r.InstrumentId == id).ToListAsync();
-            if( HttpContext.User != null && HttpContext.User.Identity != null) {
+            IEnumerable<Review> reviews = await _context.Review.Include(r => r.User)
+                                .Where(r => r.InstrumentId == id).OrderByDescending(r => r.LastUpdate).ToListAsync();
+            ViewData["Reviews"] = reviews;
+            if ( HttpContext.User != null && HttpContext.User.Identity != null) {
                 User u = await _context.User.Where(u => u.Email == HttpContext.User.Identity.Name).FirstOrDefaultAsync();
                 ViewData["UserId"] = u != null ? u.Id : u;
             }
