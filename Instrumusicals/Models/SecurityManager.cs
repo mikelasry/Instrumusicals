@@ -34,18 +34,5 @@ namespace Instrumusicals.Models
         {
             return user.Hash == HashPassword(givenPassword, user.Salt);
         }
-
-        public static bool test()
-        {
-            string pw = "1111";
-            string salt = GenerateSalt();
-            string hash1 = HashPassword(pw, salt);
-            string hash2 = HashPassword(pw, salt);
-            bool test = hash1 == hash2;
-            int i = 0;
-            while (i < 10)
-                i++;
-            return test;
-        }
     }
 }

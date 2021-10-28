@@ -5,19 +5,19 @@
 }
 
 <hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row text-center justify-content-center">
+    <div class="w-50">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                
-                @if (ViewBag.Instrument != null)
-                    {<h3>Review @ViewBag.Instrument.Name</h3>}
-                
-            </div>
 
+                @if (ViewBag.Instrument != null)
+                {<h3>Review @ViewBag.Instrument.Name</h3>}
+
+            </div>
+            <hr />
             <div class="form-group">
-                <input asp-for="Content" class="form-control" multiple placeholder="Write your review here ... "/>
+                <input asp-for="Content" class="form-control" rows="5" placeholder="Write your review here ... " />
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -31,7 +31,7 @@
                 }
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Submit!" class="btn btn-primary m-5 w-25" />
             </div>
         </form>
     </div>

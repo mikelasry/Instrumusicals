@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Instrumusicals.Controllers
 {
+    [Authorize]
     public class ReviewsController : Controller
     {
         private readonly InstrumusicalsContext _context;
@@ -20,6 +21,7 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var instrumusicalsContext = _context.Review
@@ -30,19 +32,12 @@ namespace Instrumusicals.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return RedirectToAction("Malfunction","Home");
-            }
+            if (id == null) return RedirectToMalfunction();
 
             var review = await _context.Review
                 .Include(r => r.Instrument)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (review == null)
-            {
-                return RedirectToAction("Malfunction","Home");
-            }
-
+            if (review == null) return RedirectToMalfunction();
             return View(review);
         }
 
@@ -55,7 +50,6 @@ namespace Instrumusicals.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,InstrumentId,Content")] Review review, int instrument)
         {
@@ -63,10 +57,11 @@ namespace Instrumusicals.Controllers
             {
                 string cookieIdentifier = HttpContext.User.Identity.Name;
                 User user = await _context.User.FirstOrDefaultAsync(u => u.Email == cookieIdentifier);
-                if (user == null) return RedirectToAction("Malfunction", "Home");
+                if (user == null) return RedirectToMalfunction();
 
                 review.Id = 0;
                 review.UserId = user.Id;
+
                 review.LastUpdate = review.Created;
                 review.InstrumentId = instrument;
 
@@ -80,19 +75,22 @@ namespace Instrumusicals.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return RedirectToAction("Malfunction","Home");
-            }
-
-            var review = await _context.Review.FindAsync(id);
-            if (review == null) return RedirectToAction("Malfunction","Home");
+            if (id == null) return RedirectToMalfunction();
             
+            var review = await _context.Review.FindAsync(id);
+            if (review == null) return RedirectToMalfunction();
+            int currUid = Int32.Parse(
+                            HttpContext.User.Claims
+                                .Where(c => c.Type == "Uid")
+                                .Select(c => c.Value)
+                                .SingleOrDefault()
+                            );
+            if (review.UserId != currUid) return RedirectToAccessDenied();
             Review reviewFromDB = await _context.Review
                                             .Include(r => r.Instrument)
                                             .Where(r => r.Id == id)
                                             .FirstOrDefaultAsync();
-            if (reviewFromDB == null) return RedirectToAction("Malfunction","Home");
+            if (reviewFromDB == null) return RedirectToMalfunction();
 
             ViewData["Instrument"] = reviewFromDB.Instrument;
             return View(review);
@@ -100,12 +98,12 @@ namespace Instrumusicals.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,InstrumentId,Created,LastUpdate,Content")] Review review)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,InstrumentId,Created,LastUpdate,Content")] Review review, string returnUrl)
         {
-            if (id != review.Id) return RedirectToAction("Malfunction","Home");
+            if (id != review.Id) return RedirectToMalfunction();
 
             Review reviewFromDb = await _context.Review.Where(r => r.Id == id).FirstOrDefaultAsync();
-            if (reviewFromDb == null) return RedirectToAction("Malfunction","Home");
+            if (reviewFromDb == null) return RedirectToMalfunction();
 
             reviewFromDb.Content = review.Content;
             reviewFromDb.LastUpdate = DateTime.Now;
@@ -120,10 +118,10 @@ namespace Instrumusicals.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ReviewExists(review.Id))
-                        return RedirectToAction("Malfunction","Home");
+                        return RedirectToMalfunction();
                     else throw;
                 }
-                return RedirectToAction(nameof(Index));
+                return returnUrl != null ? LocalRedirect(returnUrl) : RedirectToAction(nameof(Index), "Instruments");
             }
             return View(review);
         }
@@ -132,14 +130,14 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             var review = await _context.Review
                 .Include(r => r.Instrument)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (review == null) return RedirectToAction("Malfunction","Home");
+            if (review == null) return RedirectToMalfunction();
 
             return View(review);
         }
@@ -157,6 +155,15 @@ namespace Instrumusicals.Controllers
         private bool ReviewExists(int id)
         {
             return _context.Review.Any(e => e.Id == id);
+        }
+
+        private IActionResult RedirectToMalfunction()
+        {
+            return RedirectToAction("Malfunction", "Home");
+        }
+        private IActionResult RedirectToAccessDenied()
+        {
+            return RedirectToAction("AccessDenied", "Users");
         }
     }
 }

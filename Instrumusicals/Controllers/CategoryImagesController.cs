@@ -32,7 +32,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             var categoryImage = await _context.CategoryImage
@@ -40,7 +40,7 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (categoryImage == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             return View(categoryImage);
@@ -81,13 +81,13 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             var categoryImage = await _context.CategoryImage.Include(ci=> ci.Category).SingleOrDefaultAsync(ci => ci.Id == id);
             if (categoryImage == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
             ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name), categoryImage.CategoryId);
             return View(categoryImage);
@@ -102,7 +102,7 @@ namespace Instrumusicals.Controllers
         {
             if (id != categoryImage.Id)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             if (ModelState.IsValid)
@@ -122,7 +122,7 @@ namespace Instrumusicals.Controllers
                 {
                     if (!CategoryImageExists(categoryImage.Id))
                     {
-                        return RedirectToAction("Malfunction","Home");
+                        return RedirectToMalfunction();
                     }
                     else
                     {
@@ -140,7 +140,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             var categoryImage = await _context.CategoryImage
@@ -148,7 +148,7 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (categoryImage == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             return View(categoryImage);
@@ -168,6 +168,11 @@ namespace Instrumusicals.Controllers
         private bool CategoryImageExists(int id)
         {
             return _context.CategoryImage.Any(e => e.Id == id);
+        }
+
+        private IActionResult RedirectToMalfunction()
+        {
+            return RedirectToAction("Malfunction", "Home");
         }
     }
 }

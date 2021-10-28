@@ -6,44 +6,43 @@
 
 }
 
-@*<div style="height:20px;"></div>*@
-<div class="m-5">
+<div class="m-5 text-light">
     <h6>New to Instrumusicals? </h6>
     <h3>Register!</h3>
+    <hr class="text-light w-100" />
 </div>
-<hr />
 
 <div style="height:0px;"></div>
 
 <div class="row justify-content-center m-5">
-    <div class="col-md-4">
-        <form asp-action="Register" class="card pt-2 pr-4 pl-4 pb-1">
+    <div class="w-50">
+        <form asp-action="Register" class="card pt-2 pr-4 pl-4 pb-1 bg-dark text-light">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" class="form-control bg-dark text-light" autocomplete="off" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
+                <input asp-for="FirstName" class="form-control bg-dark text-light" autocomplete="off" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
+                <input asp-for="LastName" class="form-control bg-dark text-light" autocomplete="off" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control" />
+                <input asp-for="Address" class="form-control bg-dark text-light" autocomplete="off" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 @{ if (ViewBag.Areas != null)
                     {
                         <label class="control-label">Choose your state area</label>
-                        <select name="area" asp-items="ViewBag.Areas"></select>
+                        <select class="bg-dark text-light" style="border-radius:50px;" name="area" asp-items="ViewBag.Areas"></select>
                     }
                     else
                     {
@@ -53,12 +52,12 @@
                     }
                 }
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control bg-dark text-light" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group m-1">
                 <input type="submit" value="SIGN UP" class="btn btn-primary" style="width:100%" />
             </div>
             @if (!String.IsNullOrEmpty(ViewBag.Error))

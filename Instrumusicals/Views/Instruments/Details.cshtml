@@ -1,8 +1,22 @@
 ﻿@model Instrumusicals.Models.Instrument
 
-@{
-    ViewData["Title"] = "Details";
-}
+@{ ViewData["Title"] = "Details"; }
+
+<div class="modal bg-black text-center" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="moadlHeader" class="modal-title text-dark text-center">Modal title</h5>
+            </div>
+            <div class="modal-body text-dark">
+                <p>The instrument has been added to your cart.</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" id="modalClose" class="btn btn-primary w-75">OK!</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div>
     <div class="text-center" id="header">
@@ -10,13 +24,13 @@
         <h5>@Html.DisplayFor(model => model.Description)</h5>
 
         <div class="text-center mt-3" id="ctrlButtons">
-            <a asp-action="Index">Instruments</a> |
-            <a asp-action="Index">Homepage</a>
+            <a class="text-light" asp-action="Index">Instruments</a> |
+            <a class="text-light" asp-action="Index">Homepage</a>
 
             @if (Context != null && Context.User != null && Context.User.Identity.Name != null && Context.User.IsInRole("Admin"))
             {
                 <span> | </span>
-                <a class="text-danger" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                <a class="text-warning" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
                 <span> | </span>
                 <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
             }
@@ -25,11 +39,11 @@
         @if (Model.Image != null)
         {
             string img = Convert.ToBase64String(Model.Image);
-            <img src="data:image/png;base64,@img" style="width:500px; border-radius:30px" />
+            <img src="data:image/png;base64,@img" style="margin:10px; border:5px solid white; width:500px; border-radius:30px" />
         }
     </div>
     <hr />
-    <table class="table text-center">
+    <table class="table text-center text-light">
         <thead>
             <tr>
                 <th>
@@ -59,7 +73,7 @@
                 <td>
                     @Html.DisplayFor(model => model.Price)
                 </td>
-                @if (Context != null && Context.User != null && Context.User != null && Context.User.IsInRole("Admin"))
+                @if (Context != null && Context.User != null && Context.User.IsInRole("Admin"))
                 {
                     <td>@Html.DisplayFor(model => model.Quantity)</td>
 
@@ -71,26 +85,31 @@
 </div>
 
 <hr />
-<div class="text-center">
-    <h2>
-        @if (ViewBag.Reviews != null)
-        {@ViewBag.Reviews.Count}
-    else
-    {<span>Problem with</span>}
-        Reviews -
-    </h2>
+
+<div class="text-center justify-content-between">
+    <a asp-action="Create" asp-controller="Reviews" asp-route-inst="@Model.Id" class="btn btn-primary m-1 w-25">
+        Add a Review (@if (ViewBag.Reviews != null)
+        {@ViewBag.Reviews.Count})
+    </a>
+    @if (ViewBag.UserId != null)
+    {
+        <div class="d-inline m-5 w-25">
+            <div id="cartLoader" class="spinner-border d-none text-light" role="status"></div>
+        </div>
+        <button type="button" class="btn btn-success w-25 m-1" onclick="addToCart(@Model.Id, @ViewBag.UserId)">
+            Add to Cart
+        </button>
+    }
 </div>
-<hr />
-<a asp-action="Create" asp-controller="Reviews" asp-route-inst="@Model.Id" class="btn btn-primary w-100">Add a Review</a>
 
 <hr />
 @if (ViewBag.Reviews != null)
 {
     foreach (var item in ViewBag.Reviews)
     {
-        <div class="card border-dark mb-3 w-100">
-            <div class="card-header bg-secondary text-light w-100">
-                <h5 class="card-title d-inline"><cite>@item.User.LastName @item.User.FirstName</cite></h5>
+        <div class="card bg-dark border-2 border-info mb-3 w-100">
+            <div class="card-header bg-dark text-light w-100">
+                <h5 class="card-title text-info d-inline"><cite>@item.User.LastName @item.User.FirstName</cite></h5>
                 @if ((ViewBag.UserId != null && ViewBag.UserId == item.UserId) || Context.User.IsInRole("Admin"))
                 {
                     <div class="d-inline m-2">
@@ -100,14 +119,18 @@
                 }
                 <span class="w-25 d-inline float-end">Last Updated: @item.LastUpdate</span>
             </div>
-            <div class="card-body text-dark">
+            <div class="card-body bg-secondary text-light">
                 <p class="card-text">@item.Content</p>
+                <hr />
             </div>
-            <hr />
-            <footer class="blockquote-footer">
+            <footer class="blockquote-footer bg-dark text-secondary">
                 @item.Instrument.Name, @item.Instrument.Category.Name
-                <span class="float-end">Created: @item.Created &nbsp;</span>
+                <span class="float-end bg-dark">Created: @item.Created &nbsp;</span>
             </footer>
         </div>
     }
+}
+
+@section Scripts{
+    <script src="~/js/Instruments/AddToCart.js"></script>
 }

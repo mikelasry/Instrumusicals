@@ -56,7 +56,7 @@ namespace Instrumusicals.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Admin()
+        public IActionResult Admin()
         {
             return View();
         }
@@ -66,7 +66,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             // TODO: check if authenticated user is authorized (self or admin)
@@ -74,7 +74,7 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             return View(user);
@@ -226,7 +226,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             // TODO: check if authenticated user is authorized (self or admin)
@@ -235,7 +235,7 @@ namespace Instrumusicals.Controllers
             var user = await _context.User.FindAsync(id);
             if (user == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
             return View(user);
         }
@@ -246,7 +246,7 @@ namespace Instrumusicals.Controllers
         {
             if (id != user.Id)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             if (ModelState.IsValid)
@@ -260,7 +260,7 @@ namespace Instrumusicals.Controllers
                 {
                     if (!UserExists(user.Id))
                     {
-                        return RedirectToAction("Malfunction","Home");
+                        return RedirectToMalfunction();
                     }
                     else
                     {
@@ -276,7 +276,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             // TODO: check if authenticated user is authorized (self or admin)
@@ -286,7 +286,7 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             return View(user);
@@ -305,6 +305,12 @@ namespace Instrumusicals.Controllers
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
+        }
+
+
+        private IActionResult RedirectToMalfunction()
+        {
+            return RedirectToAction("Malfunction", "Home");
         }
     }
 }

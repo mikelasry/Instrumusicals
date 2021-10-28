@@ -14,12 +14,10 @@ namespace Instrumusicals.Models
         Author,
         Editor,
         Admin
-    }
-    
+    }    
     
     public class User
-    {
-        
+    {       
         public int Id { get; set; }
         
         [Required]
@@ -54,6 +52,8 @@ namespace Instrumusicals.Models
 
         // ------------------------------------------------------
         // ------------------------------------------------------
+
+        public String InstrumentsWishlist { get; set; } = "";
 
         public IEnumerable<Review> Reviews { get; set; }
 

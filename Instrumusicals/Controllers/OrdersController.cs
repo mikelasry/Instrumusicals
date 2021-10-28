@@ -29,7 +29,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             var order = await _context.Order
@@ -37,7 +37,7 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             return View(order);
@@ -68,13 +68,13 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             var order = await _context.Order.FindAsync(id);
             if (order == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id", order.UserId);
             return View(order);
@@ -89,7 +89,7 @@ namespace Instrumusicals.Controllers
         {
             if (id != order.Id)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             if (ModelState.IsValid)
@@ -103,7 +103,7 @@ namespace Instrumusicals.Controllers
                 {
                     if (!OrderExists(order.Id))
                     {
-                        return RedirectToAction("Malfunction","Home");
+                        return RedirectToMalfunction();
                     }
                     else
                     {
@@ -121,7 +121,7 @@ namespace Instrumusicals.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             var order = await _context.Order
@@ -129,7 +129,7 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
-                return RedirectToAction("Malfunction","Home");
+                return RedirectToMalfunction();
             }
 
             return View(order);
@@ -149,6 +149,11 @@ namespace Instrumusicals.Controllers
         private bool OrderExists(int id)
         {
             return _context.Order.Any(e => e.Id == id);
+        }
+
+        private IActionResult RedirectToMalfunction()
+        {
+            return RedirectToAction("Malfunction", "Home");
         }
     }
 }
