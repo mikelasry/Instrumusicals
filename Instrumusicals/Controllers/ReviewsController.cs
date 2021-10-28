@@ -67,7 +67,7 @@ namespace Instrumusicals.Controllers
 
                 _context.Add(review);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return LocalRedirect("/Instruments/Details/"+instrument);
             }
             ViewData["Instruments"] = new SelectList(_context.Instrument, "Id", "Name", review.InstrumentId);
             return View(review);
@@ -147,9 +147,11 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var review = await _context.Review.FindAsync(id);
+
+
             _context.Review.Remove(review);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return LocalRedirect("/Instruments/Details/" + review.InstrumentId);
         }
 
         private bool ReviewExists(int id)
