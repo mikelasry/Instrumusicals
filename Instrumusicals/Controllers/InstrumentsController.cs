@@ -45,11 +45,11 @@ namespace Instrumusicals.Controllers
             return Json(await q.ToListAsync());
         }
 
-        
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return RedirectToMalfunction();
-            
+
             var instrument = await _context.Instrument.Include(i => i.Reviews)
                                 .Include(i => i.Category).FirstOrDefaultAsync(m => m.Id == id);
             if (instrument == null) return RedirectToAction("Malfunction", "Home");
@@ -57,7 +57,8 @@ namespace Instrumusicals.Controllers
             IEnumerable<Review> reviews = await _context.Review.Include(r => r.User)
                                 .Where(r => r.InstrumentId == id).OrderByDescending(r => r.LastUpdate).ToListAsync();
             ViewData["Reviews"] = reviews;
-            if ( HttpContext.User != null && HttpContext.User.Identity != null) {
+            if (HttpContext.User != null && HttpContext.User.Identity != null)
+            {
                 User u = await _context.User.Where(u => u.Email == HttpContext.User.Identity.Name).FirstOrDefaultAsync();
                 ViewData["UserId"] = u != null ? u.Id : u;
             }
@@ -111,7 +112,7 @@ namespace Instrumusicals.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
         {
-            if (id != instrument.Id)return RedirectToMalfunction();
+            if (id != instrument.Id) return RedirectToMalfunction();
 
             if (ModelState.IsValid)
             {
@@ -130,10 +131,11 @@ namespace Instrumusicals.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!InstrumentExists(instrument.Id)) 
+                    if (!InstrumentExists(instrument.Id))
                         return RedirectToMalfunction();
-                    else throw;                    
-                } return RedirectToAction(nameof(Index));
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id", instrument.CategoryId);
             return View(instrument);
@@ -141,18 +143,19 @@ namespace Instrumusicals.Controllers
 
         public async Task<IActionResult> AddToCart(int instrumentId, int userId)
         {
-            if (instrumentId == 0 || userId ==0) return RedirectToMalfunction();
+            if (instrumentId == 0 || userId == 0) return RedirectToMalfunction();
 
             User user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
             if (user == null) return RedirectToMalfunction();
             if (user.InstrumentsWishlist == null)
                 user.InstrumentsWishlist = new String("");
 
-            user.InstrumentsWishlist += instrumentId + ",1;";
+            appaendToWishlist(ref user, instrumentId);
+
             Instrument instrumentFromDB = await _context.Instrument.Where(i => i.Id == instrumentId).SingleOrDefaultAsync();
             if (instrumentFromDB == null) return RedirectToMalfunction();
 
-            /*try
+            try
             {
                 _context.Update(user);
                 await _context.SaveChangesAsync();
@@ -160,11 +163,45 @@ namespace Instrumusicals.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 return RedirectToMalfunction();
-            }*/
+            }
 
             return JsonSuccess(true, instrumentFromDB);
         }
-        
+
+        private bool appaendToWishlist(ref User user, int instrumentId)
+        {
+            if (User == null || instrumentId == 0) return false;
+            if (user.InstrumentsWishlist != "")
+            {
+                string[] inst_count_pairs = user.InstrumentsWishlist.Split(";");
+                bool found = false;
+
+                user.InstrumentsWishlist = "";
+
+                foreach (string ic_pair in inst_count_pairs)
+                {
+                    try
+                    {
+                        if(ic_pair == "") continue;
+                        int i = Int32.Parse(ic_pair.Split(",")[0]);
+                        int c = Int32.Parse(ic_pair.Split(",")[1]);
+                        if (i < 1 || c < 1) return false;
+
+                        user.InstrumentsWishlist += i + ",";
+                        if (i == instrumentId)
+                        {
+                            c++;
+                            found = true;
+                        }
+                        user.InstrumentsWishlist += c + ";";
+                        if (found) return true;
+                    } catch { return false; }
+                }
+            }
+            user.InstrumentsWishlist += instrumentId + ",1;";
+            return true;
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -173,7 +210,7 @@ namespace Instrumusicals.Controllers
                 .Include(i => i.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (instrument == null) return RedirectToMalfunction();
-            
+
             return View(instrument);
         }
 
