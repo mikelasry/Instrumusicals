@@ -147,32 +147,30 @@ namespace Instrumusicals.Controllers
 
             User user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
             if (user == null) return RedirectToMalfunction();
-            if (user.InstrumentsWishlist == null)
-                user.InstrumentsWishlist = new String("");
-
-            appaendToWishlist(ref user, instrumentId);
+            if (user.InstrumentsWishlist == null) user.InstrumentsWishlist = new String("");
 
             Instrument instrumentFromDB = await _context.Instrument.Where(i => i.Id == instrumentId).SingleOrDefaultAsync();
             if (instrumentFromDB == null) return RedirectToMalfunction();
+            if (instrumentFromDB.Quantity < 1) return JsonSuccess(false, new { msg = "NAV", inst = instrumentFromDB });
+            appaendToWishlist(ref user, instrumentId);
 
             try
             {
                 _context.Update(user);
+                _context.Update(instrumentFromDB);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
-            {
-                return RedirectToMalfunction();
-            }
+            { return RedirectToMalfunction(); }
 
-            return JsonSuccess(true, instrumentFromDB);
+            return JsonSuccess(true, new { msg = "NON", inst = instrumentFromDB });
         }
 
         private bool appaendToWishlist(ref User user, int instrumentId)
         {
             if (User == null || instrumentId == 0) return false;
             if (user.InstrumentsWishlist != "")
-            {
+            { // check if the instrument alreadt exist in wish list
                 string[] inst_count_pairs = user.InstrumentsWishlist.Split(";");
                 bool found = false;
 
@@ -182,7 +180,7 @@ namespace Instrumusicals.Controllers
                 {
                     try
                     {
-                        if(ic_pair == "") continue;
+                        if (ic_pair == "") continue;
                         int i = Int32.Parse(ic_pair.Split(",")[0]);
                         int c = Int32.Parse(ic_pair.Split(",")[1]);
                         if (i < 1 || c < 1) return false;
@@ -195,7 +193,8 @@ namespace Instrumusicals.Controllers
                         }
                         user.InstrumentsWishlist += c + ";";
                         if (found) return true;
-                    } catch { return false; }
+                    }
+                    catch { return false; }
                 }
             }
             user.InstrumentsWishlist += instrumentId + ",1;";

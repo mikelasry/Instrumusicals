@@ -12,15 +12,29 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections;
 
 namespace Instrumusicals.Controllers
 {
+    public class CartItem
+    {
+        public int Id { get; set; }
+        public Instrument Inst{ get; set; }
+        public int Count { get; set; }
+        public CartItem(int Id, Instrument Inst, int Count)
+        {
+            this.Id = Id;
+            this.Inst = Inst;
+            this.Count = Count;
+        }
+    }
+
     [Authorize]
     public class UsersController : Controller
     {
         private readonly InstrumusicalsContext _context;
         private List<string> adminsEmails;
-        private string ERR, CREDS_ERR, USERNAME, NAVA_UN_ERR;
+        private string ERR, CREDS_ERR, NAVA_UN_ERR;
 
         private string mikesMail, shirsMail, dansMail;
 
@@ -29,7 +43,6 @@ namespace Instrumusicals.Controllers
             _context = context;
 
             ERR = "Error";
-            USERNAME = "username";
             CREDS_ERR = "Credentials mismatch. Please try again";
             NAVA_UN_ERR = "Email already in use. If you forgot your password, IT'S YOUR PROBLEM.";
 
@@ -117,9 +130,7 @@ namespace Instrumusicals.Controllers
                 await _context.SaveChangesAsync();
                 logUser(user);
                 return RedirectToAction(nameof(Index), "Home");
-
-            }
-            return View(user);
+            } return View(user);
         }
 
         private string getDirectionSuffix(String area)
@@ -143,7 +154,6 @@ namespace Instrumusicals.Controllers
 
             return View();
         }
-
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -164,16 +174,17 @@ namespace Instrumusicals.Controllers
             }
 
             logUser(userFromDB);
-            
-
             return ReturnUrl == null ? RedirectToAction(nameof(Index), "Home") : LocalRedirect(ReturnUrl);
         }
-
+        public IActionResult Logout()
+        {
+            logUser(null);
+            return RedirectToAction(nameof(Index), "Home");
+        }
         private async void logUser(User user)
         {
             if (user == null)
             {
-                //HttpContext.Session.Clear();
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 return;
             }
@@ -184,7 +195,6 @@ namespace Instrumusicals.Controllers
                 new Claim(ClaimTypes.Role, user.UserType.ToString()),
                 new Claim("FullName", user.FirstName + " " + user.LastName),
                 new Claim("Uid", user.Id.ToString())
-                // Todo: sign to cookie users cart
             };
 
             var claimsIdentity = new ClaimsIdentity(
@@ -192,7 +202,7 @@ namespace Instrumusicals.Controllers
 
             var authProperties = new AuthenticationProperties
             {
-                // ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10);
+                // Cookie lifetime declared in startup file
             };
 
             await HttpContext.SignInAsync(
@@ -201,14 +211,43 @@ namespace Instrumusicals.Controllers
                 authProperties);
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Cart()
         {
-            logUser(null);
-            return RedirectToAction(nameof(Index), "Home");
-        }
+            int uid = Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault());
+            if (uid < 1) RedirectToMalfunction();
 
-        public IActionResult Cart()
-        {
+            User dbUser = await _context.User.Where(u => u.Id == uid).SingleOrDefaultAsync();
+            if (dbUser == null) RedirectToMalfunction();
+
+            IDictionary<int,int> countDict = new Dictionary<int,int>();
+            string[] inst_count_pairs = dbUser.InstrumentsWishlist.Split(";");
+            int[] instsIds = new int[inst_count_pairs.Length - 1];
+            int i = 0;
+
+            foreach (string inst_count_pair in inst_count_pairs)
+            {
+                if (inst_count_pair.Trim() == "") continue;
+                int instId = Int32.Parse(inst_count_pair.Split(",")[0]);
+                int instCount = Int32.Parse(inst_count_pair.Split(",")[1]);
+                if (instId < 1 || instCount < 0 ) return RedirectToMalfunction();
+                
+                instsIds[i++] = instId;
+                countDict.Add(new KeyValuePair<int, int>(instId, instCount));
+            }
+
+            List<Instrument> cartInsts = await _context.Instrument.Where(i => instsIds.Contains(i.Id)).ToListAsync();
+            if (cartInsts == null) return RedirectToMalfunction();
+
+            List<CartItem> cartBag = new();
+            foreach(Instrument cartItem in cartInsts)
+            {
+                int instCount;
+                if (!countDict.TryGetValue(cartItem.Id, out instCount))
+                    { return RedirectToMalfunction(); } 
+                cartBag.Add(new CartItem(cartItem.Id, cartItem, instCount));
+            }
+
+            ViewData["CartBag"] = cartBag;
             return View();
         }
 
@@ -239,7 +278,6 @@ namespace Instrumusicals.Controllers
             }
             return View(user);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
@@ -306,7 +344,6 @@ namespace Instrumusicals.Controllers
         {
             return _context.User.Any(e => e.Id == id);
         }
-
 
         private IActionResult RedirectToMalfunction()
         {

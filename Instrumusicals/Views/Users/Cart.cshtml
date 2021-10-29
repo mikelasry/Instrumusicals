@@ -1,7 +1,97 @@
-﻿<h1>Cart</h1>
-@{
-    if (Context != null && Context.User != null)
+﻿
+
+<div class="text-center">
+    @if (Context != null && Context.User != null)
     {
-        <h3>Welcome to your cart, @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()</h3>
+        <h6 class="text-secondary">Welcome to your cart</h6>
+        <h3 class="text-primary">
+            <cite>
+                @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()
+            </cite>
+        </h3>
+        <a href="/Instruments/Index" class="text-light text-sm-center">continue shopping</a>
     }
+    <hr />
+
+    @if (ViewBag.CartBag != null)
+    {
+        if (ViewBag.CartBag.Count > 0)
+        {
+            <table class="table text-center text-light">
+                <thead>
+                <th></th>
+                <th></th>
+                <th class="text-info">Instrument</th>
+                <th class="text-info">Quantity</th>
+                <th class="text-info">Price</th>
+                <th class="text-info">Total</th>
+                <th></th>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.CartBag)
+                    {
+                        <tr class="justify-content-around">
+                            <td style="width:10%"></td>
+                            <td class="align-middle">
+                                @if (item.Inst.Image != null)
+                                {
+                                    string img = Convert.ToBase64String(item.Inst.Image);
+                                    <img src="data:image/png;base64,@img" style="height:100px; width:100px; border-radius:10px" />
+                                }
+                                else
+                                {
+                                    <span class="text-danger">No image yet.</span>
+                                }
+                            </td>
+                            <td class="align-middle">
+                                @item.Inst.Name
+                            </td>
+                            <td class="align-middle">
+                                @{
+                                    int count = item.Inst.Quantity == 0 ? 0 : item.Count;
+                                    if (count != 0)
+                                    {
+                                        <button class="btn btn-transparent text-danger btn-sm" onclick="dec(@item.Id, @Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" style="border-radius:100px; height:25px;">-</button>
+                                        <span>@count</span>
+                                        <button class="btn btn-transparent text-success btn-sm" onclick="inc(@item.Id, @Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" style="border-radius:100px;">+</button>
+                                    }
+                                    else
+                                    { <span class="text-warning">Currently not available</span>}
+                                }
+                            </td>
+                            <td class="align-middle">
+                                @item.Inst.Price $
+                            </td>
+                            <td class="align-middle">
+                                @{
+                                    float total = item.Inst.Quantity == 0 ? 0 : (item.Inst.Price * item.Count);
+                                    <span>@total $</span>
+                                }
+                            </td>
+                            <td class="align-middle">
+                                <a class="text-danger" onclick="remove(@item.Id, @Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())"><cite>remove</cite></a>
+                            </td>
+                            <td id="@item.Id" class="align-middle" style="width:10%">
+                                <div style="width:50px;">
+                                    <div id="updateCartItemLoader" class="spinner-border p-2 text-light" role="status"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button onclick="placeOrder(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" class="btn btn-success w-75 m-3">Place my order!</button>
+        }
+        else
+        {
+            <h3>Your shopping cart is empty!!! :O</h3>
+            <h5>Let's <a href="/Instruments/Index" class="text-light">go shopping!</a></h5>
+        }
+    }
+                                    
+</div>
+
+@section Scripts{
+    <script src="~/js/Users/CartUpdate.js"></script>
 }
