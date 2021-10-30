@@ -152,7 +152,16 @@ namespace Instrumusicals.Controllers
             Instrument instrumentFromDB = await _context.Instrument.Where(i => i.Id == instrumentId).SingleOrDefaultAsync();
             if (instrumentFromDB == null) return RedirectToMalfunction();
             if (instrumentFromDB.Quantity < 1) return JsonSuccess(false, new { msg = "NAV", inst = instrumentFromDB });
-            appaendToWishlist(ref user, instrumentId);
+
+            string appendResult = appaendToWishlist(ref user, instrumentId);
+            char cause = appendResult.ToCharArray().ElementAt(1);
+            if (appendResult.ToCharArray().ElementAt(0) == 'f')
+            {
+                if (cause == 'm' || cause == 'd' || cause == 'i' || cause == 'e')
+                // malfunction / definition err / instrument err / exception
+                    { return RedirectToMalfunction(); }
+                return JsonSuccess(false, new { msg = cause, inst = instrumentFromDB });
+            }
 
             try
             {
@@ -163,14 +172,14 @@ namespace Instrumusicals.Controllers
             catch (DbUpdateConcurrencyException)
             { return RedirectToMalfunction(); }
 
-            return JsonSuccess(true, new { msg = "NON", inst = instrumentFromDB });
+            return JsonSuccess(true, new { msg = cause, inst = instrumentFromDB });
         }
 
-        private bool appaendToWishlist(ref User user, int instrumentId)
+        private string appaendToWishlist(ref User user, int instrumentId)
         {
-            if (User == null || instrumentId == 0) return false;
+            if (User == null || instrumentId == 0) return "fd"; // -f-alse, -d-efinition err
             if (user.InstrumentsWishlist != "")
-            { // check if the instrument alreadt exist in wish list
+            { // check if the instrument already exist in wish list
                 string[] inst_count_pairs = user.InstrumentsWishlist.Split(";");
                 bool found = false;
 
@@ -183,22 +192,25 @@ namespace Instrumusicals.Controllers
                         if (ic_pair == "") continue;
                         int i = Int32.Parse(ic_pair.Split(",")[0]);
                         int c = Int32.Parse(ic_pair.Split(",")[1]);
-                        if (i < 1 || c < 1) return false;
+                        if (i < 1 || c < 1) return "fm"; // -f-alse, -m-alfunction
 
                         user.InstrumentsWishlist += i + ",";
                         if (i == instrumentId)
                         {
+                            Instrument inst =  _context.Instrument.Where(i => i.Id == instrumentId).SingleOrDefault();
+                            if (inst == null) return "fi"; // -f-alse, -i-nstrument err
+                            if (inst.Quantity == 0 || inst.Quantity - c <= 0) return "fo"; // -f-alse, -o-ut of stock
                             c++;
                             found = true;
                         }
                         user.InstrumentsWishlist += c + ";";
-                        if (found) return true;
+                        if (found) return "tf"; // -t-rue, -f-ound
                     }
-                    catch { return false; }
+                    catch { return "fe"; } // false, -e-xeption
                 }
             }
             user.InstrumentsWishlist += instrumentId + ",1;";
-            return true;
+            return "ts"; // -t-rue, -s-uccess
         }
 
         public async Task<IActionResult> Delete(int? id)

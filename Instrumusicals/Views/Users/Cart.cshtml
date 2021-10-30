@@ -44,7 +44,7 @@
                                 }
                             </td>
                             <td class="align-middle">
-                                @item.Inst.Name
+                                <a class="text-light" asp-action="Details" asp-controller="Instruments" asp-route-id="@item.Inst.Id">@item.Inst.Name</a>
                             </td>
                             <td class="align-middle">
                                 @{
@@ -73,7 +73,7 @@
                             </td>
                             <td id="@item.Id" class="align-middle" style="width:10%">
                                 <div style="width:50px;">
-                                    <div id="updateCartItemLoader" class="spinner-border p-2 text-light" role="status"></div>
+                                    <div id="updateCartItemLoader" class="spinner-border p-2 text-light d-none" role="status"></div>
                                 </div>
                             </td>
                         </tr>
@@ -81,6 +81,10 @@
                 </tbody>
             </table>
 
+            float globalTotal = 0;
+            foreach (var item in ViewBag.CartBag)
+            { globalTotal += (item.Inst.Quantity > 0) ? (item.Inst.Quantity >= item.Count ? item.Count * item.Inst.Price : item.Inst.Quantity*item.Count) : 0; }
+            <h3>Total cost: @globalTotal $</h3>
             <button onclick="placeOrder(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" class="btn btn-success w-75 m-3">Place my order!</button>
         }
         else
@@ -89,7 +93,7 @@
             <h5>Let's <a href="/Instruments/Index" class="text-light">go shopping!</a></h5>
         }
     }
-                                    
+
 </div>
 
 @section Scripts{
