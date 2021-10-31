@@ -1,6 +1,6 @@
 ﻿
 
-<div class="text-center">
+<div id="cartContainer" class="text-center">
     @if (Context != null && Context.User != null)
     {
         <h6 class="text-secondary">Welcome to your cart</h6>
@@ -17,7 +17,7 @@
     {
         if (ViewBag.CartBag.Count > 0)
         {
-            <table class="table text-center text-light">
+            <table id="cartTable" class="table text-center text-light">
                 <thead>
                 <th></th>
                 <th></th>
@@ -27,7 +27,7 @@
                 <th class="text-info">Total</th>
                 <th></th>
                 </thead>
-                <tbody>
+                <tbody id="cartBody">
                     @foreach (var item in ViewBag.CartBag)
                     {
                         <tr class="justify-content-around">
@@ -69,25 +69,35 @@
                                 }
                             </td>
                             <td class="align-middle">
-                                <a class="text-danger" onclick="remove(@item.Id, @Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())"><cite>remove</cite></a>
+                                <a class="text-danger" onclick="remove( @item.Id, @Int32.Parse(Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) )">
+                                    <cite>
+                                        remove
+                                    </cite>
+                                </a>
                             </td>
-                            <td id="@item.Id" class="align-middle" style="width:10%">
+                            <td class="align-middle" style="width:10%">
                                 <div style="width:50px;">
-                                    <div id="updateCartItemLoader" class="spinner-border p-2 text-light d-none" role="status"></div>
+                                    <div id="@item.Inst.Id" class="spinner-border p-2 text-light d-none" role="status"></div>
                                 </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-
-            float globalTotal = 0;
-            foreach (var item in ViewBag.CartBag)
-            { globalTotal += (item.Inst.Quantity > 0) ? (item.Inst.Quantity >= item.Count ? item.Count * item.Inst.Price : item.Inst.Quantity*item.Count) : 0; }
-            <h3>Total cost: @globalTotal $</h3>
-            <button onclick="placeOrder(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" class="btn btn-success w-75 m-3">Place my order!</button>
+            <div id="cartSummary">
+                @{
+                    float globalTotal = 0;
+                    foreach (var item in ViewBag.CartBag)
+                    { globalTotal += (item.Inst.Quantity > 0) ? (item.Inst.Quantity >= item.Count ? item.Count * item.Inst.Price : item.Inst.Quantity * item.Count) : 0; }
+                    <h5 class="d-inline">Total cost:</h5>
+                    <h3 id="defTotal"> @globalTotal $</h3>
+                    <button onclick="placeOrder(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" class="btn btn-success w-75 m-3" style="border-radius:100px;">
+                        Place my order!
+                    </button>
+                }
+            </div>
         }
-        else
+        else // ViewBag.CartBag.Count <= 0
         {
             <h3>Your shopping cart is empty!!! :O</h3>
             <h5>Let's <a href="/Instruments/Index" class="text-light">go shopping!</a></h5>
@@ -95,7 +105,49 @@
     }
 
 </div>
+<script type="text/template" id="cartItemTemplate">
+    <tr class="justify-content-around">
+        <td style="width:10%"></td>
+        <td class="align-middle">
+            <img src="data:image/png;base64,${image}" style="height:100px; width:100px; border-radius:10px" />
+        </td>
+        <td class="align-middle">
+            <a class="text-light" asp-action="Details" asp-controller="Instruments" asp-route-id="${id}">${name}</a>
+        </td>
+        <td class="align-middle">
+            <button class="btn btn-transparent text-danger btn-sm" onclick="dec(${id}, @Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" style="border-radius:100px; height:25px;">-</button>
+            <span>${count}</span>
+            <button class="btn btn-transparent text-success btn-sm" onclick="inc(${id}, @Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" style="border-radius:100px;">+</button>
+            <span id="NA" class="text-warning d-none">Currently not available</span>
+        </td>
+        <td class="align-middle">
+            ${price}
+        </td>
+        <td class="align-middle">
+            ${total}
+        </td>
+        <td class="align-middle">
+            <a class="text-danger" onclick="remove( ${id} , @Int32.Parse(Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) )">
+                <cite>
+                    remove
+                </cite>
+            </a>
+        </td>
+        <td class="align-middle" style="width:10%">
+            <div style="width:50px;">
+                <div id="${id}" class="spinner-border p-2 text-light d-none" role="status"></div>
+            </div>
+        </td>
+    </tr>
 
+</script>
+<script type="text/template" id="emptyTemplate">
+    <div class=" emptyclass ">
+        <h3>Your shopping cart is empty!!! :O</h3>
+        <h5>Let's <a href="/Instruments/Index" class="text-light">go shopping!</a></h5>
+    </div>
+</script>
+</script>
 @section Scripts{
     <script src="~/js/Users/CartUpdate.js"></script>
 }

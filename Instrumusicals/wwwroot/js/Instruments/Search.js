@@ -29,7 +29,6 @@ $(function () {
             tableBody.html('');
             let resLen = result != null ? result.length : 0;
             if (resLen != null && resLen > 0) {
-
                 $.each(result, function (_ix, _instrument) {
                     let template = $('#rowTemplate').html();
 
@@ -43,7 +42,6 @@ $(function () {
                     });
                     tableBody.append(template);
                 });
-
             } else tableBody.html(NO_RESULTS_HEADING);
 
             loader.addClass(DISPLAY_NONE);

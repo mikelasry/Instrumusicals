@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Instrumusicals.Controllers
 {
@@ -141,20 +142,23 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
+        [Authorize]
         public async Task<IActionResult> AddToCart(int instrumentId, int userId)
         {
             if (instrumentId == 0 || userId == 0) return RedirectToMalfunction();
-
+            if (!IsUserAuthorized(userId)) return RedirectToAccessDenied();
             User user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
             if (user == null) return RedirectToMalfunction();
             if (user.InstrumentsWishlist == null) user.InstrumentsWishlist = new String("");
 
             Instrument instrumentFromDB = await _context.Instrument.Where(i => i.Id == instrumentId).SingleOrDefaultAsync();
             if (instrumentFromDB == null) return RedirectToMalfunction();
-            if (instrumentFromDB.Quantity < 1) return JsonSuccess(false, new { msg = "NAV", inst = instrumentFromDB });
+            if (instrumentFromDB.Quantity < 1) 
+                return JsonSuccess(false, new { msg = "NAV", inst = instrumentFromDB }); // Not available
 
-            string appendResult = appaendToWishlist(ref user, instrumentId);
+            string appendResult = AppaendToWishlist(ref user, instrumentId);
             char cause = appendResult.ToCharArray().ElementAt(1);
+
             if (appendResult.ToCharArray().ElementAt(0) == 'f')
             {
                 if (cause == 'm' || cause == 'd' || cause == 'i' || cause == 'e')
@@ -162,7 +166,6 @@ namespace Instrumusicals.Controllers
                     { return RedirectToMalfunction(); }
                 return JsonSuccess(false, new { msg = cause, inst = instrumentFromDB });
             }
-
             try
             {
                 _context.Update(user);
@@ -175,7 +178,7 @@ namespace Instrumusicals.Controllers
             return JsonSuccess(true, new { msg = cause, inst = instrumentFromDB });
         }
 
-        private string appaendToWishlist(ref User user, int instrumentId)
+        private string AppaendToWishlist(ref User user, int instrumentId)
         {
             if (User == null || instrumentId == 0) return "fd"; // -f-alse, -d-efinition err
             if (user.InstrumentsWishlist != "")
@@ -213,6 +216,64 @@ namespace Instrumusicals.Controllers
             return "ts"; // -t-rue, -s-uccess
         }
 
+        public async Task<IActionResult> RemoveFromCart(int instrumentId, int userId)
+        {
+            if (!IsUserAuthorized(userId)) return RedirectToAccessDenied();
+            User user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
+            if (user == null) return RedirectToMalfunction();
+
+            Instrument instrument = await _context.Instrument.Where(i => i.Id == instrumentId).SingleOrDefaultAsync();
+            if (instrument == null) return RedirectToMalfunction();
+
+            Dictionary<int, int> id_count_dict = DeleteFromWishlist(ref user, instrumentId);
+            if (id_count_dict == null) return JsonSuccess(false, new { msg = "failure" });
+
+            List<int> leftInstrumentsIds = new();
+            foreach (KeyValuePair<int,int> id_count_pair in id_count_dict) { leftInstrumentsIds.Add(id_count_pair.Key); }
+            
+            List<Instrument> leftInstruments = await _context.Instrument.Where(i => leftInstrumentsIds.Contains(i.Id)).ToListAsync();
+            if (leftInstruments == null) return RedirectToMalfunction();
+
+            List<CartItem> newCartItems = new();
+            foreach (Instrument i in leftInstruments) { newCartItems.Add(new CartItem(i.Id, i, id_count_dict[i.Id])); }
+
+            try
+            {
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            { return RedirectToMalfunction(); }
+
+            return JsonSuccess(true, new { msg = "success", uid= userId, insts = newCartItems });
+        }
+
+        private Dictionary<int,int> DeleteFromWishlist(ref User user, int instrumentId)
+        {
+            if (User == null || instrumentId == 0) return null;
+            if (user.InstrumentsWishlist == "") return null;
+            
+            string[] inst_count_pairs = user.InstrumentsWishlist.Split(";");
+            user.InstrumentsWishlist = "";
+            Dictionary<int, int> id_count_dict = new();
+
+            foreach (string ic_pair in inst_count_pairs)
+            {
+                try
+                {
+                    if (ic_pair == "") continue; // skip the last empty iteration
+                    int i = Int32.Parse(ic_pair.Split(",")[0]); // extract insturment id
+                    int c = Int32.Parse(ic_pair.Split(",")[1]); // extract insturment count
+                    if (i < 1 || c < 1) return null; // parse malfunction
+                    if (i == instrumentId) continue; // skip the instrument to be removed
+                    user.InstrumentsWishlist += i + "," + c + ";"; // assign all other instruments
+                    id_count_dict.Add(i, c);// dictionary to sign the instruments' count
+                }
+                catch { return null; }
+            }
+            return id_count_dict;
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -245,9 +306,19 @@ namespace Instrumusicals.Controllers
             return RedirectToAction("Malfunction", "Home");
         }
 
+        private IActionResult RedirectToAccessDenied()
+        {
+            return RedirectToAction("AccessDenied", "Users");
+        }
+
         private IActionResult JsonSuccess(bool success, Object dataDict)
         {
             return Json(new { success = success, data = dataDict });
         }
+
+        private bool IsUserAuthorized(int uid)
+        {
+            return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid;                
+        } 
     }
 }

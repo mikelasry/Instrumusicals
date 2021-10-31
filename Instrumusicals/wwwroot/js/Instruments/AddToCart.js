@@ -33,7 +33,6 @@ function addToCart(iid, uid) {
 
     $.ajax({ url: URL, data: dict })
         .done(function (result) {
-            console.log(result);
             if (result != null) {
                 modalHeader.html(result.data.inst.name);
                 var content = "";
@@ -61,6 +60,7 @@ function addToCart(iid, uid) {
 
                 modalContent.html(content);
                 modal.show();
+                btnModalClose.focus();
             }
             loader.addClass(DISPLAY_NONE);
         });
