@@ -10,15 +10,15 @@
 
 function addToCart(iid, uid) {
 
-    const TOO_FEW = "There is not enough occurrences of this insteument";
-    const ANOTHER_ONE= "Another instance of this instrument has been added to your cart";
     const DISPLAY_NONE = "d-none";
     const BTN_GREEN= "btn-success";
     const BTN_RED = "btn-danger";
     const URL = "/Instruments/AddToCart";
-    const NEXT_TIME = "Maybe next time!"
     const INST_ADDED = "The instrument has been successfully added to your cart."
-    const INST_NOT_AVAIL = "The instrument is currently not available. =("
+    const ANOTHER_ONE= "Another instance of this instrument has been added to your cart";
+    const TOO_FEW = "There is not enough occurrences of this insteument";
+    const INST_NOT_AVAIL = "The instrument is currently not available."
+    const NEXT_TIME = "Maybe next time!"
 
     var dict = { instrumentId: iid, userId: uid };
 

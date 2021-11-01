@@ -69,8 +69,33 @@ namespace Instrumusicals.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Admin()
+        public async Task<IActionResult> Admin()
         {
+            Dictionary<string, int> data = new Dictionary<string, int>();
+            Dictionary<string, int> data2 = new Dictionary<string, int>();
+
+            var query_ = from row in _context.Instrument.AsEnumerable()
+                         group row by row.CategoryId into groups
+                         select groups;
+
+            foreach (var groupName in query_) // for each category
+            {
+                var name = _context.Category.Find(groupName.Key).Name;
+                Console.WriteLine(name);
+                int i = 0;
+                int counter = 0;
+                foreach (var inst in groupName) // for each instrument
+                {
+                    counter++;
+                    i += (((int)inst.Price) * ((int)inst.Quantity));
+                }
+                data2.Add(name, counter);
+                data.Add(name, i);
+            }
+
+            ViewData["data"] = data;
+            ViewData["data2"] = data2;
+            
             return View();
         }
 

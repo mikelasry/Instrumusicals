@@ -2,71 +2,165 @@
 
 @{
     ViewData["Title"] = "Admin's Panel";
+
 }
 
-<div class="text-center text-">
-    <h1>Admin's Panel</h1>
-    <table class="table text-light">
-        <thead>
-            <tr>
-                <th>
-                    Instruments
-                </th>
-                <th>
-                    Categories
-                </th>
-                <th>
-                    Orders
-                </th>
-                <th>
-                    Users
-                </th>
-                <th>
-                    Reviews
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <a class="text-danger" asp-controller="Instruments" asp-action="Index">Show All Instruments</a>
-                </td>
-                <td>
-                    <a class="text-danger" asp-controller="Categories" asp-action="Index">Show All Categories</a>
-                </td>
-                <td>
-                    <a class="text-danger" asp-controller="Orders" asp-action="Index">Show All Orders</a>
-                </td>
-                <td>
-                    <a class="text-danger" asp-controller="Users" asp-action="Index">Show All Users</a>
-                </td>
-                <td>
-                    <a class="text-danger" asp-controller="Reviews" asp-action="Index">Show All Reviews</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a class="text-danger" asp-controller="Instruments" asp-action="Create">Create a new Instrument</a>
-                </td>
-                <td>
-                    <a class="text-danger" asp-controller="Categories" asp-action="Create">Create a new Category</a>
-                </td>
-                <td>
-                    <a class="text-danger" asp-controller="Orders" asp-action="Create">Create a new Order</a>
-                </td>
-                <td>
-                    <a class="text-danger" asp-controller="Users" asp-action="Register">Register a User</a>
-                </td>
-                <td>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<head>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            var data = [];
+            var names = [];
 
-    <br />
-    <br />
-    <h2>Instrumusical Statistics</h2>
-    <h2>.</h2>
-    <h2>.</h2>
-    <h2>.</h2>
-</div>
+            @{Dictionary<string, int> dict = ViewData["data"] as Dictionary<string, int>; }
+            @foreach (var a in dict)
+            {
+                @:data.push(@a.Value);
+                @:names.push("@a.Key");
+            }
+
+            var colors = ["#FF5733", "#5EFAB1", "#5E65FA"];
+            var radius = 200;
+            var colorScale = d3.scale.ordinal().range(colors);
+            var area = d3.selectAll('section').append('svg')
+                .attr('width', 500)
+                .attr('height', 500);
+            var pieGroup = area.append('g').attr('transform', 'translate(300, 300)');
+            var arc = d3.svg.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
+            var pie = d3.layout.pie()
+                .value(function (data) { return data; })
+            var arcs = pieGroup.selectAll('.arc')
+                .data(pie(data))
+                .enter()
+                .append('g')
+                .attr('class', 'arc');
+            arcs.append('path')
+                .attr('d', arc)
+                .attr('fill', function (d) { return colorScale(d.data); });
+
+            arcs.append('text')
+                .attr('transform', function (data) { return 'translate(' + arc.centroid(data) + ')'; })
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '1em')
+                .text(function (data) {
+                    return names.pop() + " Total:" + data.value;
+                });
+        });
+        $(function () {
+            var data = [];
+            var names = [];
+
+            @{Dictionary<string, int> dict2 = ViewData["data2"] as Dictionary<string, int>; }
+            @foreach (var a in dict2)
+            {
+                @:data.push(@a.Value);
+                @:names.push("@a.Key");
+            }
+
+            var colors = ["#5E0000", "#5EFEEE", "#FF5555"];
+            var radius = 200;
+            var colorScale = d3.scale.ordinal().range(colors);
+            var area = d3.selectAll('p').append('svg')
+                .attr('width', 500)
+                .attr('height', 500);
+            var pieGroup = area.append('g').attr('transform', 'translate(300, 300)');
+            var arc = d3.svg.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
+            var pie = d3.layout.pie()
+                .value(function (data) { return data; })
+            var arcs = pieGroup.selectAll('.arc')
+                .data(pie(data))
+                .enter()
+                .append('g')
+                .attr('class', 'arc');
+            arcs.append('path')
+                .attr('d', arc)
+                .attr('fill', function (d) { return colorScale(d.data); });
+
+            arcs.append('text')
+                .attr('transform', function (data) { return 'translate(' + arc.centroid(data) + ')'; })
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '1em')
+                .text(function (data) {
+                    return names.pop() + " Total:" + data.value;
+                });
+        });
+    </script>
+
+</head>
+<body>
+    <div class="text-center text-">
+        <h1>Admin's Panel</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Instruments
+                    </th>
+                    <th>
+                        Categories
+                    </th>
+                    <th>
+                        Orders
+                    </th>
+                    <th>
+                        Users
+                    </th>
+                    <th>
+                        Reviews
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a class="text-danger" asp-controller="Instruments" asp-action="Index">Show All Instruments</a>
+                    </td>
+                    <td>
+                        <a class="text-danger" asp-controller="Categories" asp-action="Index">Show All Categories</a>
+                    </td>
+                    <td>
+                        <a class="text-danger" asp-controller="Orders" asp-action="Index">Show All Orders</a>
+                    </td>
+                    <td>
+                        <a class="text-danger" asp-controller="Users" asp-action="Index">Show All Users</a>
+                    </td>
+                    <td>
+                        <a class="text-danger" asp-controller="Reviews" asp-action="Index">Show All Reviews</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a class="text-danger" asp-controller="Instruments" asp-action="Create">Create a new Instrument</a>
+                    </td>
+                    <td>
+                        <a class="text-danger" asp-controller="Categories" asp-action="Create">Create a new Category</a>
+                    </td>
+                    <td>
+                        <a class="text-danger" asp-controller="Orders" asp-action="Create">Create a new Order</a>
+                    </td>
+                    <td>
+                        <a class="text-danger" asp-controller="Users" asp-action="Register">Register a User</a>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br />
+        <br />
+        <div>
+            <h2>Instrumusical Statistics</h2>
+            <section>
+            </section>
+            <p>
+            </p>
+        </div>
+       
+    </div>
+</body>

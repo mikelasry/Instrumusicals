@@ -71,7 +71,7 @@
                     @Html.DisplayFor(model => model.Category.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(model => model.Price)
+                    @Html.DisplayFor(model => model.Price)$
                 </td>
                 @if (Context != null && Context.User != null && Context.User.IsInRole("Admin"))
                 {
