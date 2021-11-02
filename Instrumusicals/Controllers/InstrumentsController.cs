@@ -33,52 +33,10 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var instrumentsContext = _context.Instrument.Include(i => i.Category);
-            List<Instrument> l = null;
-            try { l = await instrumentsContext.ToListAsync(); }
-            catch { return RedirectToMalfunction(); }
-            return View(l);
-        }
-
-        public async Task<IActionResult> SearchJson(bool all, String name)
-        {
-
-            if (all)
-            {
-                return Json(await _context.Instrument.ToListAsync());
-            }
-
-            var q = from instrument in _context.Instrument
-                    where instrument.Name.Contains(name)
-                    orderby instrument.Name
-                    select instrument;
-
-            return Json(await q.ToListAsync());
-        }
-
-
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return RedirectToMalfunction();
-
-            var instrument = await _context.Instrument.Include(i => i.Reviews)
-                                .Include(i => i.Category).FirstOrDefaultAsync(m => m.Id == id);
-            if (instrument == null) return RedirectToAction("Malfunction", "Home");
-
-            IEnumerable<Review> reviews = await _context.Review.Include(r => r.User)
-                                .Where(r => r.InstrumentId == id).OrderByDescending(r => r.LastUpdate).ToListAsync();
-            ViewData["Reviews"] = reviews;
-            if (HttpContext.User != null && HttpContext.User.Identity != null)
-            {
-                User u = await _context.User.Where(u => u.Email == HttpContext.User.Identity.Name).FirstOrDefaultAsync();
-                ViewData["UserId"] = u != null ? u.Id : u;
-            }
-
-            return View(instrument);
-        }
-
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ -------------------- CRUD --------------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name));
@@ -110,6 +68,15 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var instrumentsContext = _context.Instrument.Include(i => i.Category);
+            List<Instrument> l = null;
+            try { l = await instrumentsContext.ToListAsync(); }
+            catch { return RedirectToMalfunction(); }
+            return View(l);
+        }
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -139,7 +106,7 @@ namespace Instrumusicals.Controllers
                 }
                 try
                 {
-                    if(instrument.Image == null)
+                    if (instrument.Image == null)
                     {
                         byte[] image = await _context.Instrument.Where(i => i.Id == id).Select(i => i.Image).SingleOrDefaultAsync();
                         if (image == null) return RedirectToMalfunction();
@@ -160,17 +127,59 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        
-        // -- Putting instruments in wishlist -- 
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return RedirectToMalfunction();
 
+            var instrument = await _context.Instrument
+                .Include(i => i.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (instrument == null) return RedirectToMalfunction();
+
+            return View(instrument);
+        }
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var instrument = await _context.Instrument.FindAsync(id);
+            _context.Instrument.Remove(instrument);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+       
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return RedirectToMalfunction();
+
+            var instrument = await _context.Instrument.Include(i => i.Reviews)
+                                .Include(i => i.Category).FirstOrDefaultAsync(m => m.Id == id);
+            if (instrument == null) return RedirectToAction("Malfunction", "Home");
+
+            IEnumerable<Review> reviews = await _context.Review.Include(r => r.User)
+                                .Where(r => r.InstrumentId == id).OrderByDescending(r => r.LastUpdate).ToListAsync();
+            ViewData["Reviews"] = reviews;
+            if (HttpContext.User != null && HttpContext.User.Identity != null)
+            {
+                User u = await _context.User.Where(u => u.Email == HttpContext.User.Identity.Name).FirstOrDefaultAsync();
+                ViewData["UserId"] = u != null ? u.Id : u;
+            }
+
+            return View(instrument);
+        }
+
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ -------------------- Cart --------------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+        // ---------------------- Cart in ---------------------- //
         [Authorize]
         public async Task<IActionResult> AddToCart(int instrumentId, int userId)
         {
             if (instrumentId == 0 || userId == 0) return JsonSuccess(false, new { msg = "d" });
             if (!IsUserAuthorized(userId)) return RedirectToAccessDenied();
-            
+
             User user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
             if (user == null) return RedirectToMalfunction();
             if (user.InstrumentsWishlist == null) user.InstrumentsWishlist = new String("");
@@ -181,43 +190,6 @@ namespace Instrumusicals.Controllers
 
             UpdateCartResult appendResult = AppaendToWishlist(ref user, instrumentFromDB);
             if (!appendResult.success) return JsonSuccess(appendResult.success, new { msg = appendResult.msg, inst = instrumentFromDB });
-            
-            try
-            {
-                _context.Update(user);
-                _context.Update(instrumentFromDB);
-                await _context.SaveChangesAsync();
-            } catch (DbUpdateConcurrencyException)
-                { return RedirectToMalfunction(); }
-
-            Dictionary<int, int> id_count_dict = (Dictionary<int, int>)appendResult.data;
-
-            List<int> leftInstrumentsIds = new();
-            foreach (KeyValuePair<int, int> id_count_pair in id_count_dict) { leftInstrumentsIds.Add(id_count_pair.Key); }
-
-            List<Instrument> leftInstruments = await _context.Instrument.Where(i => leftInstrumentsIds.Contains(i.Id)).ToListAsync();
-            if (leftInstruments == null) return RedirectToMalfunction();
-
-            List<CartItem> newCartItems = new();
-            foreach (Instrument i in leftInstruments) { newCartItems.Add(new CartItem(i.Id, i, id_count_dict[i.Id])); }
-
-            return JsonSuccess(true, new { msg = appendResult.msg, uid = userId, insts = newCartItems ,inst = instrumentFromDB });
-        }
-
-       
-        /*[Authorize]
-        public async Task<IActionResult> IncInCart(int instrumentId, int userId)
-        {
-            if (!IsUserAuthorized(userId)) return RedirectToAccessDenied();
-            User user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
-            if (user == null) return RedirectToMalfunction();
-
-            Instrument instrumentFromDB = await _context.Instrument.Where(i => i.Id == instrumentId).SingleOrDefaultAsync();
-            if (instrumentFromDB == null) return RedirectToMalfunction();
-
-            UpdateCartResult appendResult = AppaendToWishlist(ref user, instrumentFromDB);
-            if (appendResult.msg.ToCharArray()[0] != 't')
-                return JsonSuccess(false, new { msg = appendResult.msg.ToCharArray()[1], uid = userId });
 
             try
             {
@@ -229,7 +201,7 @@ namespace Instrumusicals.Controllers
             { return RedirectToMalfunction(); }
 
             Dictionary<int, int> id_count_dict = (Dictionary<int, int>)appendResult.data;
-            
+
             List<int> leftInstrumentsIds = new();
             foreach (KeyValuePair<int, int> id_count_pair in id_count_dict) { leftInstrumentsIds.Add(id_count_pair.Key); }
 
@@ -239,9 +211,8 @@ namespace Instrumusicals.Controllers
             List<CartItem> newCartItems = new();
             foreach (Instrument i in leftInstruments) { newCartItems.Add(new CartItem(i.Id, i, id_count_dict[i.Id])); }
 
-            return JsonSuccess(true, new { msg = "inc", uid = userId, insts = newCartItems });
-        }*/
-
+            return JsonSuccess(true, new { msg = appendResult.msg, uid = userId, insts = newCartItems, inst = instrumentFromDB });
+        }
         private UpdateCartResult AppaendToWishlist(ref User user, Instrument instrument)
         {
             if (User == null || instrument == null) return new UpdateCartResult(msg: "d"); // -d-efinition err
@@ -276,23 +247,21 @@ namespace Instrumusicals.Controllers
                         user.InstrumentsWishlist += c + ";";
                         id_count_dict.Add(i, c);
                     }
-                    catch { return new UpdateCartResult( msg: "e"); } // -e-xeption
+                    catch { return new UpdateCartResult(msg: "e"); } // -e-xeption
                 }
-            } if(!found) { user.InstrumentsWishlist += instrument.Id + ",1;"; }
+            }
+            if (!found) { user.InstrumentsWishlist += instrument.Id + ",1;"; }
 
             result.success = true;
             if (result.msg == null) result.msg = "s"; // -s-uccess
             if (result.data == null) result.data = id_count_dict;
-            
+
             return result;
-            
+
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-        // -- Taking out instruments from wishlist -- 
-
+        // --------------------- Cart out ---------------------- //
         public async Task<IActionResult> RemoveFromCart(int instrumentId, int userId, bool deleteAll)
         {
             if (!IsUserAuthorized(userId)) return RedirectToAccessDenied();
@@ -304,7 +273,7 @@ namespace Instrumusicals.Controllers
 
             UpdateCartResult removeResult = DeleteFromWishlist(ref user, instrument, deleteAll);
             if (removeResult.msg.ToCharArray()[0] == 'f') return JsonSuccess(false, new { msg = removeResult.msg.ToCharArray()[1] });
-            
+
             try
             {
                 _context.Update(user);
@@ -327,11 +296,10 @@ namespace Instrumusicals.Controllers
 
             return JsonSuccess(true, new { msg = "s", uid = userId, insts = newCartItems });
         }
-
         private UpdateCartResult DeleteFromWishlist(ref User user, Instrument instrument, bool all)
         {
-            if (User == null || instrument == null || user.InstrumentsWishlist == "") 
-                return new UpdateCartResult(msg:"fd"); // -f-alse, -d-efinition err
+            if (User == null || instrument == null || user.InstrumentsWishlist == "")
+                return new UpdateCartResult(msg: "fd"); // -f-alse, -d-efinition err
 
             string[] inst_count_pairs = user.InstrumentsWishlist.Split(";");
             user.InstrumentsWishlist = "";
@@ -344,54 +312,24 @@ namespace Instrumusicals.Controllers
                     if (ic_pair == "") continue; // skip the last empty iteration
                     int i = Int32.Parse(ic_pair.Split(",")[0]); // extract insturment id
                     int c = Int32.Parse(ic_pair.Split(",")[1]); // extract insturment count
-                    if (i < 1 || c < 1) return new UpdateCartResult(msg:"fp"); // -f-alse, -p-arse malfunction
-                    if (i == instrument.Id) if (all || c == 1) continue; else c--; 
+                    if (i < 1 || c < 1) return new UpdateCartResult(msg: "fp"); // -f-alse, -p-arse malfunction
+                    if (i == instrument.Id) if (all || c == 1) continue; else c--;
                     user.InstrumentsWishlist += i + "," + c + ";"; // assign all other instruments
                     id_count_dict.Add(i, c);// dictionary to sign the instruments' count
                 }
                 catch { return new UpdateCartResult(msg: "fe"); ; } // -f-alse, -e-xception err
             }
-            return new UpdateCartResult(msg:"ts", data: id_count_dict);
+            return new UpdateCartResult(msg: "ts", data: id_count_dict);
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return RedirectToMalfunction();
-
-            var instrument = await _context.Instrument
-                .Include(i => i.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (instrument == null) return RedirectToMalfunction();
-
-            return View(instrument);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var instrument = await _context.Instrument.FindAsync(id);
-            _context.Instrument.Remove(instrument);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ --------------- Util functions ---------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
         private bool InstrumentExists(int id)
         {
             return _context.Instrument.Any(e => e.Id == id);
-        }
-
-        private IActionResult RedirectToMalfunction()
-        {
-            return RedirectToAction("Malfunction", "Home");
-        }
-
-        private IActionResult RedirectToAccessDenied()
-        {
-            return RedirectToAction("AccessDenied", "Users");
         }
 
         private IActionResult JsonSuccess(bool success, Object dataDict)
@@ -403,5 +341,40 @@ namespace Instrumusicals.Controllers
         {
             return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid;
         }
+
+        public async Task<IActionResult> SearchJson(bool all, String name)
+        {
+
+            if (all)
+            {
+                return Json(await _context.Instrument.ToListAsync());
+            }
+
+            var q = from instrument in _context.Instrument
+                    where instrument.Name.Contains(name)
+                    orderby instrument.Name
+                    select instrument;
+
+            return Json(await q.ToListAsync());
+        }
+
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ ----------- Reditection functions ------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+        private IActionResult RedirectToMalfunction()
+        {
+            return RedirectToAction("Malfunction", "Home");
+        }
+
+        private IActionResult RedirectToAccessDenied()
+        {
+            return RedirectToAction("AccessDenied", "Users");
+        }
+
+
+
+
     }
+
 }

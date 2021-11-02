@@ -21,27 +21,10 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> Index()
-        {
-            var instrumusicalsContext = _context.Review
-                .Include(r => r.Instrument)
-                .Include(r=> r.User);
-            return View(await instrumusicalsContext.ToListAsync());
-        }
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ -------------------- CRUD --------------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ // 
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return RedirectToMalfunction();
-
-            var review = await _context.Review
-                .Include(r => r.Instrument)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (review == null) return RedirectToMalfunction();
-            return View(review);
-        }
-
-        [Authorize]
         public async Task<IActionResult> Create(int? inst)
         {
             ViewData["InstrumentId"] = inst;
@@ -67,33 +50,29 @@ namespace Instrumusicals.Controllers
 
                 _context.Add(review);
                 await _context.SaveChangesAsync();
-                return LocalRedirect("/Instruments/Details/"+instrument);
+                return LocalRedirect("/Instruments/Details/" + instrument);
             }
             ViewData["Instruments"] = new SelectList(_context.Instrument, "Id", "Name", review.InstrumentId);
             return View(review);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        [AllowAnonymous]
+        public async Task<IActionResult> Index()
         {
-            if (id == null) return RedirectToMalfunction();
-            
-            var review = await _context.Review.FindAsync(id);
-            if (review == null) return RedirectToMalfunction();
-            int currUid = Int32.Parse(
-                            HttpContext.User.Claims
-                                .Where(c => c.Type == "Uid")
-                                .Select(c => c.Value)
-                                .SingleOrDefault()
-                            );
-            if (review.UserId != currUid) return RedirectToAccessDenied();
-            Review reviewFromDB = await _context.Review
-                                            .Include(r => r.Instrument)
-                                            .Where(r => r.Id == id)
-                                            .FirstOrDefaultAsync();
-            if (reviewFromDB == null) return RedirectToMalfunction();
-
-            ViewData["Instrument"] = reviewFromDB.Instrument;
-            return View(review);
+            var instrumusicalsContext = _context.Review
+                .Include(r => r.Instrument)
+                .Include(r=> r.User);
+            return View(await instrumusicalsContext.ToListAsync());
+        }
+        
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == 0) return RedirectToMalfunction();
+            Review dbReview = await _context.Review.Include(r => r.Instrument).Where(r => r.Id == id).FirstOrDefaultAsync();
+            if (dbReview == null) return RedirectToMalfunction();
+            if (!IsUserAuthorized(dbReview.UserId)) return RedirectToAccessDenied();
+            ViewData["Instrument"] = dbReview.Instrument;
+            return View(dbReview);
         }
 
         [HttpPost]
@@ -101,7 +80,6 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("Id,InstrumentId,Created,LastUpdate,Content")] Review review, string returnUrl)
         {
             if (id != review.Id) return RedirectToMalfunction();
-
             Review reviewFromDb = await _context.Review.Where(r => r.Id == id).FirstOrDefaultAsync();
             if (reviewFromDb == null) return RedirectToMalfunction();
 
@@ -116,29 +94,18 @@ namespace Instrumusicals.Controllers
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
-                {
-                    if (!ReviewExists(review.Id))
-                        return RedirectToMalfunction();
-                    else throw;
-                }
+                { if (!ReviewExists(review.Id)) return RedirectToMalfunction(); else throw;}
                 return returnUrl != null ? LocalRedirect(returnUrl) : RedirectToAction(nameof(Index), "Instruments");
             }
             return View(review);
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return RedirectToMalfunction();
-            }
-
-            var review = await _context.Review
-                .Include(r => r.Instrument)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
+            if (id == 0) return RedirectToMalfunction();
+            var review = await _context.Review.Include(r => r.Instrument).FirstOrDefaultAsync(m => m.Id == id);
             if (review == null) return RedirectToMalfunction();
-
+            if (!IsUserAuthorized(review.UserId)) return RedirectToAccessDenied();
             return View(review);
         }
 
@@ -146,23 +113,49 @@ namespace Instrumusicals.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (id == 0) return RedirectToMalfunction();
             var review = await _context.Review.FindAsync(id);
-
+            if (!IsUserAuthorized(review.UserId)) return RedirectToAccessDenied();
 
             _context.Review.Remove(review);
             await _context.SaveChangesAsync();
             return LocalRedirect("/Instruments/Details/" + review.InstrumentId);
         }
+        
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return RedirectToMalfunction();
+
+            var review = await _context.Review
+                .Include(r => r.Instrument)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (review == null) return RedirectToMalfunction();
+            return View(review);
+        }
+
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ --------------- Util functions ---------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
         private bool ReviewExists(int id)
         {
             return _context.Review.Any(e => e.Id == id);
         }
+        
+        private bool IsUserAuthorized(int uid)
+        {
+            return HttpContext.User.IsInRole("Admin") || Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid;
+        }
+
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ ----------- Reditection functions ------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
         private IActionResult RedirectToMalfunction()
         {
             return RedirectToAction("Malfunction", "Home");
         }
+        
         private IActionResult RedirectToAccessDenied()
         {
             return RedirectToAction("AccessDenied", "Users");

@@ -34,17 +34,18 @@ namespace Instrumusicals.Controllers
     {
         private readonly InstrumusicalsContext _context;
         private List<string> adminsEmails;
-        private string ERR, CREDS_ERR, NAVA_UN_ERR;
+        private string ERR, CREDS_ERR, NA_UN_ERR;
 
         private string mikesMail, shirsMail, dansMail;
 
+        // ---------------------- C'tor ------------------------- //
         public UsersController(InstrumusicalsContext context)
         {
             _context = context;
 
             ERR = "Error";
             CREDS_ERR = "Credentials mismatch. Please try again";
-            NAVA_UN_ERR = "Email already in use. If you forgot your password, IT'S YOUR PROBLEM.";
+            NA_UN_ERR = "Email already in use. If you forgot your password, IT'S YOUR PROBLEM.";
 
             mikesMail = "mikelasry123@gmail.com";
             shirsMail = "shirboxer@gmail.com";
@@ -57,68 +58,11 @@ namespace Instrumusicals.Controllers
 
         }
 
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.User.ToListAsync());
-        }
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ -------------------- CRUD --------------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-        [AllowAnonymous]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Admin()
-        {
-            Dictionary<string, int> data = new Dictionary<string, int>();
-            Dictionary<string, int> data2 = new Dictionary<string, int>();
-
-            var query_ = from row in _context.Instrument.AsEnumerable()
-                         group row by row.CategoryId into groups
-                         select groups;
-
-            foreach (var groupName in query_) // for each category
-            {
-                var name = _context.Category.Find(groupName.Key).Name;
-                Console.WriteLine(name);
-                int i = 0;
-                int counter = 0;
-                foreach (var inst in groupName) // for each instrument
-                {
-                    counter++;
-                    i += (((int)inst.Price) * ((int)inst.Quantity));
-                }
-                data2.Add(name, counter);
-                data.Add(name, i);
-            }
-
-            ViewData["data"] = data;
-            ViewData["data2"] = data2;
-            
-            return View();
-        }
-
-        [AllowAnonymous]
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return RedirectToMalfunction();
-            }
-
-            // TODO: check if authenticated user is authorized (self or admin)
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return RedirectToMalfunction();
-            }
-
-            return View(user);
-        }
-
-        [AllowAnonymous]
+        [AllowAnonymous] // Create: Get
         public IActionResult Register()
         {
             ViewData["Areas"] = new SelectList(new[] {
@@ -133,18 +77,19 @@ namespace Instrumusicals.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] // Create: Post
         public async Task<IActionResult> Register([Bind("Email,FirstName,LastName,Address,Password")] User user, String area)
         {
             if (ModelState.IsValid)
             {
-                if (_context.User.FirstOrDefault(x => x.Email.ToLower() == user.Email.ToLower()) != null)
+                user.Email = user.Email.Trim().ToLower(); ;
+                if (_context.User.FirstOrDefault(x => x.Email == user.Email) != null)
                 {
-                    ViewData[ERR] = NAVA_UN_ERR;
+                    ViewData[ERR] = NA_UN_ERR;
                     return View(user);
                 }
 
-                user.Address += getDirectionSuffix(area);
+                user.Address += GetDirectionSuffix(area);
 
                 user.Salt = SecurityManager.GenerateSalt();
                 user.Hash = SecurityManager.HashPassword(user.Password, user.Salt);
@@ -155,21 +100,83 @@ namespace Instrumusicals.Controllers
                 await _context.SaveChangesAsync();
                 logUser(user);
                 return RedirectToAction(nameof(Index), "Home");
-            } return View(user);
+            }
+            return View(user);
         }
 
-        private string getDirectionSuffix(String area)
+        // Read: Get
+        public async Task<IActionResult> Index()
         {
-            switch (area)
-            {
-                case "e": return ", East";
-                case "w": return ", West";
-                case "s": return ", South";
-                case "n": return ", North";
-                case "c": return ", Center";
-                default: return ", NA";
-            }
+            return View(await _context.User.ToListAsync());
         }
+
+        // Update: Get
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == 0) return RedirectToMalfunction();
+            if (!IsUserAuthorized(id)) return RedirectToAccessDenied();
+            var user = await _context.User.FindAsync(id);
+            if (user == null) return RedirectToMalfunction();
+            return View(user);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Update: Post
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
+        {
+            if (id != user.Id) return RedirectToMalfunction();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!IsUserExists(user.Id)) return RedirectToMalfunction();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(user);
+        }
+
+        // Delete: Get
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == 0) return RedirectToMalfunction();
+            if (!IsUserAuthorized(id)) return AccessDenied();
+            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null) return RedirectToMalfunction();
+            return View(user);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken] // Delete: Post
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+            _context.User.Remove(user);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
+        {
+            if (id == 0) return RedirectToMalfunction();
+            if (!IsUserAuthorized(id)) return RedirectToAccessDenied();
+
+            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null) return RedirectToMalfunction();
+            return View(user);
+        }
+
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ --------------- User Auth --------------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
         [AllowAnonymous]
         public IActionResult Login()
@@ -184,7 +191,8 @@ namespace Instrumusicals.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([Bind("Id,Email,Password")] User user, String ReturnUrl)
         {
-            User userFromDB = await _context.User.FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == user.Email.Trim().ToLower());
+            user.Email = user.Email.Trim().ToLower();
+            User userFromDB = await _context.User.FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == user.Email);
             if (userFromDB == null)
             {
                 ViewData[ERR] = CREDS_ERR;
@@ -236,45 +244,9 @@ namespace Instrumusicals.Controllers
                 authProperties);
         }
 
-        public async Task<IActionResult> Cart()
-        {
-            int uid = Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault());
-            if (uid < 1) RedirectToMalfunction();
-
-            User dbUser = await _context.User.Where(u => u.Id == uid).SingleOrDefaultAsync();
-            if (dbUser == null) RedirectToMalfunction();
-
-            IDictionary<int,int> countDict = new Dictionary<int,int>();
-            string[] inst_count_pairs = dbUser.InstrumentsWishlist.Split(";");
-            int[] instsIds = new int[inst_count_pairs.Length - 1];
-            int i = 0;
-
-            foreach (string inst_count_pair in inst_count_pairs)
-            {
-                if (inst_count_pair.Trim() == "") continue;
-                int instId = Int32.Parse(inst_count_pair.Split(",")[0]);
-                int instCount = Int32.Parse(inst_count_pair.Split(",")[1]);
-                if (instId < 1 || instCount < 0 ) return RedirectToMalfunction();
-                
-                instsIds[i++] = instId;
-                countDict.Add(new KeyValuePair<int, int>(instId, instCount));
-            }
-
-            List<Instrument> cartInsts = await _context.Instrument.Where(i => instsIds.Contains(i.Id)).ToListAsync();
-            if (cartInsts == null) return RedirectToMalfunction();
-
-            List<CartItem> cartBag = new();
-            foreach(Instrument cartItem in cartInsts)
-            {
-                int instCount;
-                if (!countDict.TryGetValue(cartItem.Id, out instCount))
-                    { return RedirectToMalfunction(); } 
-                cartBag.Add(new CartItem(cartItem.Id, cartItem, instCount));
-            }
-
-            ViewData["CartBag"] = cartBag;
-            return View();
-        }
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ ----------- Profile & Admin Panel ------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
         public async Task<IActionResult> Profile(int? id)
         {
@@ -286,93 +258,129 @@ namespace Instrumusicals.Controllers
             return (user == null) ? NotFound(user) : View(user);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        [Authorize(Roles = "Admin")]
+        public IActionResult Admin()
         {
-            if (id == null)
-            {
-                return RedirectToMalfunction();
-            }
+            Dictionary<string, int> data = new Dictionary<string, int>();
+            Dictionary<string, int> data2 = new Dictionary<string, int>();
 
-            // TODO: check if authenticated user is authorized (self or admin)
-            // if not so, retrun redirect AccessDenied
+            var query_ = from row in _context.Instrument.AsEnumerable()
+                         group row by row.CategoryId into groups
+                         select groups;
 
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
+            foreach (var groupName in query_) // for each category
             {
-                return RedirectToMalfunction();
-            }
-            return View(user);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
-        {
-            if (id != user.Id)
-            {
-                return RedirectToMalfunction();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                var name = _context.Category.Find(groupName.Key).Name;
+                Console.WriteLine(name);
+                int i = 0;
+                int counter = 0;
+                foreach (var inst in groupName) // for each instrument
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    counter++;
+                    i += (((int)inst.Price) * ((int)inst.Quantity));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
-                    {
-                        return RedirectToMalfunction();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                data2.Add(name, counter);
+                data.Add(name, i);
             }
-            return View(user);
+
+            ViewData["data"] = data;
+            ViewData["data2"] = data2;
+
+            return View();
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ ------------------- Cart ---------------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+        public async Task<IActionResult> Cart()
         {
-            if (id == null)
+            int uid = GetAuthUserId();
+            if (uid < 1) RedirectToMalfunction();
+
+            User dbUser = await _context.User.Where(u => u.Id == uid).SingleOrDefaultAsync();
+            if (dbUser == null) RedirectToMalfunction();
+
+            IDictionary<int, int> countDict = new Dictionary<int, int>();
+            string[] inst_count_pairs = dbUser.InstrumentsWishlist.Split(";");
+            List<int> instsIds = new();
+            int i = 0;
+
+            foreach (string inst_count_pair in inst_count_pairs)
             {
-                return RedirectToMalfunction();
+                if (inst_count_pair.Trim() == "") continue;
+                int instId = Int32.Parse(inst_count_pair.Split(",")[0]);
+                int instCount = Int32.Parse(inst_count_pair.Split(",")[1]);
+                if (instId < 1 || instCount < 0) return RedirectToMalfunction();
+
+                instsIds.Add(instId);
+                countDict.Add(new KeyValuePair<int, int>(instId, instCount));
             }
 
-            // TODO: check if authenticated user is authorized (self or admin)
-            // if not so, retrun redirect AccessDenied
+            List<Instrument> cartInsts = await _context.Instrument.Where(i => instsIds.Contains(i.Id)).ToListAsync();
+            if (cartInsts == null) return RedirectToMalfunction();
 
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+            List<CartItem> cartBag = new();
+            foreach (Instrument cartItem in cartInsts)
             {
-                return RedirectToMalfunction();
+                int instCount;
+                if (!countDict.TryGetValue(cartItem.Id, out instCount))
+                    { return RedirectToMalfunction(); }
+                cartBag.Add(new CartItem(cartItem.Id, cartItem, instCount));
             }
 
-            return View(user);
+            ViewData["CartBag"] = cartBag;
+            return View();
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var user = await _context.User.FindAsync(id);
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ --------------- Util functions ---------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-        private bool UserExists(int id)
+        private bool IsUserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
         }
 
+        private bool IsUserAuthorized(int uid)
+        {
+            return HttpContext.User.IsInRole("Admin") || (Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid) ;
+        }
+        private int GetAuthUserId()
+        {
+            if (HttpContext.User == null || HttpContext.User.Identity == null) return 0;
+            return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault());
+        }
+
+        private string GetDirectionSuffix(String area)
+        {
+            switch (area)
+            {
+                case "e": return ", East";
+                case "w": return ", West";
+                case "s": return ", South";
+                case "n": return ", North";
+                case "c": return ", Center";
+                default: return ", NA";
+            }
+        }
+
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ ----------- Reditection functions ------------- @@ //
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
         private IActionResult RedirectToMalfunction()
         {
             return RedirectToAction("Malfunction", "Home");
+        }
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+        private IActionResult RedirectToAccessDenied()
+        {
+            return RedirectToAction("AccessDenied", "Users");
         }
     }
 }

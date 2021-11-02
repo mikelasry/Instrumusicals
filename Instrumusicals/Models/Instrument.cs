@@ -24,7 +24,7 @@ namespace Instrumusicals.Models
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 
-        [NotMapped] // The file uploaded should be converted to bytes array and NOT be MAPPED to the db.
+        [NotMapped] // The uploaded file should be converted to bytes array and NOT be MAPPED to the db.
         public IFormFile ImageFile { get; set; }
         public byte[] Image { get; set; } // Actual image as bytes array
 
