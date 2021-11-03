@@ -21,10 +21,9 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ -------------------- CRUD --------------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ // 
+        /* @@ @@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@ @@ */
 
+        // @@ -------------------- Create ------------------- @@ //
         public async Task<IActionResult> Create(int? inst)
         {
             ViewData["InstrumentId"] = inst;
@@ -56,6 +55,7 @@ namespace Instrumusicals.Controllers
             return View(review);
         }
 
+        // @@ --------------------- Read ------------------- @@ //
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
@@ -65,6 +65,7 @@ namespace Instrumusicals.Controllers
             return View(await instrumusicalsContext.ToListAsync());
         }
         
+        // @@ -------------------- Update ------------------ @@ //
         public async Task<IActionResult> Edit(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -100,6 +101,7 @@ namespace Instrumusicals.Controllers
             return View(review);
         }
 
+        // @@ -------------------- Delete ----------------- @@ //
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -122,6 +124,7 @@ namespace Instrumusicals.Controllers
             return LocalRedirect("/Instruments/Details/" + review.InstrumentId);
         }
         
+        // @@ -------------------- Details----------------- @@ //
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -133,9 +136,7 @@ namespace Instrumusicals.Controllers
             return View(review);
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ --------------- Util functions ---------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@ @@ //
 
         private bool ReviewExists(int id)
         {
@@ -147,9 +148,7 @@ namespace Instrumusicals.Controllers
             return HttpContext.User.IsInRole("Admin") || Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid;
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ ----------- Reditection functions ------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@ @@ //
 
         private IActionResult RedirectToMalfunction()
         {

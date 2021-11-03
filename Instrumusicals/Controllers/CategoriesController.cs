@@ -19,24 +19,10 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Category.Include(c => c.CategoryImage).ToListAsync());
-        }
+        // @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@@ @@ //
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return RedirectToMalfunction();
-            var category = await _context.Category.Include(c => c.CategoryImage)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            return category == null ? RedirectToMalfunction() : View(category);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
+        // @@ -- Create -- @@ //
+        public IActionResult Create() { return View(); }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
@@ -50,17 +36,20 @@ namespace Instrumusicals.Controllers
             return View(category);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        // @@ -- Read -- @@ //
+        public async Task<IActionResult> Index()
         {
-            if (id == null) return RedirectToMalfunction();
-
-            var category = await _context.Category
-                                    .Include(c => c.CategoryImage)
-                                    .FirstOrDefaultAsync(c => c.Id == id);
-
-            return (category == null) ? RedirectToMalfunction() : View(category);
+            return View(await _context.Category.Include(c => c.CategoryImage).ToListAsync());
         }
 
+        // @@ -- Update -- @@ //
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == 0) return RedirectToMalfunction();
+            var category = await _context.Category
+                .Include(c => c.CategoryImage).FirstOrDefaultAsync(c => c.Id == id);
+            return (category == null) ? RedirectToMalfunction() : View(category);
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
@@ -76,7 +65,8 @@ namespace Instrumusicals.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id)) return RedirectToMalfunction();
+                    if (!CategoryExists(category.Id)) 
+                        return RedirectToMalfunction();
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -84,36 +74,68 @@ namespace Instrumusicals.Controllers
             return View(category);
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        // @@ -- Delete -- @@ //
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return RedirectToMalfunction();
-
-
-            var category = await _context.Category
+            if (id == 0) return RedirectToMalfunction();
+            Category category = await _context.Category
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null) return RedirectToMalfunction();
-
-            return View(category);
+            return (category == null) ? RedirectToMalfunction() : View(category);
         }
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Category.FindAsync(id);
+            Category category = await _context.Category.FindAsync(id);
             _context.Category.Remove(category);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        
+        // @@ -- Details-- @@ //
+        public async Task<IActionResult> Details(int id)
+            {
+                if (id == 0) return RedirectToMalfunction();
+                Category category = await _context.Category.Include(c => c.CategoryImage)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                return (category == null) ? RedirectToMalfunction() : View(category);
+            }
+        
+        // @@ @@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@ @@ //
 
         private bool CategoryExists(int id)
         {
             return _context.Category.Any(e => e.Id == id);
         }
 
+        private bool IsUserAuthorized(int uid)
+        {
+            return HttpContext.User.IsInRole("Admin") || (Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid);
+        }
+
+        private int GetAuthUserId()
+        {
+            if (HttpContext.User == null || HttpContext.User.Identity == null) return 0;
+            return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault());
+        }
+
+        private IActionResult JsonSuccess(bool success, Object dataDict)
+        {
+            return Json(new { success = success, data = dataDict });
+        }
+
+
+        // @@ @@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@ @@ //
+
         private IActionResult RedirectToMalfunction()
         {
             return RedirectToAction("Malfunction", "Home");
         }
+                
+        private IActionResult RedirectToAccessDenied()
+        {
+            return RedirectToAction("AccessDenied", "Users");
+        }
     }
 }
+

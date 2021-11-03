@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Instrumusicals.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoryImagesController : Controller
     {
         private readonly InstrumusicalsContext _context;
@@ -20,42 +22,14 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        // GET: CategoryImages
-        public async Task<IActionResult> Index()
-        {
-            var instrumusicalsContext = _context.CategoryImage.Include(c => c.Category);
-            return View(await instrumusicalsContext.ToListAsync());
-        }
+        // @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@ @@ //
 
-        // GET: CategoryImages/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return RedirectToMalfunction();
-            }
-
-            var categoryImage = await _context.CategoryImage
-                .Include(c => c.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (categoryImage == null)
-            {
-                return RedirectToMalfunction();
-            }
-
-            return View(categoryImage);
-        }
-
-        // GET: CategoryImages/Create
+        // @@ -- Create -- @@ //
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Category.Where(c => c.CategoryImage.Image == null), nameof(Category.Id), nameof(Category.Name));
             return View();
         }
-
-        // POST: CategoryImages/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CategoryId,ImageFile")] CategoryImage categoryImage)
@@ -75,8 +49,15 @@ namespace Instrumusicals.Controllers
             ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id", categoryImage.CategoryId);
             return View(categoryImage);
         }
-
-        // GET: CategoryImages/Edit/5
+        
+        // @@ -- Read -- @@ //
+        public async Task<IActionResult> Index()
+        {
+            var instrumusicalsContext = _context.CategoryImage.Include(c => c.Category);
+            return View(await instrumusicalsContext.ToListAsync());
+        }
+                
+        // @@ -- Update -- @@ //
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -92,10 +73,6 @@ namespace Instrumusicals.Controllers
             ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name), categoryImage.CategoryId);
             return View(categoryImage);
         }
-
-        // POST: CategoryImages/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,ImageFile")] CategoryImage categoryImage)
@@ -121,13 +98,7 @@ namespace Instrumusicals.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!CategoryImageExists(categoryImage.Id))
-                    {
-                        return RedirectToMalfunction();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    { return RedirectToMalfunction(); } else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -135,26 +106,16 @@ namespace Instrumusicals.Controllers
             return View(categoryImage);
         }
 
-        // GET: CategoryImages/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // @@ -- Delete -- @@ //
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return RedirectToMalfunction();
-            }
-
-            var categoryImage = await _context.CategoryImage
+            if (id == 0) return RedirectToMalfunction();
+            CategoryImage categoryImage = await _context.CategoryImage
                 .Include(c => c.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (categoryImage == null)
-            {
-                return RedirectToMalfunction();
-            }
-
+            if (categoryImage == null) return RedirectToMalfunction();
             return View(categoryImage);
         }
-
-        // POST: CategoryImages/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -165,14 +126,54 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // @@ -- Details -- @@ //
+        public async Task<IActionResult> Details(int id)
+        {
+            if (id == 0) return RedirectToMalfunction();
+            CategoryImage categoryImage = await _context.CategoryImage
+                .Include(c => c.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (categoryImage == null) return RedirectToMalfunction();
+            return View(categoryImage);
+        }
+
+        // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //
+        
         private bool CategoryImageExists(int id)
         {
             return _context.CategoryImage.Any(e => e.Id == id);
         }
 
+        private bool IsUserAuthorized(int uid)
+        {
+            return HttpContext.User.IsInRole("Admin") || (Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid);
+        }
+
+        private int GetAuthUserId()
+        {
+            if (HttpContext.User == null || HttpContext.User.Identity == null) return 0;
+            return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault());
+        }
+
+        private IActionResult JsonSuccess(bool success, Object dataDict)
+        {
+            return Json(new { success = success, data = dataDict });
+        }
+
+
+
+        // @@ @@@@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@@@ @@ //
+
+        [AllowAnonymous]
         private IActionResult RedirectToMalfunction()
         {
             return RedirectToAction("Malfunction", "Home");
+        }
+
+        [AllowAnonymous]
+        private IActionResult RedirectToAccessDenied()
+        {
+            return RedirectToAction("AccessDenied", "Users");
         }
     }
 }

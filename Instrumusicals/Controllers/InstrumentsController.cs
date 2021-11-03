@@ -33,10 +33,9 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ -------------------- CRUD --------------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        
+        // @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@ @@ //
+
+        // @@ -- Create -- @@ //
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Category, nameof(Category.Id), nameof(Category.Name));
@@ -68,6 +67,7 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
+        // @@ -- Read -- @@ //
         public async Task<IActionResult> Index()
         {
             var instrumentsContext = _context.Instrument.Include(i => i.Category);
@@ -77,6 +77,7 @@ namespace Instrumusicals.Controllers
             return View(l);
         }
 
+        // @@ -- Update -- @@ //
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -127,6 +128,7 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
+        // @@ -- Delete -- @@ //
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -149,6 +151,7 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index));
         }
        
+        // @@ -- Details -- @@ //
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -169,11 +172,9 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ -------------------- Cart --------------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@@@ Cart @@@@@@@@@@@@@@@@@@@@ @@ //
 
-        // ---------------------- Cart in ---------------------- //
+        // -- Cart Add -- //
         [Authorize]
         public async Task<IActionResult> AddToCart(int instrumentId, int userId)
         {
@@ -261,7 +262,7 @@ namespace Instrumusicals.Controllers
         }
 
 
-        // --------------------- Cart out ---------------------- //
+        // -- Cart Remove -- //
         public async Task<IActionResult> RemoveFromCart(int instrumentId, int userId, bool deleteAll)
         {
             if (!IsUserAuthorized(userId)) return RedirectToAccessDenied();
@@ -323,9 +324,7 @@ namespace Instrumusicals.Controllers
         }
 
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ --------------- Util functions ---------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //
 
         private bool InstrumentExists(int id)
         {
@@ -358,9 +357,7 @@ namespace Instrumusicals.Controllers
             return Json(await q.ToListAsync());
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ ----------- Reditection functions ------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@@@ @@ //
 
         private IActionResult RedirectToMalfunction()
         {

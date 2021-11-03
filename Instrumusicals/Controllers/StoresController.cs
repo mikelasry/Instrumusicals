@@ -20,10 +20,10 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-    // @@ --------------------- CRUD -------------------- @@ //
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+   
+    /* @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@ @@ */   
         
+    // @@ -- Create -- @@ //
         [Authorize(Roles = "Admin")]
         public IActionResult Create() { return View(); }
 
@@ -41,17 +41,19 @@ namespace Instrumusicals.Controllers
             return View(store);
         }
 
+        // @@ -- Read -- @@ //
         public async Task<IActionResult> Index()
         {
             return View(await _context.Store.ToListAsync());
         }
-        
+
+        // @@ -- Update -- @@ //
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
-            if (id == 0) return NotFound();
+            if (id == 0) return RedirectToMalfunction();
             var store = await _context.Store.FindAsync(id);
-            if (store == null) return NotFound();            
+            if (store == null) return RedirectToMalfunction();            
             return View(store);
         }
 
@@ -60,7 +62,7 @@ namespace Instrumusicals.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Lat,Lng")] Store store)
         {
-            if (id != store.Id) return NotFound();
+            if (id != store.Id) return RedirectToMalfunction();
             
             if (ModelState.IsValid)
             {
@@ -71,7 +73,7 @@ namespace Instrumusicals.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StoreExists(store.Id)) return NotFound();
+                    if (!StoreExists(store.Id)) return RedirectToMalfunction();
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -79,14 +81,15 @@ namespace Instrumusicals.Controllers
             return View(store);
         }
 
-        
+
+        // @@ -- Delete -- @@ //
         [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
-            if (id == 0) return NotFound();
+            if (id == 0) return RedirectToMalfunction();
 
             Store store = await _context.Store.FirstOrDefaultAsync(m => m.Id == id);
-            if (store == null) return NotFound();
+            if (store == null) return RedirectToMalfunction();
             return View(store);
         }
 
@@ -101,16 +104,17 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+    // @@ -- Details -- @@ //
         public async Task<IActionResult> Details(int id)
         {
-            if (id == 0) return NotFound();
+            if (id == 0) return RedirectToMalfunction();
             var store = await _context.Store.FirstOrDefaultAsync(m => m.Id == id);
-            if (store == null)return NotFound();
+            if (store == null)return RedirectToMalfunction();
             return View(store);
         }
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-    // @@ ---------------- Util functions --------------- @@ //
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+   
+    // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //   
 
         private bool StoreExists(int id)
         {
@@ -133,10 +137,8 @@ namespace Instrumusicals.Controllers
             return Json(new { success = success, data = dataDict });
         }
 
-
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-    // @@ ----------- Reditection functions ------------- @@ //
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+   
+    // @@ @@@@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@@@ @@ //   
 
         private IActionResult RedirectToMalfunction()
         {

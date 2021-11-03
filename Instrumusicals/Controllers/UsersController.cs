@@ -58,10 +58,9 @@ namespace Instrumusicals.Controllers
 
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ -------------------- CRUD --------------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@ @@ //
 
+        // @@ -- Create -- @@ //
         [AllowAnonymous] // Create: Get
         public IActionResult Register()
         {
@@ -74,7 +73,6 @@ namespace Instrumusicals.Controllers
                     }, "Value", "Text");
             return View();
         }
-
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken] // Create: Post
@@ -104,13 +102,14 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
+        // @@ -- Read -- @@ //
         // Read: Get
         public async Task<IActionResult> Index()
         {
             return View(await _context.User.ToListAsync());
         }
 
-        // Update: Get
+        // @@ -- Update -- @@ //
         public async Task<IActionResult> Edit(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -119,7 +118,6 @@ namespace Instrumusicals.Controllers
             if (user == null) return RedirectToMalfunction();
             return View(user);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken] // Update: Post
         public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
@@ -143,7 +141,7 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
-        // Delete: Get
+        // @@ -- Delete -- @@ //
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -152,7 +150,6 @@ namespace Instrumusicals.Controllers
             if (user == null) return RedirectToMalfunction();
             return View(user);
         }
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken] // Delete: Post
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -163,6 +160,7 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // @@ -- Details -- @@ //
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
@@ -174,9 +172,7 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ --------------- User Auth --------------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@ User Auth @@@@@@@@@@@@@@@@@@ @@ //
 
         [AllowAnonymous]
         public IActionResult Login()
@@ -244,9 +240,7 @@ namespace Instrumusicals.Controllers
                 authProperties);
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ ----------- Profile & Admin Panel ------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@ Profile & Admin Panel @@@@@@@@@@@@@@@@@@ @@ //
 
         public async Task<IActionResult> Profile(int? id)
         {
@@ -289,9 +283,7 @@ namespace Instrumusicals.Controllers
             return View();
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ ------------------- Cart ---------------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@ Cart @@@@@@@@@@@@@@@@@@ @@ //
 
         public async Task<IActionResult> Cart()
         {
@@ -333,9 +325,7 @@ namespace Instrumusicals.Controllers
             return View();
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ --------------- Util functions ---------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@ @@ //
 
         private bool IsUserExists(int id)
         {
@@ -365,9 +355,7 @@ namespace Instrumusicals.Controllers
             }
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ ----------- Reditection functions ------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@ @@ //
 
         private IActionResult RedirectToMalfunction()
         {

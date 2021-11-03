@@ -20,23 +20,15 @@ namespace Instrumusicals.Controllers
         {
             _context = context;
         }
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ -------------------- CRUD --------------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
+        /* @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@ @@ */
+
+        // @@ -- Create -- @@ //
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id");
             return View();
         }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
-        {
-            var instrumusicalsContext = _context.Order.Include(o => o.User);
-            return View(await instrumusicalsContext.ToListAsync());
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -53,11 +45,18 @@ namespace Instrumusicals.Controllers
             return View(order);
         }
         
+        // @@ -- Read -- @@ //
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Index()
+        {
+            var instrumusicalsContext = _context.Order.Include(o => o.User);
+            return View(await instrumusicalsContext.ToListAsync());
+        }
 
+        // @@ -- Update -- @@ //
         public async Task<IActionResult> Edit(int id)
         {
             if (id == 0) return RedirectToMalfunction();
-
             Order order = await _context.Order.Where(o => o.Id == id).Include(o => o.Instruments).FirstOrDefaultAsync();
             if (order == null) return RedirectToMalfunction();
             if (!IsUserAuthorized(order.UserId)) return RedirectToAccessDenied();
@@ -65,7 +64,6 @@ namespace Instrumusicals.Controllers
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id", order.UserId);
             return View(order);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Address,TotalPrice,Create,LastUpdate")] Order order)
@@ -88,8 +86,8 @@ namespace Instrumusicals.Controllers
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id", order.UserId);
             return View(order);
         }
-
-        // GET: Delete
+        
+        // @@ -- Delete -- @@ //
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -98,8 +96,6 @@ namespace Instrumusicals.Controllers
             if (!IsUserAuthorized(order.UserId)) return RedirectToAccessDenied();
             return View(order);
         }
-
-        // POST: Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -112,6 +108,7 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // @@ -- Details -- @@ //
         public async Task<IActionResult> Details(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -121,9 +118,7 @@ namespace Instrumusicals.Controllers
             return View(order);
         }
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ --------------- Util functions ---------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //
 
         public async Task<IActionResult> PlaceOrder(int uid)
         {
@@ -239,9 +234,7 @@ namespace Instrumusicals.Controllers
         }
 
 
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-        // @@ ----------- Reditection functions ------------- @@ //
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        // @@ @@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@ @@ //
 
         [AllowAnonymous]
         private IActionResult RedirectToMalfunction()
