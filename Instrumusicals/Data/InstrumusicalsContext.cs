@@ -25,5 +25,7 @@ namespace Instrumusicals.Data
         public DbSet<Instrumusicals.Models.Review> Review { get; set; }
 
         public DbSet<Instrumusicals.Models.User> User { get; set; }
+
+        public DbSet<Instrumusicals.Models.Store> Store { get; set; }
     }
 }

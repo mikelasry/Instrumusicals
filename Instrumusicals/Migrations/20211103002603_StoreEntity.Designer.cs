@@ -4,14 +4,16 @@ using Instrumusicals.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Instrumusicals.Migrations
 {
     [DbContext(typeof(InstrumusicalsContext))]
-    partial class InstrumusicalsContextModelSnapshot : ModelSnapshot
+    [Migration("20211103002603_StoreEntity")]
+    partial class StoreEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
