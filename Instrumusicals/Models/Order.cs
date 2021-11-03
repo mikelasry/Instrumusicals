@@ -25,6 +25,6 @@ namespace Instrumusicals.Models
 
         public DateTime Create { get; set; } = DateTime.Now;
 
-        public DateTime LastUpdate { get; set; }
+        public DateTime Shipping { get; set; }
     }
 }

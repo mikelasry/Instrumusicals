@@ -201,7 +201,7 @@ namespace Instrumusicals.Controllers
                 order.TotalPrice= totalPrice;
 
                 order.Create = DateTime.Now;
-                order.LastUpdate = DateTime.Now.AddMonths(3);
+                order.Shipping = DateTime.Now.AddMonths(3);
 
                 dbUser.InstrumentsWishlist = "";
                 _context.Add(order);
