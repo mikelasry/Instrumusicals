@@ -3,13 +3,44 @@
 @{
     ViewData["Title"] = "Profile";
 }
-
-<h1>Hello @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()!</h1>
-<div class="btn-group" role="group" aria-label="Basic example">
-    <button type="button" class="btn btn-secondary">Profile</button>
-    <button type="button" class="btn btn-secondary">Cart</button>
-    <button type="button" class="btn btn-secondary">Orders</button>
-    <button type="button" class="btn btn-secondary">Reviews</button>
-    <button type="button" class="btn btn-secondary">Security & Privacy</button>
+<div class="row text-center justify-content-center">
+    <div class="w-50">
+        <span class="text-secondary">Hello</span>
+        <h3 class="text-primary">
+            <cite>
+                @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()!
+            </cite>
+        </h3>
+        <span class="text-secondary">Welcome to your profile</span>
+        <br />
+        <div class="btn-group m-3" role="group" aria-label="Basic example">
+            <button id="btnProfile" type="button" onclick="switchContent('p')" class="btn btn-secondary">Profile</button>
+            <button id="btnOrders"  type="button" onclick="switchContent('o')" class="btn btn-secondary">Orders</button>
+            <button id="btnReviews" type="button" onclick="switchContent('r')" class="btn btn-secondary">Reviews</button>
+            <button id="btnSecurity" type="button" onclick="switchContent('s')" class="btn btn-secondary">Security & Privacy</button>
+        </div>
+    </div>
+</div>
+<div id="dynamicContent" class="text-center w-100" style="width:100px;">
+    <div id="profileContent" class=" m-3">
+        <h3>Profile Content</h3>
+    </div>
+    <div id="ordersContent" class="d-none m-3">
+        <h3>Orders Content</h3>
+    </div>
+    <div id="reviewsContent" class="d-none m-3">
+        <h3>Reviews Content</h3>
+    </div>
+    <div id="securityContent" class="d-none m-3">
+        <h3>Security & Privacy Content
+    </div>
 </div>
 
+<script type="text/template" id="privateDetailsTemplate"></script>
+<script type="text/template" id="myOrdersTemplate"></script>
+<script type="text/template" id="myReviewsTemplate"></script>
+<script type="text/template" id="securityPrivacyTemplate"></script>
+
+@section Scripts{
+    <script src="~/js/Users/ProfileViewController.js"></script>
+}

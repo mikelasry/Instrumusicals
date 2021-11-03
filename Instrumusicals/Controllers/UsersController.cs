@@ -242,14 +242,15 @@ namespace Instrumusicals.Controllers
 
         // @@ @@@@@@@@@@@@@@@@@@ Profile & Admin Panel @@@@@@@@@@@@@@@@@@ @@ //
 
-        public async Task<IActionResult> Profile(int? id)
+        public async Task<IActionResult> Profile(int id)
         {
-            string cookieIdentifier = HttpContext.User.Identity.Name;
-            User user = (id == null || id == 0) ?
-                (await _context.User.FirstOrDefaultAsync(u => u.Email == cookieIdentifier)) :
-                    (await _context.User.FirstOrDefaultAsync(u => u.Id == id));
+            if(id == 0) id = GetAuthUserId();
+            User user = await _context.User
+                .Include(u => u.Orders)
+                .Include(u => u.Reviews)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
-            return (user == null) ? NotFound(user) : View(user);
+            return (user == null) ? RedirectToMalfunction() : View(user);
         }
 
         [Authorize(Roles = "Admin")]
