@@ -16,23 +16,24 @@
 
             </div>
             <hr />
-            <div class="form-group">
-                <input asp-for="Content" class="form-control" rows="5" placeholder="Write your review here ... " />
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                @if (ViewBag.InstrumentId != null)
-                {
-                    <input class="form-group d-none" name="instrument" value="@ViewBag.InstrumentId" />
-                }
-                else
-                {
-                    <span class="text-danger">No instrument identifier to refer!</span>
-                }
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Submit!" class="btn btn-primary m-5 w-25" />
-            </div>
+            @if (ViewBag.InstrumentId != null)
+            {
+                <div class="form-group">
+                    <input asp-for="Content" class="form-control" rows="5" placeholder="Write your review here ... " />
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                        <input class="form-group d-none" name="instrument" value="@ViewBag.InstrumentId" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Submit!" class="btn btn-primary m-5 w-25" />
+                </div>
+            }
+            else
+            {
+                <span class="text-danger">No instrument identifier to refer!</span>
+                <h3>Choose an <a asp-action="Index" asp-controller="Instruments"> instrument</a></h3>
+            }
         </form>
     </div>
 </div>

@@ -98,55 +98,30 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>
-                        Instruments
-                    </th>
-                    <th>
-                        Categories
-                    </th>
-                    <th>
-                        Orders
-                    </th>
-                    <th>
-                        Users
-                    </th>
-                    <th>
-                        Reviews
-                    </th>
+                    <th class="text-primary"> Instruments </th>
+                    <th class="text-primary"> Categories </th>
+                    <th class="text-primary"> Orders </th>
+                    <th class="text-primary"> Users </th>
+                    <th class="text-primary"> Stores </th>
+                    <th class="text-primary"> Reviews </th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>
-                        <a class="text-danger" asp-controller="Instruments" asp-action="Index">Show All Instruments</a>
-                    </td>
-                    <td>
-                        <a class="text-danger" asp-controller="Categories" asp-action="Index">Show All Categories</a>
-                    </td>
-                    <td>
-                        <a class="text-danger" asp-controller="Orders" asp-action="Index">Show All Orders</a>
-                    </td>
-                    <td>
-                        <a class="text-danger" asp-controller="Users" asp-action="Index">Show All Users</a>
-                    </td>
-                    <td>
-                        <a class="text-danger" asp-controller="Reviews" asp-action="Index">Show All Reviews</a>
-                    </td>
+                    <td><a class="text-danger" asp-controller="Instruments" asp-action="Index">Show All Instruments</a></td>
+                    <td><a class="text-danger" asp-controller="Categories" asp-action="Index">Show All Categories</a></td>
+                    <td><a class="text-danger" asp-controller="Orders" asp-action="Index">Show All Orders</a></td>
+                    <td><a class="text-danger" asp-controller="Users" asp-action="Index">Show All Users</a></td>
+                    <td><a class="text-danger" asp-controller="Stores" asp-action="Index">Show All Stores</a></td>
+                    <td><a class="text-danger" asp-controller="Reviews" asp-action="Index">Show All Reviews</a></td>
                 </tr>
                 <tr>
-                    <td>
-                        <a class="text-danger" asp-controller="Instruments" asp-action="Create">Create a new Instrument</a>
-                    </td>
-                    <td>
-                        <a class="text-danger" asp-controller="Categories" asp-action="Create">Create a new Category</a>
-                    </td>
-                    <td>
-                        <a class="text-danger" asp-controller="Orders" asp-action="Create">Create a new Order</a>
-                    </td>
-                    <td>
-                        <a class="text-danger" asp-controller="Users" asp-action="Register">Register a User</a>
-                    </td>
-                    <td>
+                    <td><a class="text-danger" asp-controller="Instruments" asp-action="Create">Create a new Instrument</a></td>
+                    <td><a class="text-danger" asp-controller="Categories" asp-action="Create">Create a new Category</a></td>
+                    <td><a class="text-danger" asp-controller="Orders" asp-action="Create">Create a new Order</a></td>
+                    <td><a class="text-danger" asp-controller="Stores" asp-action="Register">Register a User</a></td>
+                    <td><a class="text-danger" asp-controller="Stores" asp-action="Create">Open new Store</a>
+                    </td><td>
                     </td>
                 </tr>
             </tbody>
@@ -161,6 +136,6 @@
             <p>
             </p>
         </div>
-       
+
     </div>
 </body>

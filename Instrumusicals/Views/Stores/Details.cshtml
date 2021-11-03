@@ -3,40 +3,37 @@
 @{
     ViewData["Title"] = "Details";
 }
-
-<h1>Details</h1>
-
-<div>
-    <h4>Store</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Lat)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Lat)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Lng)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Lng)
-        </dd>
-    </dl>
+<div class="row text-center text-light justify-content-center">
+    <div class="w-50">
+        <h2>@Html.DisplayFor(model => model.Name)</h2>
+        <a class="text-secondary" asp-action="Index">All Stores</a>
+        <hr />
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="row text-center text-light justify-content-center">
+    <div class="w-75">
+        <table class="table text-center text-light">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Address)</th>
+                    <th>@Html.DisplayNameFor(model => model.Lat)</th>
+                    <th>@Html.DisplayNameFor(model => model.Lng)</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>                    
+                    <td>@Html.DisplayFor(model => model.Address)</td>
+                    <td>@Html.DisplayFor(model => model.Lat)</td>
+                    <td>@Html.DisplayFor(model => model.Lng)</td>
+                    <td>
+                        <a class="text-warning" asp-action="Edit"  asp-route-id="@Model.Id" >Edit</a> |
+                        <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id" >Delete</a>
+                    </td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

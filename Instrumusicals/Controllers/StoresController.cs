@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Instrumusicals.Controllers
 {
@@ -19,39 +20,14 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        // GET: Stores
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Store.ToListAsync());
-        }
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@ --------------------- CRUD -------------------- @@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+        
+        [Authorize(Roles = "Admin")]
+        public IActionResult Create() { return View(); }
 
-        // GET: Stores/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var store = await _context.Store
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (store == null)
-            {
-                return NotFound();
-            }
-
-            return View(store);
-        }
-
-        // GET: Stores/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Stores/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Address,Lat,Lng")] Store store)
@@ -65,34 +41,27 @@ namespace Instrumusicals.Controllers
             return View(store);
         }
 
-        // GET: Stores/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Index()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            return View(await _context.Store.ToListAsync());
+        }
+        
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == 0) return NotFound();
             var store = await _context.Store.FindAsync(id);
-            if (store == null)
-            {
-                return NotFound();
-            }
+            if (store == null) return NotFound();            
             return View(store);
         }
 
-        // POST: Stores/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Lat,Lng")] Store store)
         {
-            if (id != store.Id)
-            {
-                return NotFound();
-            }
-
+            if (id != store.Id) return NotFound();
+            
             if (ModelState.IsValid)
             {
                 try
@@ -102,39 +71,26 @@ namespace Instrumusicals.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StoreExists(store.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!StoreExists(store.Id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
             return View(store);
         }
 
-        // GET: Stores/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == 0) return NotFound();
 
-            var store = await _context.Store
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (store == null)
-            {
-                return NotFound();
-            }
-
+            Store store = await _context.Store.FirstOrDefaultAsync(m => m.Id == id);
+            if (store == null) return NotFound();
             return View(store);
         }
 
-        // POST: Stores/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -145,9 +101,51 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            if (id == 0) return NotFound();
+            var store = await _context.Store.FirstOrDefaultAsync(m => m.Id == id);
+            if (store == null)return NotFound();
+            return View(store);
+        }
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@ ---------------- Util functions --------------- @@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
         private bool StoreExists(int id)
         {
             return _context.Store.Any(e => e.Id == id);
+        }
+
+        private bool IsUserAuthorized(int uid)
+        {
+            return HttpContext.User.IsInRole("Admin") || (Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid);
+        }
+
+        private int GetAuthUserId()
+        {
+            if (HttpContext.User == null || HttpContext.User.Identity == null) return 0;
+            return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault());
+        }
+
+        private IActionResult JsonSuccess(bool success, Object dataDict)
+        {
+            return Json(new { success = success, data = dataDict });
+        }
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@ ----------- Reditection functions ------------- @@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+        private IActionResult RedirectToMalfunction()
+        {
+            return RedirectToAction("Malfunction", "Home");
+        }
+
+        private IActionResult RedirectToAccessDenied()
+        {
+            return RedirectToAction("AccessDenied", "Users");
         }
     }
 }

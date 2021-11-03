@@ -175,6 +175,7 @@ namespace Instrumusicals.Controllers
                 if (left - ic_dict[inst.Id] < 0)  // -o-ut of stock
                     return JsonSuccess(false, new { msg = "o", left = left, inst = inst});
                 inst.Quantity -= ic_dict[inst.Id];
+                inst.Sold += ic_dict[inst.Id];
                 
                 _context.Update(inst);
 
