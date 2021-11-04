@@ -109,7 +109,7 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ -- Details -- @@ //
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == 0) return RedirectToMalfunction();
             Order order = await _context.Order.Include(o => o.User).Include(o => o.Instruments).FirstOrDefaultAsync(m => m.Id == id);

@@ -247,7 +247,8 @@ namespace Instrumusicals.Controllers
             if(id == 0) id = GetAuthUserId();
             User user = await _context.User
                 .Include(u => u.Orders)
-                .Include(u => u.Reviews)
+                .Include(u => u.Reviews).ThenInclude(r => r.User)
+                .Include(u => u.Reviews).ThenInclude(r => r.Instrument)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             return (user == null) ? RedirectToMalfunction() : View(user);
