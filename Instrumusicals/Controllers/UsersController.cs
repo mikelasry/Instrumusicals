@@ -19,7 +19,7 @@ namespace Instrumusicals.Controllers
     public class CartItem
     {
         public int Id { get; set; }
-        public Instrument Inst{ get; set; }
+        public Instrument Inst { get; set; }
         public int Count { get; set; }
         public CartItem(int Id, Instrument Inst, int Count)
         {
@@ -244,7 +244,7 @@ namespace Instrumusicals.Controllers
 
         public async Task<IActionResult> Profile(int id)
         {
-            if(id == 0) id = GetAuthUserId();
+            if (id == 0) id = GetAuthUserId();
             User user = await _context.User
                 .Include(u => u.Orders)
                 .Include(u => u.Reviews).ThenInclude(r => r.User)
@@ -252,6 +252,30 @@ namespace Instrumusicals.Controllers
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             return (user == null) ? RedirectToMalfunction() : View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(int uid, string cpw, string npw)
+        {
+            if (uid == 0) return JsonSuccess(false, new { msg = "m" }); // -m-alfunction
+            if (!IsUserAuthorized(uid)) return JsonSuccess(false, new { msg = "a" }); // -a-ccess denied
+
+            User dbUser = await _context.User.Where(u => u.Id == uid).FirstOrDefaultAsync();
+            if (dbUser == null) return JsonSuccess(false, new { msg = "m" }); // -m-alfunction
+
+            if (!SecurityManager.Validate(dbUser, cpw)) return JsonSuccess(false, new { msg = "w" }); // -w-rong password
+            dbUser.Salt = SecurityManager.GenerateSalt();
+            dbUser.Hash = SecurityManager.HashPassword(npw, dbUser.Salt);
+
+            try
+            {
+                _context.Update(dbUser);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            { return JsonSuccess(false, new {msg = "e"}); } // -e-xception
+
+            return JsonSuccess(true, new {msg = "s"}); // -s-uccess
         }
 
         [Authorize(Roles = "Admin")]
@@ -319,7 +343,7 @@ namespace Instrumusicals.Controllers
             {
                 int instCount;
                 if (!countDict.TryGetValue(cartItem.Id, out instCount))
-                    { return RedirectToMalfunction(); }
+                { return RedirectToMalfunction(); }
                 cartBag.Add(new CartItem(cartItem.Id, cartItem, instCount));
             }
 
@@ -336,12 +360,37 @@ namespace Instrumusicals.Controllers
 
         private bool IsUserAuthorized(int uid)
         {
-            return HttpContext.User.IsInRole("Admin") || (Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid) ;
+            return IsAuthUserAdmin() || (GetAuthUserId() == uid);
         }
+
+        private bool IsAuthUserAdmin()
+        {
+            if (!IsUserAuthenticated()) return false;
+            return HttpContext.User.IsInRole("Admin");
+        }
+
         private int GetAuthUserId()
         {
-            if (HttpContext.User == null || HttpContext.User.Identity == null) return 0;
-            return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault());
+            if (!IsUserAuthenticated()) 
+                return 0;
+            return Int32.
+                Parse(
+                    HttpContext.User.Claims
+                        .Where(claim => claim.Type == "Uid")
+                        .Select(claim => claim.Value)
+                        .SingleOrDefault()
+                        );
+        }
+
+        private bool IsUserAuthenticated()
+        {
+            return HttpContext.User != null && HttpContext.User.Identity != null;
+        }
+        
+        private IActionResult JsonSuccess(bool success, Object dataDict)
+        {
+            return Json(new { success = success, data = dataDict });
+
         }
 
         private string GetDirectionSuffix(String area)

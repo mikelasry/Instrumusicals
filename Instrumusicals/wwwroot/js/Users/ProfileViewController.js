@@ -1,5 +1,7 @@
 ﻿// jquery page for Profile View Controller
 
+const EMPTY = "";
+
 const BTN_BLU = "btn-primary";
 const BTN_GRAY = "btn-secondary";
 
@@ -8,7 +10,7 @@ const Display = {
     PROFILE: 8001,
     ORDERS: 8002,
     REVIEWS: 8003,
-    SECURITY: 8004
+    SECURITY: 8004,
 };
 
 var btnProfile;
@@ -24,17 +26,34 @@ var securityContent;
 var CurrentView = Display.PROFILE;
 
 $(function () {
-    btnProfile = $("#btnProfile");
-    btnOrders = $("#btnOrders");
-    btnReviews = $("#btnReviews");
-    btnSecurity = $("#btnSecurity");
-
+    // -- Dynamic Content -- //
     profileContent = $("#profileContent");
     ordersContent = $("#ordersContent");
     reviewsContent = $("#reviewsContent");
     securityContent = $("#securityContent");
 
-    swapBtnColors("p");
+    btnProfile = $("#btnProfile");
+    btnProfile.on("click", function () {
+        switchContent(Display.PROFILE);
+    });
+
+    btnOrders = $("#btnOrders");
+    btnOrders.on("click", function () {
+        switchContent(Display.ORDERS);
+    });
+
+    btnReviews = $("#btnReviews");
+    btnReviews.on("click", function () {
+        switchContent(Display.REVIEWS);
+    });
+
+    btnSecurity = $("#btnSecurity");
+    btnSecurity.on("click", function () {
+        switchContent(Display.SECURITY);
+    });
+
+
+    swapBtnColors(Display.PROFILE);
 });
 
 function switchContent(view) {
@@ -82,19 +101,19 @@ function swapBtnColors(view) {
     }
     // Turn Blue On
     switch (view) {
-        case "p":
+        case Display.PROFILE:
             btnProfile.removeClass(BTN_GRAY);
             btnProfile.addClass(BTN_BLU);
             break;
-        case "o":   
+        case Display.ORDERS:
             btnOrders.removeClass(BTN_GRAY);
             btnOrders.addClass(BTN_BLU);
             break;
-        case "r":
+        case Display.REVIEWS:
             btnReviews.removeClass(BTN_GRAY);
             btnReviews.addClass(BTN_BLU);
             break;
-        case "s":
+        case Display.SECURITY:
             btnSecurity.removeClass(BTN_GRAY);
             btnSecurity.addClass(BTN_BLU);
             break;
@@ -103,20 +122,19 @@ function swapBtnColors(view) {
 
 function toggleView(view) {
     switch (view) {
-
-        case "p":
+        case Display.PROFILE:
             profileContent.removeClass(DISP_NONE);
             CurrentView = Display.PROFILE;
             break;
-        case "o":
+        case Display.ORDERS:
             ordersContent.removeClass(DISP_NONE);
             CurrentView = Display.ORDERS;
             break;
-        case "r":
+        case Display.REVIEWS:
             reviewsContent.removeClass(DISP_NONE);
             CurrentView = Display.REVIEWS;
             break;
-        case "s":
+        case Display.SECURITY:
             securityContent.removeClass(DISP_NONE);
             CurrentView = Display.SECURITY;
             break;

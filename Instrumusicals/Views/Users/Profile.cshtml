@@ -3,6 +3,23 @@
 @{
     ViewData["Title"] = "Profile";
 }
+
+<div class="modal text-center" tabindex="-1" role="dialog" style="background-color: rgba(255,255,255,0.2);">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header justify-content-center">
+                <h5 id="moadlHeader" class="modal-title text-light text-center">Modal title</h5>
+            </div>
+            <div class="modal-body text-light">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" id="modalClose" class="btn w-75">OK!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row text-center justify-content-center">
     <div class="w-50">
         <span class="text-secondary">Hello</span>
@@ -14,14 +31,16 @@
         <span class="text-secondary">Welcome to your profile</span>
         <br />
         <div class="btn-group m-3" role="group" aria-label="Basic example">
-            <button id="btnProfile" type="button" onclick="switchContent('p')" class="btn btn-secondary">Profile</button>
-            <button id="btnOrders" type="button" onclick="switchContent('o')" class="btn btn-secondary">Orders</button>
-            <button id="btnReviews" type="button" onclick="switchContent('r')" class="btn btn-secondary">Reviews</button>
-            <button id="btnSecurity" type="button" onclick="switchContent('s')" class="btn btn-secondary">Security & Privacy</button>
+            <button id="btnProfile" type="button"  class="btn btn-secondary">Profile</button>
+            <button id="btnOrders" type="button"  class="btn btn-secondary">Orders</button>
+            <button id="btnReviews" type="button"  class="btn btn-secondary">Reviews</button>
+            <button id="btnSecurity" type="button"  class="btn btn-secondary">Security & Privacy</button>
         </div>
     </div>
 </div>
+
 <div id="dynamicContent" class="row text-center w-100  justify-content-center" style="width:100px;">
+    
     <div id="profileContent" class="w-50 row justify-content-center">
         <a class="text-warning" asp-action="Edit" asp-route-id="@Model.Id">Edit Profile</a>
         <div class="card bg-dark border border-light m-4" style="width: 18rem;">
@@ -34,6 +53,7 @@
             </ul>
         </div>
     </div>
+
     <div id="ordersContent" class="d-none m-3">
         <h3>My Orders</h3>
         <table class="table text-light">
@@ -65,6 +85,7 @@
             </tbody>
         </table>
     </div>
+
     <div id="reviewsContent" class="d-none m-3">
         <h3>My Reviews</h3>
         <table class="table text-light">
@@ -84,27 +105,38 @@
                         <td>@Html.DisplayFor(modelItem => item.LastUpdate)</td>
                         <td>
                             <a class="text-warning" asp-controller="Reviews" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                            <a class="text-primary" asp-controller="Reviews" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                            <a class="text-danger" asp-controller="Reviews" asp-action="Delete"  asp-route-id="@item.Id">Delete</a>
+                            <a class="text-primary" asp-controller="Reviews" asp-action="Details" asp-route-id="@item.Id">Details</a>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
     <div id="securityContent" class="d-none m-3">
         <h3>Keep Safe!</h3>
-        <button class="btn btn-danger btn-sm m-3" onclick="togglePwView()">
+        <button id="btnToggleChangePw" class="btn btn-danger btn-sm m-3" style="border-radius:100px">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
                 <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
             </svg> Change Password
         </button>
         <div class=" row text-center justify-content-center">
-        <div id="newPwDetails" class="w-25 text-center d-none">
-            <input type="password" id="currPwInput" class="form-control text-light bg-dark m-2 text-center" placeholder="Current Password"  style="border-radius:100px;"/>
-            <input type="password" id="newPwInput" class="form-control text-light bg-dark m-2 text-center" placeholder="New Password"  style="border-radius:100px;"/>
-            <input type="password" id="confirmPwInput" class="form-control text-light bg-dark m-2 text-center" placeholder="Confirm New Password"  style="border-radius:100px;"/>
-            <button id="submitChangePw" onclick="changePassword(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())"class="btn bg-transparent text-danger border border-2 border-danger btn-sm m-2" style="border-radius:100px;">submit</button>
+        <div id="newPwDetails" class="w-25 text-center d-none justify-content-center">
+            <input type="password" id="currPwInput" class="form-control text-light bg-dark m-2 text-center border border-warning" placeholder="Current Password"  style="border-radius:100px;"/>
+            <input type="password" id="newPwInput" class="form-control text-light bg-dark m-2 text-center border border-success" placeholder="New Password"  style="border-radius:100px;"/>
+            <input type="password" id="confirmPwInput" class="form-control text-light bg-dark m-2 text-center border border-success" placeholder="Confirm New Password"  style="border-radius:100px;"/>
+            <div class="row justify-content-center">
+                <div style="width:30px; height:30px;">
+                    <div id="changePwSpinner" class="d-none">
+                        <div class="spinner-border text-light" role="status" style="width:15px; height:15px">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="submitChangePw" onclick="changePassword(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())"
+                    class="w-25 btn bg-transparent text-danger border border-2 border-danger btn-sm m-1" style="border-radius:100px;">
+                submit
+            </button>
         </div>
         </div>
     </div>

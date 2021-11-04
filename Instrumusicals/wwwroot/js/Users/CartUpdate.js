@@ -37,8 +37,6 @@ const TXT_BLK = "text-dark";
 const BG_GRN = "bg-success";
 const BG_YLW = "bg-warning";
 
-
-
 var paymentVisible = false;
 
 // ----------------------------------------------------- //
@@ -150,7 +148,6 @@ function renderCart(result) {
         }
     }
 }
-
 
 function popModal(header, content, closeMsg, color, redirectUrl) {
     var modal = $(".modal");
