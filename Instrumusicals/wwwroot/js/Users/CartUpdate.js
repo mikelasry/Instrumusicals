@@ -5,7 +5,7 @@
 const Add_TO_CART_URL = "/Instruments/AddToCart"
 const REMOVE_FROM_CART_URL = "/Instruments/RemoveFromCart"
 const PLACE_ORDER_URL = "/Orders/PlaceOrder";
-
+const PROFILE_URL = "/Users/Profile";
 
 const TOO_FEW = "There is not enough occurrences of this insteument";
 const INST_NOT_AVAIL = "The instrument is currently not available."
@@ -22,7 +22,7 @@ const OK = "Got it!";
 const AW = "Awww";
 
 const ERR = "Something went wrong!";
-const DB_UPDATE_ERR = "Could not update the database.\nPlease try again soon!"
+const DB_UPDATE_ERR = "Could not update the database.<br /> Please try again soon!"
 
 const DISP_NONE = "d-none";
 
@@ -100,11 +100,13 @@ function placeOrder(_uid) {
         popModal(PAY_DET, FULFIL_PAY, OK, "y", null);
         return;
     }
-
+    loadPlaceOrder(true);
     let dataDict = { uid: _uid };
     $.ajax({ url: PLACE_ORDER_URL, data: dataDict }).done(function (result) {
         if (result != null && result.success != null) 
-            popOrderPlacedModal(result);        
+            popOrderPlacedModal(result);
+        loadPlaceOrder(false);
+        Redirect(PROFILE_URL);
     });
 }
 
@@ -187,7 +189,7 @@ function popModal(header, content, closeMsg, color, redirectUrl) {
     btnModalClose.click(function () {
         modal.hide();
         if (redirectUrl != null)
-            Redirect("/Users/Profile");
+            Redirect(PROFILE_URL);
     });
 
     modal.show();
@@ -196,7 +198,7 @@ function popModal(header, content, closeMsg, color, redirectUrl) {
 
 function popOrderPlacedModal(result) {
     if (result.success) {
-        popModal(GRATZ, ORDER_SUCCESS, OK, "g", "/Users/Profile");
+        popModal(GRATZ, ORDER_SUCCESS, OK, "g", PROFILE_URL);
         return;
     }
 
@@ -226,6 +228,12 @@ function loading(isLoading, _id) {
 
     if (isLoading) loader.removeClass(DISPLAY_NONE);
     else loader.addClass(DISPLAY_NONE);
+}
+
+function loadPlaceOrder(isLoading) {
+    var loader = $('#placeOrderSpinner');
+    if (isLoading) loader.removeClass(DISP_NONE);
+    else loader.addClass(DISP_NONE);
 }
 
 function togglePaymentDetails() {
