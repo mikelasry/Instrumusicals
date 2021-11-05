@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.Logging;
 
 namespace Instrumusicals
 {
@@ -76,6 +77,7 @@ namespace Instrumusicals
                     pattern: "{controller=Users}/{action=Profile}/{id?}"
                 );
             });
+
         }
     }
 }
