@@ -33,7 +33,7 @@ namespace Instrumusicals.Controllers
             _context = context;
         }
 
-        // @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@ @@ //
+        /* @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@ @@ */
 
         // @@ -- Create -- @@ //
         public IActionResult Create()
@@ -172,7 +172,7 @@ namespace Instrumusicals.Controllers
             return View(instrument);
         }
 
-        // @@ @@@@@@@@@@@@@@@@@@@@ Cart @@@@@@@@@@@@@@@@@@@@ @@ //
+        /* @@ @@@@@@@@@@@@@@@@@@@@ Cart @@@@@@@@@@@@@@@@@@@@ @@ */
 
         // -- Cart Add -- //
         [Authorize]
@@ -324,7 +324,7 @@ namespace Instrumusicals.Controllers
         }
 
 
-        // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //
+        /* @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ */
 
         private bool InstrumentExists(int id)
         {
@@ -341,20 +341,23 @@ namespace Instrumusicals.Controllers
             return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid;
         }
 
-        public async Task<IActionResult> SearchJson(bool all, String name)
+       
+        public async Task<IActionResult> SearchJson(bool all, String name , string category, string brand, float lPrice, float uPrice)
         {
+            if (all) return Json(await _context.Instrument.ToListAsync());
+            int catId = 0;
+            if(!String.IsNullOrEmpty(category))
+                catId = await _context.Category.Where(c => c.Name.Contains(category)).Select(c => c.Id).FirstOrDefaultAsync();
+            List<Instrument> instruments = await _context.Instrument
+                .Where(i => !String.IsNullOrEmpty(name) ? i.Name.Contains(name) : true)
+                .Where(i => catId==0 ? true: i.CategoryId == catId)
+                .Where(i => !String.IsNullOrEmpty(brand) ? i.Brand.Contains(brand) : true)
+                .Where(i => lPrice != -1 ? i.Price >= lPrice : true)
+                .Where(i => uPrice != -1 ? i.Price <= uPrice : true)
+                .ToListAsync();
+               
+            return Json(instruments);
 
-            if (all)
-            {
-                return Json(await _context.Instrument.ToListAsync());
-            }
-
-            var q = from instrument in _context.Instrument
-                    where instrument.Name.Contains(name)
-                    orderby instrument.Name
-                    select instrument;
-
-            return Json(await q.ToListAsync());
         }
 
         // @@ @@@@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@@@ @@ //

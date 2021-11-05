@@ -120,14 +120,21 @@
                                 <div class="form-group p-3 row justify-content-center">
                                     <input id="cvvInput" type="number" class="form-control text-center w-25" placeholder="CVV" />
                                 </div>
+
                                 @*<div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="false" id="privacyAgreed">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             Default checkbox
                                         </label>
                                     </div>*@
-                                <div class="form-group p-3 row justify-content-center">
 
+                                <div class="row justify-content-center" >
+                                    <div style="width:30px; height:30px;">
+                                        <div id="placeOrderSpinner" class="spinner-grow d-none" style="width:15px; height:15px;" role="status"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group p-3 row justify-content-center">
                                     <button onclick="placeOrder(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())" class="btn btn-primary w-50 m-3" style="border-radius:100px;">
                                         Place my order!
                                     </button>

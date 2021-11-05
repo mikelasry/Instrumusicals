@@ -3,41 +3,58 @@
 @{
     ViewData["Title"] = "Index";
 }
+<div class="row text-center justify-content-center">
+    <div class="w-50">
+        <h1>Instrumusicals' Categories</h1>
+    </div>
+</div>
+<div class="card m-2" style="width: 18rem; ">
+    <img class="card-img-top" src="..." alt="Card image cap">
+    <div class="card-body bg-dark">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+</div>
+<div class="card m-2" style="width: 18rem;">
+    <img class="card-img-top" src="..." alt="Card image cap">
+    <div class="card-body bg-dark">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+</div>
 
-<h1>Musical Instruments Categories</h1>
+@*<table class="table text-light">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>@Html.DisplayNameFor(model => model.CategoryImage)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @if(item.CategoryImage.Image != null)
+                    {
+                        string img = Convert.ToBase64String(item.CategoryImage.Image);
+                        <img src="data:image/png;base64,@img" width="300" style="border-radius:10px"/>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>*@
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table text-light">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>@Html.DisplayNameFor(model => model.CategoryImage)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @if(item.CategoryImage.Image != null)
-                {
-                    string img = Convert.ToBase64String(item.CategoryImage.Image);
-                    <img src="data:image/png;base64,@img" width="300" style="border-radius:10px"/>
-                }
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
