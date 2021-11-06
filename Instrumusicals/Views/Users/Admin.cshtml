@@ -160,6 +160,53 @@
 
         <br />
         <br />
+
+        <div>
+            <h3>Users Orders - Sorted by shipping date</h3>
+            <table class="table text-center text-light">
+                <thead>
+                    <tr>
+                        <th>
+                            User First Name
+                        </th>
+                        <th>
+                            User Last Name
+                        </th>
+                        <th>
+                            Order Price
+                        </th>
+                        <th>
+                            Shipping Date
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in (List<userOrderModel>)ViewBag.items)
+                            {
+                        {
+                    <tr>
+                        <td class="align-middle">
+                            @item.UserFName
+                        </td>
+                        <td class="align-middle">
+                            @item.UserLName
+                        </td>
+                        <td class="align-middle">
+                            @item.Price
+                        </td>
+                        <td class="align-middle">
+                            @item.Shipping
+                        </td>
+
+                    </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <br />
         <div>
             <h2>Instrumusical Statistics</h2>
             <section>
@@ -170,7 +217,7 @@
         <div>
             <form>
                 <label>Enter Text:</label>
-                <input type="text" id="msg"/><br><br>
+                <input type="text" id="msg" /><br><br>
                 <button id="btn-post" onclick="post()">Post to Facebook page</button>
             </form>
         </div>
