@@ -305,14 +305,28 @@ namespace Instrumusicals.Controllers
             ViewData["data2"] = data2;
 
 
-            var query = from user in _context.User
-                        join order in _context.Order on user.Id equals order.UserId
-                        where user.Id == order.UserId
-                        orderby  order.Shipping descending
-                        select new userOrderModel(user.FirstName, user.LastName, order.TotalPrice, order.Shipping)
-                        ;
-            ViewBag.items =  query.ToListAsync().Result;
+            var join1Query = from user in _context.User
+                             join order in _context.Order on user.Id equals order.UserId
+                             where user.Id == order.UserId
+                             orderby order.Shipping descending
+                             select new userOrderModel(user.FirstName, user.LastName, order.TotalPrice, order.Shipping);
+                        
+            ViewBag.items = join1Query.ToListAsync().Result;
 
+
+            var join2Query = from review in _context.Review
+                             join inst in _context.Instrument on review.InstrumentId equals inst.Id
+                             join catg in _context.Category on inst.CategoryId equals catg.Id
+                             select new { review.Id, catg.Name };
+            Dictionary<string, int> counter_ =  new();
+            foreach(var entry in join2Query)
+            {
+                if (counter_.Keys.Contains(entry.Name))
+                    counter_[entry.Name]++;
+                else
+                    counter_.Add(entry.Name, 1);
+            }
+            ViewBag.counter_ = counter_;
             return View();
         }
 
