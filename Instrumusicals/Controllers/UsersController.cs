@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Instrumusicals.Data;
+using Instrumusicals.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Instrumusicals.Data;
-using Instrumusicals.Models;
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections;
+using System.Threading.Tasks;
 
 namespace Instrumusicals.Controllers
 {
@@ -291,7 +290,6 @@ namespace Instrumusicals.Controllers
             foreach (var groupName in query_) // for each category
             {
                 var name = _context.Category.Find(groupName.Key).Name;
-                Console.WriteLine(name);
                 int i = 0;
                 int counter = 0;
                 foreach (var inst in groupName) // for each instrument
@@ -305,6 +303,15 @@ namespace Instrumusicals.Controllers
 
             ViewData["data"] = data;
             ViewData["data2"] = data2;
+
+
+            var query = from user in _context.User
+                        join order in _context.Order on user.Id equals order.UserId
+                        where user.Id == order.UserId
+                        orderby  order.Shipping descending
+                        select new userOrderModel(user.FirstName, user.LastName, order.TotalPrice, order.Shipping)
+                        ;
+            ViewBag.items =  query.ToListAsync().Result;
 
             return View();
         }
@@ -322,7 +329,6 @@ namespace Instrumusicals.Controllers
             IDictionary<int, int> countDict = new Dictionary<int, int>();
             string[] inst_count_pairs = dbUser.InstrumentsWishlist.Split(";");
             List<int> instsIds = new();
-            int i = 0;
 
             foreach (string inst_count_pair in inst_count_pairs)
             {
