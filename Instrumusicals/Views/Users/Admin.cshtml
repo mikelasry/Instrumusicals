@@ -89,7 +89,36 @@
                     return names.pop() + " Total:" + data.value;
                 });
         });
+        $(function () {
+            window.fbAsyncInit = function () {
+                FB.init({
+                    appId: '605635517284237',
+                    autoLogAppEvents: true,
+                    xfbml: true,
+                    version: 'v12.0'
+                });
+            }
+        });
     </script>
+    
+    <script type="text/javascript">
+        function post() {
+            var accessToken = 'EAAIm0oHeZC40BAP1aypOdDbznjEHE336dPZAygdj6srB0gBFqW6ic3gEWVZAPOjSg5lbXfeoGvJoEHxuCOcZBOi5H6FVHhH70mW0VWB2VlOzuztMEFNTfNT9O8AaIYkuo4QE7jZAHFp0LANBqyPr9SrTEVtxSfq7KX29GskJimooHk4GUuKtpCcejsFbheOKK6ZBUsGc4YqD06YzfllKwd';
+            var body = String(document.getElementById("msg").value);
+            if (body && body != "") {
+                FB.api('/me/feed', 'post', { message: body, access_token: accessToken }, function (response) {
+                    if (!response || response.error) {
+                        window.alert(JSON.stringify(response.error));
+                    } else {
+                        window.alert(JSON.stringify(body));
+                    }
+                });
+            }
+
+        }
+    </script>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js"></script>
+
 
 </head>
 <body>
@@ -120,8 +149,10 @@
                     <td><a class="text-danger" asp-controller="Categories" asp-action="Create">Create a new Category</a></td>
                     <td><a class="text-danger" asp-controller="Orders" asp-action="Create">Create a new Order</a></td>
                     <td><a class="text-danger" asp-controller="Stores" asp-action="Register">Register a User</a></td>
-                    <td><a class="text-danger" asp-controller="Stores" asp-action="Create">Open new Store</a>
-                    </td><td>
+                    <td>
+                        <a class="text-danger" asp-controller="Stores" asp-action="Create">Open new Store</a>
+                    </td>
+                    <td>
                     </td>
                 </tr>
             </tbody>
@@ -136,6 +167,14 @@
             <p>
             </p>
         </div>
-
+        <div>
+            <form>
+                <label>Enter Text:</label>
+                <input type="text" id="msg"/><br><br>
+                <button id="btn-post" onclick="post()">Post to Facebook page</button>
+            </form>
+        </div>
     </div>
+
+
 </body>
