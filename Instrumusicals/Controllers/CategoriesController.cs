@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Instrumusicals.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly InstrumusicalsContext _context;
@@ -37,9 +39,13 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ -- Read -- @@ //
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Category.Include(c => c.CategoryImage).ToListAsync());
+            return View(await _context.Category
+                .Include(c => c.CategoryImage)
+                .Include(c => c.Instruments)
+                .ToListAsync());
         }
 
         // @@ -- Update -- @@ //
@@ -65,7 +71,7 @@ namespace Instrumusicals.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id)) 
+                    if (!CategoryExists(category.Id))
                         return RedirectToMalfunction();
                     else throw;
                 }
@@ -79,7 +85,9 @@ namespace Instrumusicals.Controllers
         {
             if (id == 0) return RedirectToMalfunction();
             Category category = await _context.Category
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(c => c.Instruments)
+                .Where(c => c.Id == id)
+                .SingleOrDefaultAsync();
             return (category == null) ? RedirectToMalfunction() : View(category);
         }
         [HttpPost, ActionName("Delete")]
@@ -91,16 +99,33 @@ namespace Instrumusicals.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        
+
         // @@ -- Details-- @@ //
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
-            {
-                if (id == 0) return RedirectToMalfunction();
-                Category category = await _context.Category.Include(c => c.CategoryImage)
-                    .FirstOrDefaultAsync(m => m.Id == id);
-                return (category == null) ? RedirectToMalfunction() : View(category);
-            }
-        
+        {
+            if (id == 0) return RedirectToMalfunction();
+            Category category = await _context.Category
+                .Include(c => c.CategoryImage).Include(c => c.Instruments)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (category == null) return RedirectToMalfunction();
+
+            List<int> instsIds = new();
+            foreach (Instrument inst in category.Instruments){ instsIds.Add(inst.Id); }
+
+            List<Instrument> dbInstruments = await _context.Instrument
+                .Include(i => i.Reviews)
+                .Include(i => i.Orders)
+                .Where(i => instsIds.Contains(i.Id))
+                .ToListAsync();
+            if (dbInstruments == null || dbInstruments.Count < 1)
+                return RedirectToMalfunction();
+
+            ViewData["CategoryInstruments"] = dbInstruments;
+
+            return View(category);
+        }
+
         // @@ @@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@ @@ //
 
         private bool CategoryExists(int id)
@@ -131,7 +156,7 @@ namespace Instrumusicals.Controllers
         {
             return RedirectToAction("Malfunction", "Home");
         }
-                
+
         private IActionResult RedirectToAccessDenied()
         {
             return RedirectToAction("AccessDenied", "Users");

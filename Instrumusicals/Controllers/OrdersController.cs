@@ -160,7 +160,7 @@ namespace Instrumusicals.Controllers
                 .Where(i => instrumentsIds.Contains(i.Id)).ToListAsync();
             
             // -- update instrument quantity in db -- //
-            // -- spread instruments count -- //
+            //   --  & spread instruments' count --   //
 
             float totalPrice = 0;
             List<Instrument> orderInstruments = new();
@@ -180,7 +180,7 @@ namespace Instrumusicals.Controllers
                     totalPrice += inst.Price;
                 }    
 
-            } await _context.SaveChangesAsync();
+            } /*await _context.SaveChangesAsync();*/
 
                 /* CHARGE HERE !!!
                                if !charge.success =>
