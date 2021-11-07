@@ -102,7 +102,6 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ -- Read -- @@ //
-        // Read: Get
         public async Task<IActionResult> Index()
         {
             return View(await _context.User.ToListAsync());
