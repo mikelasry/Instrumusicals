@@ -89,7 +89,37 @@
                     return names.pop() + " Total:" + data.value;
                 });
         });
+        $(function () {
+            window.fbAsyncInit = function () {
+                FB.init({
+                    appId: '605635517284237',
+                    autoLogAppEvents: true,
+                    xfbml: true,
+                    version: 'v12.0'
+                });
+            }
+        });
+
     </script>
+    
+    <script type="text/javascript">
+        function post() {
+            var accessToken = 'EAAIm0oHeZC40BAP1aypOdDbznjEHE336dPZAygdj6srB0gBFqW6ic3gEWVZAPOjSg5lbXfeoGvJoEHxuCOcZBOi5H6FVHhH70mW0VWB2VlOzuztMEFNTfNT9O8AaIYkuo4QE7jZAHFp0LANBqyPr9SrTEVtxSfq7KX29GskJimooHk4GUuKtpCcejsFbheOKK6ZBUsGc4YqD06YzfllKwd';
+            var body = String(document.getElementById("msg").value);
+            if (body && body != "") {
+                FB.api('/me/feed', 'post', { message: body, access_token: accessToken }, function (response) {
+                    if (!response || response.error) {
+                        window.alert(JSON.stringify(response.error));
+                    } else {
+                        window.alert(JSON.stringify(body));
+                    }
+                });
+            }
+
+        }
+    </script>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js"></script>
+
 
 </head>
 <body>
@@ -128,15 +158,94 @@
                     <td><a class="text-light" asp-controller="Orders" asp-action="Create">Create a new Order</a></td>
                     <td><a class="text-light" asp-controller="Stores" asp-action="Register">Register a User</a></td>
                     <td><a class="text-light" asp-controller="Stores" asp-action="Create">Open new Store</a>
-                    <td>
-                        <a class="text-light" asp-controller="Instruments" asp-action="Index">Create a new Review</a>
-                    </td>
-                    <td>
-                    </td>
+                    <td><a class="text-light" asp-controller="Instruments" asp-action="Index">Create a new Review</a></td>
                 </tr>
             </tbody>
         </table>
 
+        <br />
+        <br />
+
+        <div>
+            <h3>Reviews Per Category</h3>
+            <table class="table text-center text-light">
+                <thead>
+                    <tr>
+                        <th>
+                            Categories
+                        </th>
+                        <th>
+                            Reviews Count
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in (Dictionary<string, int>)ViewBag.counter_)
+                    {
+                        {
+                            <tr>
+                                <td class="align-middle">
+                                    @item.Key
+                                </td>
+                                <td class="align-middle">
+                                    @item.Value
+                                </td>
+                               
+
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <br />
+
+        <div>
+            <h3>Users Orders - Sorted by shipping date</h3>
+            <table class="table text-center text-light">
+                <thead>
+                    <tr>
+                        <th>
+                            User First Name
+                        </th>
+                        <th>
+                            User Last Name
+                        </th>
+                        <th>
+                            Order Price
+                        </th>
+                        <th>
+                            Shipping Date
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in (List<userOrderModel>)ViewBag.items)
+                    {
+                        {
+                            <tr>
+                                <td class="align-middle">
+                                    @item.UserFName
+                                </td>
+                                <td class="align-middle">
+                                    @item.UserLName
+                                </td>
+                                <td class="align-middle">
+                                    @item.Price
+                                </td>
+                                <td class="align-middle">
+                                    @item.Shipping
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
         <br />
         <br />
         <div>
@@ -146,6 +255,14 @@
             <p>
             </p>
         </div>
-
+        <div>
+            <form>
+                <label>Enter Text:</label>
+                <input type="text" id="msg" /><br><br>
+                <button id="btn-post" onclick="post()">Post to Facebook page</button>
+            </form>
+        </div>
     </div>
+
+
 </body>
