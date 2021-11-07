@@ -208,7 +208,7 @@ namespace Instrumusicals.Controllers
         public IActionResult Logout()
         {
             logUser(null);
-            return RedirectToAction(nameof(Index), "Home");
+            return RedirectToAction(nameof(Login));
         }
         private async void logUser(User user)
         {

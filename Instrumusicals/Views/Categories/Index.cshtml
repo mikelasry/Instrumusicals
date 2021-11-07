@@ -6,55 +6,56 @@
 <div class="row text-center justify-content-center">
     <div class="w-50">
         <h1>Instrumusicals' Categories</h1>
+        @if (Context.User.IsInRole("Admin"))
+        {
+            <a class="text-secondary" asp-action="Create"> create a new category</a>
+        }
     </div>
 </div>
-<div class="card m-2" style="width: 18rem; ">
-    <img class="card-img-top" src="..." alt="Card image cap">
-    <div class="card-body bg-dark">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
+<div class="row">
+    @foreach (Category category in Model)
+    {
+    <div class="card m-2 bg-dark border border-primary col col-md-5 col-lg-6" style="width: 18rem; border-radius:15px;">
+        @if (category.CategoryImage != null && category.CategoryImage.Image != null)
+        {
+            string img = Convert.ToBase64String(category.CategoryImage.Image);
+            <img src="data:image/png;base64,@img" class="m-1" style="border-radius:25px;" />
+        } else { <div class="d-flex justify-content-center"><span class="text-danger m-2"> No Available Image</span></div>}
+        <div class="card-body bg-dark text-center">
+            <div id="header" class="d-flex text-center justify-content-center">
+                <h5 class="card-title">
+                    <cite>
+                        <a class="text-info" asp-action="Details" asp-route-id="@category.Id">
+                            @category.Name
+                        </a>
+                    </cite>
+                </h5>
+            </div>
+            <div id="content" class="text-center">
+                <div id="instrumentsCount">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note text-warning" viewBox="0 0 16 16">
+                        <path d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z" />
+                        <path fill-rule="evenodd" d="M9 3v10H8V3h1z" />
+                        <path d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z" />
+                    </svg> @category.Instruments.Count()  Instruments
+                </div>
+            </div>
+            <div id="footer" class="row text-center justify-content-center m-2">
+                <div class="w-75">
+                    <a href="/Categories/Details/@category.Id" class="btn text-success border border-success btn-sm m-3" style="border-radius:100px;">check it out</a>
+                </div>
+                @if (Context.User.IsInRole("Admin"))
+                {
+                    <div>
+                        
+                        <a asp-action="Edit" asp-route-id="@category.Id" class="text-warning">Edit</a>
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@category.Id" class="text-danger">Delete</a>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
-</div>
-<div class="card m-2" style="width: 18rem;">
-    <img class="card-img-top" src="..." alt="Card image cap">
-    <div class="card-body bg-dark">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
-</div>
-
-@*<table class="table text-light">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>@Html.DisplayNameFor(model => model.CategoryImage)</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-    @foreach (var item in Model) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @if(item.CategoryImage.Image != null)
-                    {
-                        string img = Convert.ToBase64String(item.CategoryImage.Image);
-                        <img src="data:image/png;base64,@img" width="300" style="border-radius:10px"/>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
     }
-        </tbody>
-    </table>*@
+</div>
 
