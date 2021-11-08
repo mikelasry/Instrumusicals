@@ -1,35 +1,43 @@
 ﻿@model Instrumusicals.Models.Review
-    
-    @{
-        ViewData["Title"] = "Edit";
-    }
 
-    <div class="row text-center justify-content-center">
-        <div class="w-50">
-            <form method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="Id" />
-                <div class="form-group ">
-                    @if (ViewBag.Instrument != null)
-                    {
-                        <h3 class="d-inline">Edit @ViewBag.Instrument.Name's review </h3>
-                    }
-                    else
-                    {<span>No instrument to refer.</span>}
-                    <span asp-validation-for="InstrumentId" class="text-danger"></span>
-                </div>
-                <hr />
-                <div class="form-group">
-                    <input asp-for="Content" class="form-control" rows="5" />
-                    <span asp-validation-for="Content" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Save" asp-route-returnUrl="/Instruments/Details/@Model.InstrumentId" class="btn btn-primary m-5 w-25" />
-                </div>
-            </form>
-        </div>
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="row text-center justify-content-center">
+    <div class="w-50">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group ">
+                @if (ViewBag.Instrument != null)
+                {
+                    <h3 class="d-inline">
+                        Edit
+                        <a asp-action="Details" asp-controller="Instruments" asp-route-id="@ViewBag.Instrument.Id" class="text-light">
+                            @ViewBag.Instrument.Name
+                        </a>'s review
+                    </h3>
+                }
+                else
+                {<span>No instrument to refer.</span>}
+                <span asp-validation-for="InstrumentId" class="text-danger"></span>
+                @if (Context.User != null && Context.User.IsInRole("Admin"))
+                {<br /><a asp-action="Index" class="text-light">All Reviews</a><br />}
+                <a asp-action="Index" asp-controller="Home" class="text-secondary">Homepage</a>
+            </div>
+            <hr />
+            <div class="form-group">
+                <input asp-for="Content" class="form-control text-center bg-dark text-light" rows="5" style="border-radius:100px;" autocomplete="off"/>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Update" asp-route-returnUrl="/Instruments/Details/@Model.InstrumentId" class="btn text-success border border-success m-5 w-25"  style="border-radius:100px;" />
+            </div>
+        </form>
     </div>
+</div>
 
-    @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

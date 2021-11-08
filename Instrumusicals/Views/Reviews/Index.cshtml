@@ -4,18 +4,18 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index Reviews</h1>
-
-<table class="table text-light">
+<div class="text-center text-warning"><h1><cite>Instrumusicals' Reviews</cite></h1></div>
+<div class="text-center"><a asp-controller="Instruments" asp-action="Index">Choose an Instrument & Review</a></div>
+<table class="table text-light text-center">
     <thead>
         <tr>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.Instrument)
             </th>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.LastUpdate)
             </th>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.Content)
             </th>
             <th></th>
@@ -34,9 +34,8 @@
                 @Html.DisplayFor(modelItem => item.Content)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

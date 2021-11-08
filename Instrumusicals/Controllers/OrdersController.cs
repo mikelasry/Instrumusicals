@@ -167,6 +167,7 @@ namespace Instrumusicals.Controllers
         }
         
         // @@ -- Delete -- @@ //
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -180,6 +181,7 @@ namespace Instrumusicals.Controllers
         }
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var order = await _context.Order.FindAsync(id);

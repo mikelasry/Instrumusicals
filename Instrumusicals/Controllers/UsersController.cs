@@ -245,7 +245,6 @@ namespace Instrumusicals.Controllers
             if (id == 0) id = GetAuthUserId();
             User user = await _context.User
                 .Include(u => u.Orders)
-                .Include(u => u.Reviews).ThenInclude(r => r.User)
                 .Include(u => u.Reviews).ThenInclude(r => r.Instrument)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
@@ -317,6 +316,7 @@ namespace Instrumusicals.Controllers
                              join inst in _context.Instrument on review.InstrumentId equals inst.Id
                              join catg in _context.Category on inst.CategoryId equals catg.Id
                              select new { review.Id, catg.Name };
+
             Dictionary<string, int> counter_ =  new();
             foreach(var entry in join2Query)
             {
