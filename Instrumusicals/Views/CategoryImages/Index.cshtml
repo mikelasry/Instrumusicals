@@ -4,42 +4,90 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Category Images</h1>
+<div class="row text-center justify-content-center">
+    <div class="w-50">
+        <h1>Instrumusicals' Categories</h1>
+        <a class="text-light" asp-action="Inndex"> All Category Images</a>  
+        <br />
+        <a class="btn border border-success text-success m-3" asp-action="Create" style="border-radius:100px;">New</a>  
+        <br />         
+        <a class="text-secondary" asp-action="Create" asp-controller="Categories"> All Categories</a> | 
+        <a class="text-secondary" asp-action="Index" asp-controller="Home"> Homepage</a>
+    </div>
+</div>
+<div class="row">
+    @foreach (CategoryImage ci in Model)
+    {
+        <div class="card m-2 bg-dark border border-primary col col-md-5 col-lg-6" style="width: 18rem; border-radius:15px;">
+            <div class="card-body bg-dark text-center">
+                <div id="header" class="d-flex text-center justify-content-center">
+                    <h5 class="card-title text-info">
+                        <cite>
+                            <a class=" text-info" asp-action="Details" asp-route-id="@ci.Id">@ci.Category.Name</a>
+                            Image
+                        </cite>
+                    </h5>
+                </div>
+            </div>
+            @if (ci.Image != null)
+            {
+                string img = Convert.ToBase64String(ci.Image);
+                <img src="data:image/png;base64,@img" class="m-1" style="border-radius:25px;" />
+            }
+            else
+            { <div class="d-flex justify-content-center"><span class="text-danger m-2"> No Available Image</span></div>}
+            <div id="footer" class="row text-center justify-content-center m-2">
+                <div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table text-light">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
-            </td>
-            <td>
-                @if(item.Image != null)
-                {
-                    string img = Convert.ToBase64String(item.Image);
-                    <img src="data:img/png;base64,@img" height="50px" width="50px" style="border-radius:100px" />
-                }
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                    <a asp-action="Edit" asp-route-id="@ci.Id" class="text-warning">Edit</a>
+                    <span> | </span>
+                    <a asp-action="Delete" asp-route-id="@ci.Id" class="text-danger">Delete</a>
+                </div>
+            </div>
+
+        </div>
+    }
+</div>
+
+
+@*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    <h1>Category Images</h1>
+
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table text-light">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Image)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    <td>
+                        @if (item.Image != null)
+                        {
+                            string img = Convert.ToBase64String(item.Image);
+                            <img src="data:img/png;base64,@img" height="50px" width="50px" style="border-radius:100px" />
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+*@

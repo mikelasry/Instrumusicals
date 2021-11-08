@@ -317,6 +317,7 @@ namespace Instrumusicals.Controllers
                              join inst in _context.Instrument on review.InstrumentId equals inst.Id
                              join catg in _context.Category on inst.CategoryId equals catg.Id
                              select new { review.Id, catg.Name };
+
             Dictionary<string, int> counter_ =  new();
             foreach(var entry in join2Query)
             {

@@ -3,39 +3,46 @@
 @{
     ViewData["Title"] = "Edit";
 }
+<div class="row justify-content-center text-center">
+    <div class="w-75">
+        <h2>Change <a class="text-light" asp-action="Details" asp-controller="Categories" asp-route-id="@Model.Category.Id">@Model.Category.Name</a> Category Image</h2>
+        <hr />
+        <a class="text-light" asp-action="Index">All Category Images</a>
+        <br />
+        <a class="text-secondary" asp-action="Index" asp-controller="Categories">All Categories</a> |
+        <a class="text-secondary" asp-action="Index" asp-controller="Home">Homepage</a> 
 
-<h4>Change @Model.Category.Name Category Image</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+    </div>
+</div>
+<br />
+
+<div class="row text-center justify-content-center">
+    <div class="w-50">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
                 @if (Model.Image != null)
                 {
                     string img = Convert.ToBase64String(Model.Image);
                     <img src="data:img/png;base64,@img" height="300" width="300" style="border-radius:30px" />
                 }
                 <hr />
-                <input asp-for="ImageFile" class="form-control" accept="image/*" style="padding-bottom:35px"/>
+            </div>
+            <div class="form-group row justify-content-center">
+                <input asp-for="ImageFile" class="form-control w-50 bg-dark text-light" accept="image/*" style="border-radius:100px;" />
                 <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div style="visibility:hidden" class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select  asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId" ></select>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Update" class="btn text-success border border-success"
+                       style="border-radius:100px;"/>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

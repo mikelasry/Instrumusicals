@@ -126,16 +126,6 @@ namespace Instrumusicals.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // @@ -- Details -- @@ //
-        public async Task<IActionResult> Details(int id)
-        {
-            if (id == 0) return RedirectToMalfunction();
-            CategoryImage categoryImage = await _context.CategoryImage
-                .Include(c => c.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (categoryImage == null) return RedirectToMalfunction();
-            return View(categoryImage);
-        }
 
         // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //
         

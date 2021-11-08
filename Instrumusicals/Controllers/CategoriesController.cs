@@ -118,7 +118,7 @@ namespace Instrumusicals.Controllers
                 .Include(i => i.Orders)
                 .Where(i => instsIds.Contains(i.Id))
                 .ToListAsync();
-            if (dbInstruments == null || dbInstruments.Count < 1)
+            if (dbInstruments == null)
                 return RedirectToMalfunction();
 
             ViewData["CategoryInstruments"] = dbInstruments;
