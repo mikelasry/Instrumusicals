@@ -79,6 +79,7 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ -- Update -- @@ //
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -92,6 +93,7 @@ namespace Instrumusicals.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
         {
             if (id != instrument.Id) return RedirectToMalfunction();
@@ -136,6 +138,8 @@ namespace Instrumusicals.Controllers
 
             var instrument = await _context.Instrument
                 .Include(i => i.Category)
+                .Include(i => i.Reviews)
+                .Include(i => i.Orders)                
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (instrument == null) return RedirectToMalfunction();
 
@@ -143,7 +147,8 @@ namespace Instrumusicals.Controllers
         }
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var instrument = await _context.Instrument.FindAsync(id);
@@ -151,8 +156,9 @@ namespace Instrumusicals.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-       
+
         // @@ -- Details -- @@ //
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return RedirectToMalfunction();
