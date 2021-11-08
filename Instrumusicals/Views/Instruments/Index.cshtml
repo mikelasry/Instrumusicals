@@ -10,77 +10,79 @@ ViewData["Title"] = "Instuments";
     <h4>Search Instruments</h4>
 </div>
 <div class="align-middle" style="display:flex; justify-content:space-around; ">
-    <input id="nameInput" name="Name" placeholder="Name" class="m-1 form-control text-center text-light bg-dark" style="border-radius:100px;" autocomplete="off" />
-    <input id="categoryInput" name="Category" placeholder="Category" class="m-1 form-control text-center text-light bg-dark" style="border-radius:100px;" autocomplete="off" />
-    <input id="brandInput" name="Brand" placeholder="Brand" class="m-1 form-control text-center text-light bg-dark" style="border-radius:100px;" autocomplete="off" />
-    <input id="lPriceInput" name="lPrice" placeholder="From $" class="m-1 form-control text-center text-light bg-dark" style="border-radius:100px;" autocomplete="off" />
-    <input id="uPriceInput" name="uPrice" placeholder="To $" class="m-1 form-control text-center text-light bg-dark" style="border-radius:100px;" autocomplete="off" />
+    <input id="nameInput" name="Name" placeholder="Name" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+    <input id="categoryInput" name="Category" placeholder="Category" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+    <input id="brandInput" name="Brand" placeholder="Brand" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+    <input id="lPriceInput" name="lPrice" placeholder="From $" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+    <input id="uPriceInput" name="uPrice" placeholder="To $" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
     <button id="btnSearch" class="btn btn-primary   m-1 btn-sm" style="border-radius:100px;">Search</button>
     <button id="btnClear" class="btn btn-secondary m-1 btn-sm bg-dark text-danger" style="border-radius:100px;">Clear</button>
     @if (Context.User != null && Context.User.IsInRole("Admin"))
     {<a class="btn border border-success text-success m-1 btn-sm " asp-action="Create" style="border-radius:100px;">New</a>}
 </div>
 <hr />
-
-<table class="table text-center text-light">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Brand)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model) 
-        {
-           @* if ( item.Quantity > 0 ) *@
-            { 
+<div class="row justify-content-center text-center">
+    <div class="w-75">
+        <table class="table text-center text-light">
+            <thead>
                 <tr>
-                    <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.Brand)
-                    </td>
-                    <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </td>
-                    <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.Price)$
-                    </td>
-                    <td class="align-middle">
-                        @if( item.Image != null)
-                        {
-                        string img = Convert.ToBase64String(item.Image);
-                        <img src="data:image/png;base64,@img" style="height:100px; width:100px; border-radius:100px" />
-                        }
-                        else
-                        {
-                        <span class="text-danger">No image yet.</span>
-                        }
-                    </td>
-                    <td class="align-middle">
-                        <a class="text-light" asp-action="Details" asp-route-id="@item.Id">ABOUT</a>
-                    </td>
+                    <th class="text-info">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th class="text-info">
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th class="text-info">
+                        @Html.DisplayNameFor(model => model.Description)
+                    </th>
+                    <th class="text-info">
+                        @Html.DisplayNameFor(model => model.Price)
+                    </th>
+                    <th class="text-info">
+                        @Html.DisplayNameFor(model => model.Image)
+                    </th>
+                    <th></th>
                 </tr>
-            }
-        }
-    </tbody>
-</table>
-
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    @* if ( item.Quantity > 0 ) *@
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td class="align-middle">
+                                @Html.DisplayFor(modelItem => item.Brand)
+                            </td>
+                            <td class="align-middle">
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td class="align-middle">
+                                @Html.DisplayFor(modelItem => item.Price)$
+                            </td>
+                            <td class="align-middle">
+                                @if (item.Image != null)
+                                {
+                                    string img = Convert.ToBase64String(item.Image);
+                                    <img src="data:image/png;base64,@img" style="height:100px; width:100px; border-radius:100px" />
+                                }
+                                else
+                                {
+                                    <span class="text-danger">No image yet.</span>
+                                }
+                            </td>
+                            <td class="align-middle">
+                                <a class="text-warning" asp-action="Details" asp-route-id="@item.Id">ABOUT</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script type="text/template" id="rowTemplate">
 
