@@ -4,27 +4,32 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<div class="text-center">
+    <h1>Instrumusicals' Orders</h1>
+    <p>
+        <a class="text-light" asp-action="Index" asp-controller="Home">Homepage</a> 
+        <br /> 
+        <a class="text-secondary" asp-action="Index" asp-controller="Instruments">Instruments</a> | 
+        <a class="text-secondary" asp-action="Cart" asp-controller="Users">Cart</a> 
+    </p>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table text-light">
+<table class="table text-center text-light">
     <thead>
         <tr>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.User)
             </th>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.Address)
             </th>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.TotalPrice)
             </th>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.Create)
             </th>
-            <th>
+            <th class="text-info">
                 @Html.DisplayNameFor(model => model.Shipping)
             </th>
             <th></th>
@@ -35,7 +40,7 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.User.Id)
+                    @item.User.FirstName @item.User.LastName
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Address)
@@ -50,9 +55,9 @@
                     @Html.DisplayFor(modelItem => item.Shipping)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a class="text-primary" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                 </td>
             </tr>
         }

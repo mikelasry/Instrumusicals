@@ -87,22 +87,22 @@
                 </tr>
             </thead>
             <tbody>
-                @{
-                    List<Order> userOrders = (List<Order>)Model.Orders.OrderByDescending(o => o.Shipping).ToList();
-                    foreach (var item in userOrders)
-                    {
-                        <tr>
-                            <td>@Html.DisplayFor(modelItem => item.User.FirstName)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Address)</td>
-                            <td>@Html.DisplayFor(modelItem => item.TotalPrice)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Create)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Shipping)</td>
-                            <td>
-                                <a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                                <a class="text-primary" asp-controller="Orders" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                            </td>
-                        </tr>
-                    }
+                @foreach (var item in Model.Orders.OrderByDescending(o => o.Shipping))
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.User.FirstName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Address)</td>
+                        <td>@Html.DisplayFor(modelItem => item.TotalPrice)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Create)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Shipping)</td>
+                        <td>
+                            <a class="text-warning" asp-controller="Orders" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a class="text-primary" asp-controller="Orders" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                            @if (Context.User != null && Context.User.IsInRole("Admin"))
+                            {<span> | </span><a class="text-danger" asp-controller="Reviews" asp-action="Delete" asp-route-id="@item.Id">Delete</a>}
+                        </td>
+                    </tr>
+
                 }
             </tbody>
         </table>
@@ -119,21 +119,20 @@
                 </tr>
             </thead>
             <tbody>
-                @{
-                    List<Review> userReviews = (List<Review>)Model.Reviews.OrderByDescending(r => r.LastUpdate).ToList();
-                    foreach (var item in userReviews)
-                    {
-                        <tr>
-                            <td><a class="text-light" asp-action="Details" asp-controller="Instruments" asp-route-id="@item.Instrument.Id"><cite class="text-info">@Html.DisplayFor(modelItem => item.Instrument.Name)</cite></a></td>
-                            <td>@Html.DisplayFor(modelItem => item.Content)</td>
-                            <td>@Html.DisplayFor(modelItem => item.LastUpdate)</td>
-                            <td>
-                                <a class="text-warning" asp-controller="Reviews" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                                <a class="text-primary" asp-controller="Reviews" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                                <a class="text-danger" asp-controller="Reviews" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                            </td>
-                        </tr>
-                    }
+                @foreach (var item in Model.Reviews.OrderByDescending(r => r.LastUpdate))
+                {
+                    <tr>
+                        <td><a class="text-light" asp-action="Details"  asp-controller="Instruments" asp-route-id="@item.Instrument.Id"><cite class="text-info">@Html.DisplayFor(modelItem => item.Instrument.Name)</cite></a></td>
+                        <td>@Html.DisplayFor(modelItem => item.Content)</td>
+                        <td>@Html.DisplayFor(modelItem => item.LastUpdate)</td>
+                        <td>
+                            <a class="text-warning" asp-controller="Reviews" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a class="text-primary" asp-controller="Reviews" asp-action="Details" asp-route-id="@item.Id">Details</a> | 
+                            @if(Context.User != null && Context.User.IsInRole("Admin"))
+                            {<a class="text-danger" asp-controller="Reviews" asp-action="Delete" asp-route-id="@item.Id">Delete</a>}
+                        </td>
+                    </tr>
+
                 }
             </tbody>
         </table>
