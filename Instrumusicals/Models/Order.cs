@@ -15,7 +15,7 @@ namespace Instrumusicals.Models
         public User User { get; set; }
 
         public IEnumerable<Instrument> Instruments { get; set; }
-
+        public string OrderWishlist { get; set; }
         [MinLength(6)]
         [MaxLength(64)]
         public string Address { get; set; }

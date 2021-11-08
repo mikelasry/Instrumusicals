@@ -24,27 +24,102 @@ namespace Instrumusicals.Controllers
         /* @@ @@@@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@@@ @@ */
 
         // @@ -- Create -- @@ //
-        public IActionResult Create()
+        public async Task<IActionResult> PlaceOrder(int uid)
         {
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id");
-            return View();
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Id,UserId,Address,TotalPrice,Create,LastUpdate")] Order order)
-        {
-            if (ModelState.IsValid)
+            // -- check authorization -- //
+            if (!IsUserAuthorized(uid)) // not -a-uthrorized
+                return JsonSuccess(false, new { msg = "a" });
+
+            // -- get user from db -- //
+            User dbUser = await _context.User.Where(u => u.Id == uid).SingleOrDefaultAsync();
+            if (dbUser == null) return JsonSuccess(false, new { msg = "m" });
+
+            // -- make sure wishlist is not empty -- //
+            if (String.IsNullOrEmpty(dbUser.InstrumentsWishlist)) // -m-alfunction
+                return JsonSuccess(false, new { msg = "m" });
+
+            // -- init util variables -- //
+            List<int> instrumentsIds = new();
+            IDictionary<int, int> ic_dict = new Dictionary<int, int>();
+            int i, c;
+
+            // -- create instrumentId->count dictionary and fill it -- //
+            string[] id_count_pairs = dbUser.InstrumentsWishlist.ToString().Split(";");
+            foreach (string id_count_pair in id_count_pairs)
             {
-                order.Id = 0;
-                _context.Add(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (String.IsNullOrEmpty(id_count_pair)) continue;
+                i = Int32.Parse(id_count_pair.Split(",")[0]);
+                c = Int32.Parse(id_count_pair.Split(",")[1]);
+                if (i < 1 || c < 1)  // -m-alfunction
+                    return JsonSuccess(false, new { msg = "m" });
+
+                instrumentsIds.Add(i);
+                ic_dict.Add(new KeyValuePair<int, int>(i, c));
             }
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id", order.UserId);
-            return View(order);
+            if (ic_dict.Keys.Count < 1)  // -m-alfunction
+                return JsonSuccess(false, new { msg = "m" });
+
+            // -- get instruments from db -- //
+            List<Instrument> dbInsts = await _context.Instrument
+                .Where(i => instrumentsIds.Contains(i.Id)).ToListAsync();
+
+            // -- update instrument quantity in db -- //
+            //   --  & spread instruments' count --   //
+
+            float totalPrice = 0;
+            List<Instrument> orderInstruments = new();
+            foreach (Instrument inst in dbInsts)
+            {
+                int left = inst.Quantity;
+                if (left - ic_dict[inst.Id] < 0)  // -o-ut of stock
+                    return JsonSuccess(false, new { msg = "o", left = left, inst = inst });
+                inst.Quantity -= ic_dict[inst.Id];
+                inst.Sold += ic_dict[inst.Id];
+
+                _context.Update(inst);
+
+                for (int j = 0; j < ic_dict[inst.Id]; j++)
+                {
+                    orderInstruments.Add(inst);
+                    totalPrice += inst.Price;
+                }
+
+            } /*await _context.SaveChangesAsync();*/
+
+            /* CHARGE HERE !!!
+                           if !charge.success =>
+                                reverse instruments quantity on db
+                                redirect to malfunction */
+
+            Order order = new();
+            try
+            {
+                order.UserId = uid;
+                order.Address = dbUser.Address;
+
+                order.Instruments = orderInstruments;
+                order.TotalPrice = totalPrice;
+
+                order.Create = DateTime.Now;
+                order.Shipping = DateTime.Now.AddMonths(3);
+                
+                if (order.OrderWishlist == null)
+                    order.OrderWishlist = new string("");
+                order.OrderWishlist = dbUser.InstrumentsWishlist;
+                dbUser.InstrumentsWishlist = "";
+                
+                _context.Add(order);
+                _context.Update(dbUser);
+                await _context.SaveChangesAsync();
+            } // alert -e-xception :
+            catch (DbUpdateConcurrencyException) // -u-pdate exception
+            { return JsonSuccess(false, new { msg = "u" }); }
+
+
+            return JsonSuccess(true, new { msg = "s" });
+
         }
-        
+
         // @@ -- Read -- @@ //
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
@@ -57,11 +132,15 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             if (id == 0) return RedirectToMalfunction();
-            Order order = await _context.Order.Where(o => o.Id == id).Include(o => o.Instruments).FirstOrDefaultAsync();
+            Order order = await _context.Order
+                .Where(o => o.Id == id)
+                .Include(o => o.User)
+                .Include(o => o.Instruments)
+                .FirstOrDefaultAsync();
             if (order == null) return RedirectToMalfunction();
             if (!IsUserAuthorized(order.UserId)) return RedirectToAccessDenied();
             
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "Id", order.UserId);
+            ViewData["UserId"] = new SelectList(_context.Set<User>(), "Id", "FirstName", order.UserId);
             return View(order);
         }
         [HttpPost]
@@ -91,7 +170,10 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0) return RedirectToMalfunction();
-            var order = await _context.Order.Include(o => o.User).FirstOrDefaultAsync(m => m.Id == id);
+            var order = await _context.Order
+                .Include(o => o.User)
+                .Include(o => o.Instruments)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null) return RedirectToMalfunction();
             if (!IsUserAuthorized(order.UserId)) return RedirectToAccessDenied();
             return View(order);
@@ -109,108 +191,31 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ -- Details -- @@ //
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == 0) return RedirectToMalfunction();
-            Order order = await _context.Order.Include(o => o.User).Include(o => o.Instruments).FirstOrDefaultAsync(m => m.Id == id);
+            Order order = await _context.Order
+                .Include(o => o.User)
+                .Include(o => o.Instruments).ThenInclude(i => i.Reviews)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null) return RedirectToMalfunction();
             if (!IsUserAuthorized(order.UserId)) return RedirectToAccessDenied();
+
+            Dictionary<int,int> cartBag = new();
+            foreach (string icp in order.OrderWishlist.Split(";"))
+            {
+                if (String.IsNullOrEmpty(icp)) continue;
+                int i = Int32.Parse(icp.Split(",")[0]);
+                int c = Int32.Parse(icp.Split(",")[1]);
+                if (i < 1 || c < 1) return RedirectToMalfunction();
+                cartBag.Add(i, c);
+            }
+
+            ViewData["CartBag"] = cartBag;
             return View(order);
         }
 
         // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //
-
-        public async Task<IActionResult> PlaceOrder(int uid)
-        {
-            // -- check authorization -- //
-            if (!IsUserAuthorized(uid)) // not -a-uthrorized
-                return JsonSuccess(false, new { msg = "a" });
-
-            // -- get user from db -- //
-            User dbUser =  await _context.User.Where(u => u.Id == uid).SingleOrDefaultAsync();
-            if(dbUser == null) return JsonSuccess(false, new { msg = "m" });
-
-            // -- make sure wishlist is not empty -- //
-            if ( String.IsNullOrEmpty(dbUser.InstrumentsWishlist) ) // -m-alfunction
-                return JsonSuccess(false, new { msg = "m" }); 
-
-            // -- init util variables -- //
-            List<int> instrumentsIds = new();
-            IDictionary<int, int> ic_dict = new Dictionary<int,int>();
-            int i, c;
-
-            // -- create instrumentId->count dictionary and fill it -- //
-            string[] id_count_pairs = dbUser.InstrumentsWishlist.ToString().Split(";");
-            foreach(string id_count_pair in id_count_pairs)
-            {
-                if (String.IsNullOrEmpty(id_count_pair)) continue;
-                i = Int32.Parse(id_count_pair.Split(",")[0]);
-                c = Int32.Parse(id_count_pair.Split(",")[1]);
-                if (i < 1 || c < 1)  // -m-alfunction
-                    return JsonSuccess(false, new { msg = "m" });
-
-                instrumentsIds.Add(i);
-                ic_dict.Add(new KeyValuePair<int, int>(i, c));
-            } 
-            if (ic_dict.Keys.Count < 1)  // -m-alfunction
-                return JsonSuccess(false, new { msg = "m" });
-
-            // -- get instruments from db -- //
-            List<Instrument> dbInsts = await _context.Instrument
-                .Where(i => instrumentsIds.Contains(i.Id)).ToListAsync();
-            
-            // -- update instrument quantity in db -- //
-            //   --  & spread instruments' count --   //
-
-            float totalPrice = 0;
-            List<Instrument> orderInstruments = new();
-            foreach(Instrument inst in dbInsts)
-            {
-                int left = inst.Quantity;
-                if (left - ic_dict[inst.Id] < 0)  // -o-ut of stock
-                    return JsonSuccess(false, new { msg = "o", left = left, inst = inst});
-                inst.Quantity -= ic_dict[inst.Id];
-                inst.Sold += ic_dict[inst.Id];
-                
-                _context.Update(inst);
-
-                for (int j = 0; j < ic_dict[inst.Id]; j++)
-                {
-                    orderInstruments.Add(inst);
-                    totalPrice += inst.Price;
-                }    
-
-            } /*await _context.SaveChangesAsync();*/
-
-                /* CHARGE HERE !!!
-                               if !charge.success =>
-                                    reverse instruments quantity on db
-                                    redirect to malfunction */
-
-            Order order = new();
-            try
-            {
-                order.UserId = uid;
-                order.Address = dbUser.Address;
-
-                order.Instruments = orderInstruments;
-                order.TotalPrice= totalPrice;
-
-                order.Create = DateTime.Now;
-                order.Shipping = DateTime.Now.AddMonths(3);
-
-                dbUser.InstrumentsWishlist = "";
-                _context.Add(order);
-                _context.Update(dbUser);
-                await _context.SaveChangesAsync();
-            } // alert -e-xception :
-            catch(DbUpdateConcurrencyException) // -u-pdate exception
-            { return JsonSuccess(false, new { msg = "u" }); } 
-            
-
-            return JsonSuccess(true, new { msg = "s" });
-
-        }
 
         private bool OrderExists(int id)
         {
@@ -256,4 +261,3 @@ namespace Instrumusicals.Controllers
         }
     }
 }
-
