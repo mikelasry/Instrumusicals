@@ -4,40 +4,49 @@
     ViewData["Title"] = "Create";
 }
 
-<h4>Add a Category Image </h4>
+<div class="row justify-content-center">
+    <div class="w-50 text-center">
+        <h4>Create a new Category Image</h4>
+        <div>
+            <a class="text-secondary" asp-action="Index" asp-controller="CategoryImages">All Category Images</a> |
+            <a class="text-secondary" asp-action="Index">All Categories</a> 
+        </div>
+        <hr />
+    </div>
+    <div class="row justify-content-center text-center">
+        <div class="w-50">
+            <form asp-action="Create" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (((SelectList)ViewBag.CategoryId).Count() > 0)
+                {
+                    <div class="form-group">
+                        <label class="form-control bg-dark text-light border-0">Choose Category from the available categories with no image:</label>
+                        <select asp-for="CategoryId" asp-items="ViewBag.CategoryId"
+                                 class="form-control bg-dark text-light text-center m-2"></select>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @if (((SelectList)ViewBag.CategoryId).Count() > 0)
-            {
-                <div class="form-group">
-                    <label asp-for="CategoryId" class="control-label"></label>
-                    <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-
-                </div>
-                <div class="form-group">
-                    <label asp-for="ImageFile" class="control-label"></label>
-                    <input asp-for="ImageFile" class="form-control" accept="image/*" style="height:45px;" />
-                    <span asp-validation-for="Image" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                </div>
-            }
-            else
-            {
-                <span>No Available Categories</span>
-            }
-        </form>
+                    </div>
+                    <div class="form-group row justify-content-center ">
+                        <input asp-for="ImageFile" class="form-control bg-dark text-light text-center m-2 w-50"  style="border-radius:100px;" accept="image/*" style="height:45px;" />
+                        <span asp-validation-for="Image" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn text-primary border border-primary border-2" style="border-radius:100px;" />
+                    </div>
+                }
+                else
+                {
+                <span class="text-danger">
+                    No Available Categories without an image! 
+                    <br />
+                    Create a <a asp-action="Create" asp-controller="Categories" class="text-danger">new category</a> instead!
+                </span>
+                }
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
