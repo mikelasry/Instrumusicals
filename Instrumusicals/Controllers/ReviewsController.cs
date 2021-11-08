@@ -105,7 +105,10 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0) return RedirectToMalfunction();
-            var review = await _context.Review.Include(r => r.Instrument).FirstOrDefaultAsync(m => m.Id == id);
+            var review = await _context.Review
+                .Include(r => r.Instrument)
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null) return RedirectToMalfunction();
             if (!IsUserAuthorized(review.UserId)) return RedirectToAccessDenied();
             return View(review);
@@ -122,18 +125,6 @@ namespace Instrumusicals.Controllers
             _context.Review.Remove(review);
             await _context.SaveChangesAsync();
             return LocalRedirect("/Instruments/Details/" + review.InstrumentId);
-        }
-        
-        // @@ -------------------- Details----------------- @@ //
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return RedirectToMalfunction();
-
-            var review = await _context.Review
-                .Include(r => r.Instrument)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (review == null) return RedirectToMalfunction();
-            return View(review);
         }
 
         // @@ @@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@ @@ //
