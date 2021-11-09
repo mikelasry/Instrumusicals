@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> 
 
 <div class="row text-center justify-content-center">
     <div class="w-50">
@@ -128,11 +128,9 @@
                         <td>
                             <a class="text-warning" asp-controller="Reviews" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                             <a class="text-primary" asp-controller="Reviews" asp-action="Details" asp-route-id="@item.Id">Details</a> | 
-                            @if(Context.User != null && Context.User.IsInRole("Admin"))
-                            {<a class="text-danger" asp-controller="Reviews" asp-action="Delete" asp-route-id="@item.Id">Delete</a>}
+                            <a class="text-danger" asp-controller="Reviews" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                         </td>
                     </tr>
-
                 }
             </tbody>
         </table>

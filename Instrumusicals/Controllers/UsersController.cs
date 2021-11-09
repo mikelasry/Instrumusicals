@@ -57,28 +57,28 @@ namespace Instrumusicals.Controllers
 
         }
 
-        // @@ @@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@ @@ //
+        /* @@ @@@@@@@@@@@@@@@@@@ CRUD @@@@@@@@@@@@@@@@@@ @@ */
 
         // @@ -- Create -- @@ //
-        [AllowAnonymous] // Create: Get
+        [AllowAnonymous]
         public IActionResult Register()
         {
-            ViewData["Areas"] = new SelectList(new[] {
-                        new SelectListItem{Selected = true, Text =  "Center", Value = "c"},
-                        new SelectListItem{Selected = false, Text = "North", Value = "n"},
-                        new SelectListItem{Selected = false, Text = "East", Value = "e"},
-                        new SelectListItem{Selected = false, Text = "South", Value = "s"},
-                        new SelectListItem{Selected = false, Text = "West", Value = "w"}
-                    }, "Value", "Text");
+            ViewData["Areas"] = GetDirectionsSelectList();
             return View();
         }
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken] // Create: Post
-        public async Task<IActionResult> Register([Bind("Email,FirstName,LastName,Address,Password")] User user, String area)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register([Bind("Email,FirstName,LastName,Address,Password")] User user, String area, String cPassword)
         {
             if (ModelState.IsValid)
             {
+                ViewData["Areas"] = GetDirectionsSelectList();
+                if (!cPassword.Equals(user.Password))
+                {
+                    ViewData["PwMatchErr"] = "Passwords mismatch. Please try again!";
+                    return View(user);
+                }
                 user.Email = user.Email.Trim().ToLower(); ;
                 if (_context.User.FirstOrDefault(x => x.Email == user.Email) != null)
                 {
@@ -90,21 +90,24 @@ namespace Instrumusicals.Controllers
 
                 user.Salt = SecurityManager.GenerateSalt();
                 user.Hash = SecurityManager.HashPassword(user.Password, user.Salt);
-                user.UserType = adminsEmails.Contains(user.Email) ?
-                                    UserType.Admin : UserType.Client;
+                user.UserType = adminsEmails.Contains(user.Email) ? UserType.Admin : UserType.Client;
 
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 logUser(user);
-                return RedirectToAction(nameof(Index), "Home");
+                return RedirectToAction(nameof(Profile));
             }
             return View(user);
         }
 
         // @@ -- Read -- @@ //
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.User.ToListAsync());
+            return View(await _context.User
+                .Include(u => u.Reviews)
+                .Include(u => u.Orders)
+                .ToListAsync());
         }
 
         // @@ -- Update -- @@ //
@@ -144,7 +147,10 @@ namespace Instrumusicals.Controllers
         {
             if (id == 0) return RedirectToMalfunction();
             if (!IsUserAuthorized(id)) return AccessDenied();
-            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _context.User
+                .Include(u => u.Orders)
+                .Include(u => u.Reviews)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null) return RedirectToMalfunction();
             return View(user);
         }
@@ -165,7 +171,10 @@ namespace Instrumusicals.Controllers
             if (id == 0) return RedirectToMalfunction();
             if (!IsUserAuthorized(id)) return RedirectToAccessDenied();
 
-            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _context.User
+                .Include(u => u.Orders)
+                .Include(u => u.Reviews)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null) return RedirectToMalfunction();
             return View(user);
         }
@@ -270,9 +279,9 @@ namespace Instrumusicals.Controllers
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
-            { return JsonSuccess(false, new {msg = "e"}); } // -e-xception
+            { return JsonSuccess(false, new { msg = "e" }); } // -e-xception
 
-            return JsonSuccess(true, new {msg = "s"}); // -s-uccess
+            return JsonSuccess(true, new { msg = "s" }); // -s-uccess
         }
 
         [Authorize(Roles = "Admin")]
@@ -302,13 +311,12 @@ namespace Instrumusicals.Controllers
             ViewData["data"] = data;
             ViewData["data2"] = data2;
 
-
             var join1Query = from user in _context.User
                              join order in _context.Order on user.Id equals order.UserId
                              where user.Id == order.UserId
                              orderby order.Shipping descending
                              select new userOrderModel(user.FirstName, user.LastName, order.TotalPrice, order.Shipping);
-                        
+
             ViewBag.items = join1Query.ToListAsync().Result;
 
 
@@ -317,8 +325,8 @@ namespace Instrumusicals.Controllers
                              join catg in _context.Category on inst.CategoryId equals catg.Id
                              select new { review.Id, catg.Name };
 
-            Dictionary<string, int> counter_ =  new();
-            foreach(var entry in join2Query)
+            Dictionary<string, int> counter_ = new();
+            foreach (var entry in join2Query)
             {
                 if (counter_.Keys.Contains(entry.Name))
                     counter_[entry.Name]++;
@@ -390,7 +398,7 @@ namespace Instrumusicals.Controllers
 
         private int GetAuthUserId()
         {
-            if (!IsUserAuthenticated()) 
+            if (!IsUserAuthenticated())
                 return 0;
             return Int32.
                 Parse(
@@ -405,7 +413,7 @@ namespace Instrumusicals.Controllers
         {
             return HttpContext.User != null && HttpContext.User.Identity != null;
         }
-        
+
         private IActionResult JsonSuccess(bool success, Object dataDict)
         {
             return Json(new { success = success, data = dataDict });
@@ -423,6 +431,16 @@ namespace Instrumusicals.Controllers
                 case "c": return ", Center";
                 default: return ", NA";
             }
+        }
+
+        private SelectList GetDirectionsSelectList(){
+            return new SelectList(new[] {
+                        new SelectListItem{Selected = true, Text =  "Center", Value = "c"},
+                        new SelectListItem{Selected = false, Text = "North", Value = "n"},
+                        new SelectListItem{Selected = false, Text = "East", Value = "e"},
+                        new SelectListItem{Selected = false, Text = "South", Value = "s"},
+                        new SelectListItem{Selected = false, Text = "West", Value = "w"}
+                    }, "Value", "Text");
         }
 
         // @@ @@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@ @@ //

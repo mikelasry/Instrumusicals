@@ -18,47 +18,53 @@
     <div class="w-50">
         <form asp-action="Register" class="card pt-2 pr-4 pl-4 pb-1 bg-dark text-light">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group m-1">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control bg-dark text-light" autocomplete="off" />
+            <div class="form-group m-1 row justify-content-center">
+                <input asp-for="Email" class="form-control bg-dark text-light w-50 text-center" placeholder="Email" autocomplete="off" style="border-radius:100px;" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group m-1">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control bg-dark text-light" autocomplete="off" />
+            <div class="form-group m-1 row justify-content-center">
+                <input asp-for="FirstName" class="form-control bg-dark text-light w-50 text-center" placeholder="First Name" autocomplete="off" style="border-radius:100px;" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
-            <div class="form-group m-1">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control bg-dark text-light" autocomplete="off" />
+            <div class="form-group m-1 row justify-content-center">
+                <input asp-for="LastName" class="form-control bg-dark text-light w-50 text-center" placeholder="Last Name" autocomplete="off" style="border-radius:100px;" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
-            <div class="form-group m-1">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control bg-dark text-light" autocomplete="off" />
+            <div class="form-group m-1 row justify-content-center">
+                <input asp-for="Address" class="form-control bg-dark text-light w-50 text-center" placeholder="Full Address" autocomplete="off" style="border-radius:100px;" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
-            <div class="form-group m-1">
+            <div class="form-group m-1 d-flex justify-content-center">
                 @{ if (ViewBag.Areas != null)
                     {
-                        <label class="control-label">Choose your state area</label>
+                        <label class="control-label">Choose your state area</label> <span>&nbsp;</span>
                         <select class="bg-dark text-light" style="border-radius:50px;" name="area" asp-items="ViewBag.Areas"></select>
                     }
                     else
                     {
-                        <span>Please include your area with one of the following:
-                        <br/>
-                        "Center", "North", "East", "South" or "West" </span>
+                        <span>
+                            Please include your area with one of the following:
+                            <br />
+                            "Center", "North", "East", "South" or "West"
+                        </span>
                     }
                 }
             </div>
-            <div class="form-group m-1">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control bg-dark text-light" />
+            <div class="form-group m-1 row justify-content-center">
+                <input asp-for="Password" class="form-control bg-dark text-light w-50 text-center" placeholder="Password" style="border-radius:100px;"  autocomplete="off" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
+            <div class="form-group m-1 row justify-content-center">
+                <input type="password" name="cPassword" class="form-control bg-dark text-light w-50 text-center" placeholder="Confirm Password" style="border-radius:100px;" autocomplete="off" />
+            </div>
+            <div >
+                @if (ViewBag.PwMatchErr != null)
+                {
+                    <span class="text-danger">@ViewBag.PwMatchErr</span>
+                }
+            </div>
             <div class="form-group m-1">
-                <input type="submit" value="SIGN UP" class="btn btn-primary" style="width:100%" />
+                <input type="submit" value="SIGN UP" class="btn text-primary border border-primary m-3 w-25" style="border-radius:100px;" />
             </div>
             @if (!String.IsNullOrEmpty(ViewBag.Error))
             {
@@ -66,11 +72,8 @@
             }
         </form>
     </div>
-</div>
-
-<div>
-    <h5>Already a member?</h5>
-    <h6><a asp-action="Login">Click here</a> to Login!</h6>
+    <h5 class="text-light">Already a member?</h5>
+    <h6 class="text-light"><a asp-action="Login">Click here</a> to Login!</h6>
 </div>
 
 @section Scripts {

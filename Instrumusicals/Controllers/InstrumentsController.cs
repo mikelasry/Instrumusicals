@@ -45,6 +45,7 @@ namespace Instrumusicals.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
         {
             if (ModelState.IsValid)
@@ -132,6 +133,7 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ -- Delete -- @@ //
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return RedirectToMalfunction();
@@ -158,7 +160,6 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ -- Details -- @@ //
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return RedirectToMalfunction();
