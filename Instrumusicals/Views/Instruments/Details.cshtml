@@ -117,7 +117,7 @@
                         <a type="button" asp-action="Delete" asp-controller="Reviews" asp-route-id="@item.Id" class="btn btn-danger text-danger bg-dark">Delete</a>
                     </div>
                 }
-                <span class="w-25 d-inline float-end">Last Updated: @item.LastUpdate</span>
+                <span class="w-25 d-inline float-end">Last Updated: @item.LastUpdate.ToString("dd/MM/yyyy HH:mm")</span>
             </div>
             <div class="card-body bg-secondary text-light">
                 <p class="card-text">@item.Content</p>
@@ -125,7 +125,7 @@
             </div>
             <footer class="blockquote-footer bg-dark text-secondary">
                 @item.Instrument.Name, @item.Instrument.Category.Name
-                <span class="float-end bg-dark">Created: @item.Created &nbsp;</span>
+                <span class="float-end bg-dark">Created: @item.Created.ToString("dd/MM/yyyy") &nbsp;</span>
             </footer>
         </div>
     }

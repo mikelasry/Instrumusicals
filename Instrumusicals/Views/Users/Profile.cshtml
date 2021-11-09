@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
 
 <div class="row text-center justify-content-center">
     <div class="w-50">
@@ -74,27 +74,61 @@
         </div>
     </div>
 
-    <div id="ordersContent" class="d-none m-3">
-        <h3>My Orders</h3>
+
+
+    <div id="ordersContent" class="d-none m-3 ">
+        <button id="btnToggleSearch" class="btn text-primary border border-primary w-25" style="border-radius:100px;">search my orders</button>
+        <div id="viewSearchParams" class="row justify-content-center text-center d-none">
+            <div class="w-100 m-2 row justify-content-center">
+                <div class="w-25 align-middle">
+                    <input type="hidden" id="uid" value="@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()" />
+                    <label class="text-secondary">Created Date Starting From</label>
+                    <input type="date" id="fCreate" name="fCreated" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+
+                    <label class="text-secondary">Created Date Up To</label>
+                    <input type="date" id="tCreate" name="tCreated" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+
+                    <label class="text-secondary">Shipping Date From</label>
+                    <input type="date" id="fShipping" name="fShipping" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+
+                    <label class="text-secondary">Shipping Date Up To</label>
+                    <input type="date" id="tShipping" name="tShipping" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+
+                    <input type="text" id="address" name="address" placeholder="To Address" class="m-2 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+
+                    <input type="number" id="lPrice" name="lPrice" placeholder="From Total $" class="m-2 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+
+                    <input type="number" id="uPrice" name="uPrice" placeholder="To Total $" class="m-2 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+
+                    <div class="d-flex align-middle justify-content-around m-3">
+                        <button id="btnOrdersSearch" class="btn text-success m-1" style="border-radius:100px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16" >
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                            </svg>
+                        </button>
+                        <div id="ordersLoader" class="spinner-border text-light d-none" role="status"></div>
+                        <button id="btnOrdersClear" class="btn m-1 btn-sm text-danger border-0" style="border-radius:100px;">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <table class="table text-light">
             <thead>
                 <tr>
-                    <th>Owner</th>
+                    <th>Created</th>
                     <th>Shipping Address</th>
                     <th>TotalPrice</th>
-                    <th>Created</th>
                     <th>Shipping Date</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var item in Model.Orders.OrderByDescending(o => o.Shipping))
+            <tbody id="ordersTable">
+                @foreach (var item in Model.Orders.OrderBy(o => o.Shipping))
                 {
                     <tr>
-                        <td>@Html.DisplayFor(modelItem => item.User.FirstName)</td>
+                        <td>@item.Create.ToString("dd/MM/yyyy")</td>
                         <td>@Html.DisplayFor(modelItem => item.Address)</td>
-                        <td>@Html.DisplayFor(modelItem => item.TotalPrice)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Create)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Shipping)</td>
+                        <td>@Html.DisplayFor(modelItem => item.TotalPrice)$</td>
+                        <td>@item.Shipping.ToString("dd/MM/yyyy")</td>
                         <td>
                             <a class="text-warning" asp-controller="Orders" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                             <a class="text-primary" asp-controller="Orders" asp-action="Details" asp-route-id="@item.Id">Details</a>
@@ -107,6 +141,17 @@
             </tbody>
         </table>
     </div>
+
+
+
+
+
+
+
+
+
+
+
 
     <div id="reviewsContent" class="d-none m-3">
         <h3>My Reviews</h3>
@@ -122,12 +167,12 @@
                 @foreach (var item in Model.Reviews.OrderByDescending(r => r.LastUpdate))
                 {
                     <tr>
-                        <td><a class="text-light" asp-action="Details"  asp-controller="Instruments" asp-route-id="@item.Instrument.Id"><cite class="text-info">@Html.DisplayFor(modelItem => item.Instrument.Name)</cite></a></td>
+                        <td><a class="text-light" asp-action="Details" asp-controller="Instruments" asp-route-id="@item.Instrument.Id"><cite class="text-info">@Html.DisplayFor(modelItem => item.Instrument.Name)</cite></a></td>
                         <td>@Html.DisplayFor(modelItem => item.Content)</td>
                         <td>@Html.DisplayFor(modelItem => item.LastUpdate)</td>
                         <td>
                             <a class="text-warning" asp-controller="Reviews" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                            <a class="text-primary" asp-controller="Reviews" asp-action="Details" asp-route-id="@item.Id">Details</a> | 
+                            <a class="text-primary" asp-controller="Reviews" asp-action="Details" asp-route-id="@item.Id">Details</a> |
                             <a class="text-danger" asp-controller="Reviews" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                         </td>
                     </tr>
@@ -163,7 +208,26 @@
     </div>
 </div>
 
+<script type="text/template" id="orderRowTemplate">
+    <tr>
+        <td>${create}</td>
+        <td>${address}</td>
+        <td>${totalPrice}$</td>
+        <td>${shipping}</td>
+        <td>
+            <a class="text-warning" href="/Orders/Edit/${id}">Edit</a> |
+            <a class="text-primary" href="/Orders/Details/${id}">Details</a>
+            @if (Context.User != null && Context.User.IsInRole("Admin"))
+            {<span> | </span><a class="text-danger" href="/Orders/Delete/${id}">Delete</a>}
+        </td>
+    </tr>
+</script>
+
+
 @section Scripts{
     <script src="~/js/Users/ProfileViewController.js"></script>
+
     <script src="~/js/Users/ChangePassword.js"></script>
+
+    <script src="~/js/Orders/SearchOrders.js"></script>
 }

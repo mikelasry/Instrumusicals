@@ -117,7 +117,7 @@ function changePassword(_uid) {
 
 function validateNewPwFields(currPwVal, newPwVal, confirmPwVal) {
     if (currPwVal == EMPTY || newPwVal == EMPTY || confirmPwVal == EMPTY) {
-        popModal(Message.BUMMER,
+        popProfileModal(Message.BUMMER,
             Message.PW_DETAILS_REQUIRED,
             Message.OK,
             Color.YELLOW,
@@ -126,7 +126,7 @@ function validateNewPwFields(currPwVal, newPwVal, confirmPwVal) {
     }
 
     if (newPwVal != confirmPwVal) {
-        popModal(Message.BUMMER,
+        popProfileModal(Message.BUMMER,
             Message.NOT_THE_SAME,
             Message.OK,
             Color.RED,
@@ -138,7 +138,7 @@ function validateNewPwFields(currPwVal, newPwVal, confirmPwVal) {
     } return true;
 }
 
-function popModal(header, content, closeMsg, color, redirectUrl) {
+function popProfileModal(header, content, closeMsg, color, redirectUrl) {
     modalHeader.html(header);
     modalMessage.html(content);
 
@@ -180,7 +180,7 @@ function popModal(header, content, closeMsg, color, redirectUrl) {
 
 function popChangePwModal(result) {
     if (result.success) {
-        popModal(Message.YAY,
+        popProfileModal(Message.YAY,
             Message.SUCCESS,
             Message.OK,
             Color.GREEN,
@@ -198,7 +198,7 @@ function popChangePwModal(result) {
         case "a": content = Message.NOT_ALLOWED; break;
         default: color = Color.BLUE;
     }
-    popModal(Message.BUMMER, content, Message.OK, color, null);
+    popProfileModal(Message.BUMMER, content, Message.OK, color, null);
 }
 
 function Redirect(dst) {
