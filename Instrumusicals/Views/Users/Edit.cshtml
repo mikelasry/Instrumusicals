@@ -3,46 +3,49 @@
 @{
     ViewData["Title"] = "Edit";
 }
+<div class="row text-center justify-content-center">
+    <div class="w-50">
+        <h3>Edit  <a class="text-light" asp-action="Details" asp-route-id="@Model.Id">@Model.FirstName @Model.LastName's User</a></h3>
+        @if (Context.User != null && Context.User.IsInRole("Admin"))
+        {
+            <a class="text-primary" asp-action="Index">All Users</a>
+            <span> | </span>
+            <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+        }
+        <hr />
+    </div>
+</div>
 
-<h1>Edit</h1>
 
-<h4>User</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row text-center justify-content-center">
+    <div class="w-50">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" disabled />
+            <div class="form-group row justify-content-center">
+                <input asp-for="Email" class="form-control m-2 bg-dark text-light text-center w-50 border border-danger" style="border-radius:100px;" placeholder="Email" disabled />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
+            <div class="form-group row justify-content-center">
+                <input asp-for="FirstName" class="form-control m-2 bg-dark text-light text-center w-50 border border-light" style="border-radius:100px;" autocomplete="off" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
+            <div class="form-group row justify-content-center">
+                <input asp-for="LastName" class="form-control m-2 bg-dark text-light text-center w-50 border border-light" style="border-radius:100px;" autocomplete="off" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control" />
+            <div class="form-group row justify-content-center">
+                <input asp-for="Address" class="form-control m-2 bg-dark text-light text-center w-75 border border-light" style="border-radius:100px;" autocomplete="off" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="form-group justify-content-center">
+                <input type="submit" value="Update" class="btn btn-sm m-2 border border-success text-success text-center" style="border-radius:100px;" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

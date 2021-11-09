@@ -4,33 +4,45 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div class="row text-center justify-content-center">
+    <div class="w-50">
+        <h2>All about <cite>@Model.FirstName @Model.LastName's</cite> User</h2>
+        @if (Context.User != null && Context.User.IsInRole("Admin"))
+        {
+            <a class="text-primary" asp-action="Index">All Users</a>
+            <br />
+        }
+        <a class="text-warning" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> | 
+        <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+        <hr />
 
-<div>
-    <h4>User</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-    </dl>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="row text-center justify-content-center">
+    <div class="w-75">
+        <table class="table text-light text-center">
+            <thead>
+                <tr>
+                    <th class="text-info">Email</th>
+                    <th class="text-info">Name</th>
+                    <th class="text-info">Address</th>
+                    <th class="text-info">Orders</th>
+                    <th class="text-info">Reviews</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr class="">
+                    <td class="align-middle">@Model.Email</td>
+                    <td class="align-middle">@Model.FirstName @Model.LastName</td>
+                    <td class="align-middle">@Model.Address</td>
+                    <td class="align-middle">@Model.Orders.Count()</td>
+                    <td class="align-middle">@Model.Reviews.Count()</td>
+
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
 </div>

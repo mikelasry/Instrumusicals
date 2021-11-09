@@ -7,9 +7,7 @@
     <div class="w-50">
         <h1>Instrumusicals' Categories</h1>
         @if (Context.User.IsInRole("Admin"))
-        {
-            <a class="text-secondary" asp-action="Create"> create a new category</a>
-        }
+        { <a class="btn border border-success text-success m-3" asp-action="Create" style="border-radius:100px;">New</a> }
     </div>
 </div>
 <div class="row">

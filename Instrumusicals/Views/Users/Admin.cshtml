@@ -20,7 +20,7 @@
                 @:names.push("@a.Key");
             }
 
-            var colors = ["#FF5733", "#5EFAB1", "#5E65FA"];
+            var colors = ["#00A2E9", "#FF8000", "#00DB00"];
             var radius = 200;
             var colorScale = d3.scale.ordinal().range(colors);
             var area = d3.selectAll('section').append('svg')
@@ -59,8 +59,8 @@
                 @:data.push(@a.Value);
                 @:names.push("@a.Key");
             }
-
-            var colors = ["#5E0000", "#5EFEEE", "#FF5555"];
+            var i = 0;
+            var colors = ['#B762B7', "#E3E300", "#0000DB", "#FF5555",];
             var radius = 200;
             var colorScale = d3.scale.ordinal().range(colors);
             var area = d3.selectAll('p').append('svg')
@@ -79,7 +79,7 @@
                 .attr('class', 'arc');
             arcs.append('path')
                 .attr('d', arc)
-                .attr('fill', function (d) { return colorScale(d.data); });
+                .attr('fill', function (d) { return colorScale(i++); });
 
             arcs.append('text')
                 .attr('transform', function (data) { return 'translate(' + arc.centroid(data) + ')'; })
@@ -128,8 +128,8 @@
     <hr />
     <br />
     <br />
-    <div class="text-center ">
-        <h2 class="text-warning"><cite><u>Quick Access</u><cite /></h2>
+    <div class="row text-center justify-content-center">
+        <h2 class="text-warning"><cite><u>Quick Access</u></cite></h2>
 
         <table class="table">
             <thead>
@@ -168,15 +168,15 @@
         <br />
         <br />
 
-        <div>
-            <h2 class="text-warning"><cite><u>Reviews Per Category</u><cite /></h2>
+        <div class="d-flex justify-content-center"><h2 class="text-warning"><cite><u>Reviews Per Category</u></cite></h2></div>
+        <div class="w-25">
             <table class="table text-center text-light">
                 <thead>
                     <tr>
                         <th class="text-info">
                             Categories
                         </th>
-                        <th class="text-info">
+                        <th class="text-info"> 
                             Reviews Count
                         </th>
 
@@ -206,7 +206,7 @@
         <br />
 
         <div>
-            <h2 class="text-warning"><cite><u>Users Orders - Sorted by shipping date</u><cite /></h2>
+            <h2 class="text-warning"><cite><u>Users Orders - Sorted by shipping date</u></cite></h2>
             <table class="table text-center text-light">
                 <thead>
                     <tr>
@@ -254,7 +254,7 @@
         <br />
 
         <div>
-            <h2 class="text-warning"><cite><u>Post to <a class="text-warning" href="https://www.facebook.com/Instrumusicals-100896432413118">Instrumusicals' Facebook</a></u><cite /></h2>
+            <h2 class="text-warning"><cite><u>Post to <a class="text-warning" href="https://www.facebook.com/Instrumusicals-100896432413118">Instrumusicals' Facebook</a></u></cite></h2>
             <br />
             <div class="row justify-content-center">
                 <div class="w-50">
@@ -284,16 +284,19 @@
         <br />
 
         <div>
-            <h2 class="text-warning"><cite><u>Instrumusical Statistics</u><cite /></h2>
-            
+            <h2 class="text-warning"><cite><u>Instrumusical Statistics</u></cite></h2>
+
             <section>
             </section>
-
-            <br/>
+            <br />
             <h4 class="text-info">Store Value by Categories</h4>
+            <br />
+            <br />
+            <br />
             <p>
             </p>
-            <h4 class="text-info"></h4>
+            <h4 class="text-info">Instruments Count By Category</h4>
+            <br />
         </div>
     </div>
 
