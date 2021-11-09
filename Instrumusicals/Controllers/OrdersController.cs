@@ -218,6 +218,35 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ //
+        public async Task<IActionResult> Search(int uid, bool all, DateTime fCreate, DateTime tCreate, String address, float lPrice, float uPrice, DateTime fShipping, DateTime tShipping)
+        {
+            if (uid == 0) return JsonSuccess(false, new { msg = "unf" }); // -u-ser -n-ot -f-ound
+            if (!IsUserAuthorized(uid)) return JsonSuccess(false, new { msg = "nad" }); // -n-ot -a-thorize-d-
+            if (all) return JsonSuccess(true, await _context.Order.Where(o => o.UserId == uid).ToListAsync());
+
+            DateTime DateNotSubmitted = new();
+            bool isAdminRequest = IsAuthUserAdmin();
+
+            bool a = tCreate != DateNotSubmitted && fCreate != DateNotSubmitted && fCreate > tCreate;
+            if (a)
+            { return JsonSuccess(false, new { msg = "xc" }); }  // x created dates
+
+            if(tShipping != DateNotSubmitted && fShipping != DateNotSubmitted && fShipping > tShipping)
+            { return JsonSuccess(false, new { msg = "xs" }); } // x shipping dates
+
+            List<Order> dbOrders = await _context.Order
+                .Where(o => o.UserId == uid)
+                .Where(o => fCreate == DateNotSubmitted ? true : fCreate <= o.Create)
+                .Where(o => tCreate == DateNotSubmitted ? true : tCreate >= o.Create)
+                .Where(o => lPrice == 0 ? true : o.TotalPrice >= lPrice)
+                .Where(o => uPrice == 0 ? true : o.TotalPrice <= uPrice)
+                .Where(o => String.IsNullOrEmpty(address) ? true : o.Address.Contains(address))
+                .Where(o => fShipping == DateNotSubmitted ? true : fShipping <= o.Shipping.Date)
+                .Where(o => tShipping == DateNotSubmitted ? true : tShipping >= o.Shipping.Date)
+                .ToListAsync();
+
+            return JsonSuccess(true, dbOrders);
+        }
 
         private bool OrderExists(int id)
         {
@@ -228,6 +257,17 @@ namespace Instrumusicals.Controllers
         {
             return HttpContext.User.IsInRole("Admin") || (Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid);
         }
+        private bool IsAuthUserAdmin()
+        {
+            if (!IsUserAuthenticated()) return false;
+            return HttpContext.User.IsInRole("Admin");
+        }
+
+        private bool IsUserAuthenticated()
+        {
+            return HttpContext.User != null && HttpContext.User.Identity != null;
+        }
+
 
         private int GetAuthUserId()
         {

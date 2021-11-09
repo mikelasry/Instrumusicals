@@ -365,7 +365,6 @@ namespace Instrumusicals.Controllers
                 .ToListAsync();
                
             return Json(instruments);
-
         }
 
         // @@ @@@@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@@@ @@ //

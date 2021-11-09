@@ -19,11 +19,13 @@
             <form method="post" class="card bg-dark pt-2 pr-4 pl-4 pb-1">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <input asp-for="Email" class="form-control bg-dark text-light m-3" placeholder="Email" autocomplete="off"/>
+                    <label >Email</label>
+                    <input asp-for="Email" class="form-control bg-dark text-light m-3" autocomplete="off"/>
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div>
-                    <input asp-for="Password" class="form-control bg-dark text-light m-3" placeholder="Password"/>
+                    <label>Password</label>
+                    <input asp-for="Password" class="form-control bg-dark text-light m-3" />
                 </div>
                 <hr />
                 <div style="height:50px">

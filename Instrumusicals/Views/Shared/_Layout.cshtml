@@ -18,28 +18,109 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1 justify-content-center">
-                        <li class="nav-item">
+                        <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Instruments" asp-action="Index">Instruments</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Instruments" asp-action="Index">Brands</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
                         </li>
                         @{
                             if ((Context != null) && (Context.User != null) && (!String.IsNullOrEmpty(Context.User.Identity.Name)))
                             { // User is logged
-                                <div class="m-auto justify-content-center text-center text-light">Hello, @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault() </div>
-                                <li class="nav-item">
+
+                                @* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ *@
+
+                                <div class="mr-3 d-flex justify-content-center text-center text-light" style="margin-right: 25px; margin-left: 25px;">
+                                    <div class="d-flex text-center justify-content-center">
+                                        <h1>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note text-warning" viewBox="0 0 16 16">
+                                                <path d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z" />
+                                                <path fill-rule="evenodd" d="M9 3v10H8V3h1z" />
+                                                <path d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z" />
+                                            </svg>
+                                        </h1>
+                                        &nbsp;
+                                        <h2>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note-list text-danger" viewBox="0 0 16 16">
+                                                <path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z" />
+                                                <path fill-rule="evenodd" d="M12 3v10h-1V3h1z" />
+                                                <path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z" />
+                                                <path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z" />
+                                            </svg>
+                                        </h2>
+                                        &nbsp;
+                                        <h3>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note-beamed text-primary" viewBox="0 0 16 16">
+                                                <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z" />
+                                                <path fill-rule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z" />
+                                                <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4V2.905z" />
+                                            </svg>
+                                        </h3>
+                                        &nbsp;
+                                        <h5>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note text-success" viewBox="0 0 16 16">
+                                                <path d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z" />
+                                                <path fill-rule="evenodd" d="M9 3v10H8V3h1z" />
+                                                <path d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z" />
+                                            </svg>
+                                        </h5>
+                                        &nbsp;
+                                        <h4>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note-list text-warning" viewBox="0 0 16 16">
+                                                <path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z" />
+                                                <path fill-rule="evenodd" d="M12 3v10h-1V3h1z" />
+                                                <path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z" />
+                                                <path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z" />
+                                            </svg>
+                                        </h4>
+                                        &nbsp;
+                                        <h3>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note-beamed text-danger" viewBox="0 0 16 16">
+                                                <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z" />
+                                                <path fill-rule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z" />
+                                                <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4V2.905z" />
+                                            </svg>
+                                        </h3>
+                                        &nbsp;
+                                        <h2>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note text-primary" viewBox="0 0 16 16">
+                                                <path d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z" />
+                                                <path fill-rule="evenodd" d="M9 3v10H8V3h1z" />
+                                                <path d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z" />
+                                            </svg>
+                                        </h2>
+                                        &nbsp;
+                                        <h1>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-vinyl text-success" viewBox="0 0 16 16">
+                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                <path d="M8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM4 8a4 4 0 1 1 8 0 4 4 0 0 1-8 0z" />
+                                                <path d="M9 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                                            </svg>
+                                        </h1>
+                                        &nbsp;
+
+                                    </div><div class="d-flex align-items-center">Hello, @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()</div>
+
+
+                                </div>
+
+
+
+
+                                @* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ *@
+
+                                <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                                     <a class="nav-link text-light bg-transparent border-light" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Profile" asp-route-id="0">My Profile</a>
                                 </li>
-                                <li class="nav-item">
+                                <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                                     <a class="nav-link text-danger bg-transparent border-danger" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
                                 </li>
                                 @if (Context.User.IsInRole("Admin"))
                                 {
-                                    <li class="nav-item">
+                                    <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                                         <a class="nav-link text-dark bg-danger border-dark" style="font-weight:bold ;" asp-area="" asp-controller="Users" asp-action="Admin">Admin</a>
                                     </li>
                                 }
@@ -47,15 +128,15 @@
                             }
                             else
                             { // no logged user
-                                <li class="nav-item">
+                                <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                                     <a class="nav-link text-light bg-primary border-light" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
                                 </li>
-                                <li class="nav-item">
+                                <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                                     <a class="nav-link text-light bg-success border-light" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Register">Register</a>
                                 </li>
                             }
 
-                            <li class="nav-item">
+                            <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                                 <a class="nav-link text-light bg-dark border-success" asp-area="" asp-controller="Users" asp-action="Cart">Cart</a>
                             </li>
                         }
