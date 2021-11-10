@@ -169,7 +169,7 @@ namespace Instrumusicals.Controllers
             if (instrument == null) return RedirectToAction("Malfunction", "Home");
 
             IEnumerable<Review> reviews = await _context.Review.Include(r => r.User)
-                                .Where(r => r.InstrumentId == id).OrderByDescending(r => r.LastUpdate).ToListAsync();
+                                .Where(r => r.InstrumentId == id).OrderByDescending(r => r.Created).ToListAsync();
             ViewData["Reviews"] = reviews;
             if (HttpContext.User != null && HttpContext.User.Identity != null)
             {

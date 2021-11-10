@@ -18,11 +18,11 @@
     @if (Context != null && Context.User != null)
     {
         <h6 class="text-secondary">Welcome to your cart</h6>
-        <h3 class="text-primary">
+        <h2 class="text-success" style="text-shadow: 2px 2px 20px #ff0000;">
             <cite>
                 @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()
             </cite>
-        </h3>
+        </h2>
         <a href="/Instruments/Index" class="text-light text-sm-center">continue shopping</a>
     }
     <hr />
@@ -33,13 +33,13 @@
         {
             <table id="cartTable" class="table text-center text-light">
                 <thead>
-                    <th></th>
-                    <th></th>
-                    <th class="text-info">Instrument</th>
-                    <th class="text-info">Quantity</th>
-                    <th class="text-info">Price</th>
-                    <th class="text-info">Total</th>
-                    <th></th>
+                <th></th>
+                <th></th>
+                <th class="text-info">Instrument</th>
+                <th class="text-info">Quantity</th>
+                <th class="text-info">Price</th>
+                <th class="text-info">Total</th>
+                <th></th>
                 </thead>
                 <tbody id="cartBody">
                     @foreach (var item in ViewBag.CartBag)
@@ -128,7 +128,7 @@
                                         </label>
                                     </div>*@
 
-                                <div class="row justify-content-center" >
+                                <div class="row justify-content-center">
                                     <div style="width:30px; height:30px;">
                                         <div id="placeOrderSpinner" class="spinner-grow d-none" style="width:15px; height:15px;" role="status"></div>
                                     </div>
@@ -147,7 +147,8 @@
         }
         else // ViewBag.CartBag.Count <= 0
         {
-            <h3>Your shopping cart is empty!!! :O</h3>
+            <h3>Your shopping cart is empty!!! </h3>
+            <span style='font-size:100px;'>&#128561;</span>
             <h5>Let's <a href="/Instruments/Index" class="text-light">go shopping!</a></h5>
         }
 
@@ -200,8 +201,9 @@
 
 </script>
 <script type="text/template" id="emptyTemplate">
-    <div class=" emptyclass ">
-        <h3>Your shopping cart is empty!!! :O</h3>
+    <div class="emptyclass ">
+        <h3>Your shopping cart is empty!!!<h3>
+        <span style='font-size:100px;'>&#128561;</span>
         <h5>Let's <a href="/Instruments/Index" class="text-light">go shopping!</a></h5>
     </div>
 </script>
