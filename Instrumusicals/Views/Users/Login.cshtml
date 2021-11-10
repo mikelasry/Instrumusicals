@@ -10,25 +10,20 @@
     <h1 class="text-center">Login!</h1>
     <hr />
 
-    <div style="height:70px;">
-        <h5> We've missed you </h5>
-    </div>
 
     <div class="row justify-content-center">
         <div class="col-md-4">
-            <form method="post" class="card bg-dark pt-2 pr-4 pl-4 pb-1">
+            <form method="post" class="card bg-dark pt-2 pr-4 pl-4 pb-1 justify-content-center">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label >Email</label>
-                    <input asp-for="Email" class="form-control bg-dark text-light m-3" autocomplete="off"/>
+                <div class="form-group  row justify-content-center">
+                    <input asp-for="Email" class="form-control bg-dark text-light m-3 text-center w-75" autocomplete="off" style="border-radius:100px;" placeholder="Email"/>
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-                <div>
-                    <label>Password</label>
-                    <input asp-for="Password" class="form-control bg-dark text-light m-3" />
+                <div class="form-group row justify-content-center">
+                    <input asp-for="Password" class="form-control bg-dark text-light m-3 text-center w-75" style="border-radius:100px;" placeholder="Password" />
                 </div>
                 <hr />
-                <div style="height:50px">
+                <div style="height:50px" class="row  row justify-content-center">
                     @if (ViewBag.Error != null)
                     {
                         <div class="text-danger">
@@ -42,18 +37,19 @@
                         </div>
                     }
                 </div>
-                <div class="form-group" style="display:flex; justify-content:space-between;">
-                    <input type="submit" value="Login!" class="btn btn-primary" style="width:100%" />
+                <div class="form-group row justify-content-center m-2" style="display:flex; justify-content:space-between;">
+                    <input type="submit" value="Login!" class="btn text-primary border border-primary w-50" style="width:100%; border-radius:100px;" />
                 </div>
             </form>
         </div>
     </div>
 
     <div class="text-center">
+        <h6><a class="text-warning" asp-action="Register">Register Here!</a></h6>
+        <a asp-action="Index" asp-controller="Home" class="text-secondary">Homepage</a>
         <br />
-        <a asp-action="Register">Register Here!</a>
-        <br />
-        <a asp-action="Index" asp-controller="Home" class="text-secondary">Back to Home Page</a>
+        <span style='font-size:50px;'>&#128521;</span>
+
     </div>
 </div>
 @section Scripts {

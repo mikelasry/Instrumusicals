@@ -26,27 +26,6 @@ namespace Instrumusicals.Controllers
 
         public IActionResult Index() {
 
-            List<Store> stores =  _context.Store.ToList();
-            List<List<double>> geolocations = new();
-            stores.ForEach((st =>
-            {
-                string requestUri = string.Format("https://maps.googleapis.com/maps/api/geocode/xml?key={1}&address={0}&sensor=false", Uri.EscapeDataString(st.Address), "AIzaSyBAAgBPty6vBndlH-lOqUDLq1cfPeDpuFI");
-                WebRequest request = WebRequest.Create(requestUri);
-                WebResponse response = request.GetResponse();
-                XDocument xdoc = XDocument.Load(response.GetResponseStream());
-
-                XElement result = xdoc.Element("GeocodeResponse").Element("result");
-                XElement locationElement = result.Element("geometry").Element("location");
-                XElement lat = locationElement.Element("lat");
-                XElement lng = locationElement.Element("lng");
-
-                geolocations.Add(new List<double> { Convert.ToDouble(lng.Value), Convert.ToDouble(lat.Value)});
-
-            }
-            ));
-
-            ViewData["Geolocations"] = JsonSerializer.Serialize(geolocations);//Json(geolocations.ToArray()).Value.ToString();
-            ViewData["Stores"] = JsonSerializer.Serialize(stores.ToArray().Select(st => st.Name).ToArray());
             
             return View();
         }
@@ -60,6 +39,7 @@ namespace Instrumusicals.Controllers
         {
             return View();
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

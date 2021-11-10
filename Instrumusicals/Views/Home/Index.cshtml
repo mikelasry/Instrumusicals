@@ -1,76 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
-
-
-<!DOCTYPE link href="https://maps/documentation/javascript/examples/default.css" rel="stylesheet">
-<html>
-<head>
-    <script>
-        function initMap() {
-            var lnt = { lat: 31.9697552, lng: 34.7709846 };
-            var mapOptions = {
-                zoom: 7,
-                center: lnt
-            }
-            const map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-
-
-            var locations = JSON.parse('@Html.Raw(ViewBag.Geolocations)');
-            var stores = JSON.parse('@Html.Raw(ViewBag.Stores)');
-            for (let i = 0; i < 3; i++) {
-                var loc = { lat: locations[i][1], lng: locations[i][0] };
-                const coordInfoWindow = new google.maps.InfoWindow();
-                coordInfoWindow.setContent(createInfoWindowContent(loc, map.getZoom(), ['<p class="text-primary">' + stores[i] +'</p>']));
-                coordInfoWindow.setPosition(loc);
-                coordInfoWindow.open(map);
-                map.addListener("zoom_changed", () => {
-                    coordInfoWindow.setContent(createInfoWindowContent(loc, map.getZoom()));
-                    coordInfoWindow.open(map);
-                });
-            }
-
-        }
-        const TILE_SIZE = 256;
-        function createInfoWindowContent(latLng, zoom, msg) {
-            const scale = 1 << zoom;
-            const worldCoordinate = project(latLng);
-            const pixelCoordinate = new google.maps.Point(
-                Math.floor(worldCoordinate.x * scale),
-                Math.floor(worldCoordinate.y * scale)
-            );
-            const tileCoordinate = new google.maps.Point(
-                Math.floor((worldCoordinate.x * scale) / TILE_SIZE),
-                Math.floor((worldCoordinate.y * scale) / TILE_SIZE)
-            );
-            return msg.join("<br>");
-        }
-
-        function project(latLng) {
-            let siny = Math.sin((latLng.lat * Math.PI) / 180);
-
-            // Truncating to 0.9999 effectively limits latitude to 89.189. This is
-            // about a third of a tile past the edge of the world tile.
-            siny = Math.min(Math.max(siny, -0.9999), 0.9999);
-            return new google.maps.Point(
-                TILE_SIZE * (0.5 + latLng.lng / 360),
-                TILE_SIZE * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI))
-            );
-        }
-
-
-    </script>
-</head>
-
-<body>
-    <footer>
-    <div id="map-canvas" style="width: 600px; height: 390px; border: 5px solid #5E5454;"><div>
-    </footer>
-    
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAAgBPty6vBndlH-lOqUDLq1cfPeDpuFI&callback=initMap&libraries=&v=weekly" async></script>
-</body>
-
-
-
-</html>
+<div id="homeContainer" class="container justify-content-center">
+    <div class="row justify-content-center text-center">
+        <div class="w-50 ">
+            <h1>Welcome to Instrumusicals</h1>
+        </div>
+    </div>
+</div>

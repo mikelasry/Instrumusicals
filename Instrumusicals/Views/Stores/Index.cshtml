@@ -6,51 +6,112 @@
 
 <div class="row text-center justify-content-center m-5">
     <div class="w-50">
-        <h3>Instrumusicals' Stores</h3>
+        <h2>Instrumusicals' Stores</h2>
+        @if (Context != null && Context.User != null && Context.User.IsInRole("Admin"))
+        {<a class="btn text-success border border-success" asp-action="Create" style="border-radius:100px;">New</a>}
+    </div>
+    <div class="w-75">
+        <table class="table text-center text-light m-3">
+            <thead>
+                <tr>
+                    <th class="text-info">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th class="text-info">
+                        @Html.DisplayNameFor(model => model.Address)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Address)
+                        </td>
+                        <td>
+                            @{
+                                if (Context != null && Context.User != null && Context.User.IsInRole("Admin"))
+                                {<a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a><span> |</span>}
+                                <a class="text-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                if (Context != null && Context.User != null && Context.User.IsInRole("Admin"))
+                                {<span> | </span><a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>}
+                            }
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="m-5 text-light text-center m-auto bg p-5 bg-dark" style="border-radius: 100px;">
+        <div class="row justify-content-center">
+            <h3>We're On The Map!!!</h3>
+            <div id="map-canvas" style="width: 600px; height: 390px; border: 5px solid rgb(0 36 255 / 0.78); border-radius:100px;"></div>
+        </div>
     </div>
 
-    <table class="table text-center text-light m-5">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Address)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Lat)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Lng)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Address)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Lat)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Lng)
-                    </td>
-                    <td>
-                        <a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a class="text-primary" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <a asp-action="Create">open a new store</a>
+    <br />
+    <br />
+    <h4>Go <a class="text-white" asp-action="Index" asp-controller="Home">back to home page</a>!!!</h4>
 </div>
+
+
+<link href="https://maps/documentation/javascript/examples/default.css" rel="stylesheet">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAAgBPty6vBndlH-lOqUDLq1cfPeDpuFI&callback=initMap&libraries=&v=weekly" async></script>
+<script>
+        function initMap() {
+            var lnt = { lat: 31.9697552, lng: 34.7709846 };
+            var mapOptions = {
+                zoom: 7,
+                center: lnt
+            }
+            const map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+            var locations = JSON.parse('@Html.Raw(ViewBag.Geolocations)');
+            var stores = JSON.parse('@Html.Raw(ViewBag.Stores)');
+            for (let i = 0; i < 3; i++) {
+                var loc = { lat: locations[i][1], lng: locations[i][0] };
+                const coordInfoWindow = new google.maps.InfoWindow();
+                coordInfoWindow.setContent(createInfoWindowContent(loc, map.getZoom(), ['<a class="text-dark" href="/Stores/Details?name='+stores[i].split(" ")[1]+'">' + stores[i] +'</a>']));
+                coordInfoWindow.setPosition(loc);
+                coordInfoWindow.open(map);
+                map.addListener("zoom_changed", () => {
+                    coordInfoWindow.setContent(createInfoWindowContent(loc, map.getZoom()));
+                    coordInfoWindow.open(map);
+                });
+            }
+
+        }
+        const TILE_SIZE = 256;
+        function createInfoWindowContent(latLng, zoom, msg) {
+            const scale = 1 << zoom;
+            const worldCoordinate = project(latLng);
+            const pixelCoordinate = new google.maps.Point(
+                Math.floor(worldCoordinate.x * scale),
+                Math.floor(worldCoordinate.y * scale)
+            );
+            const tileCoordinate = new google.maps.Point(
+                Math.floor((worldCoordinate.x * scale) / TILE_SIZE),
+                Math.floor((worldCoordinate.y * scale) / TILE_SIZE)
+            );
+            return msg.join("<br>");
+        }
+
+        function project(latLng) {
+            let siny = Math.sin((latLng.lat * Math.PI) / 180);
+
+            // Truncating to 0.9999 effectively limits latitude to 89.189. This is
+            // about a third of a tile past the edge of the world tile.
+            siny = Math.min(Math.max(siny, -0.9999), 0.9999);
+            return new google.maps.Point(
+                TILE_SIZE * (0.5 + latLng.lng / 360),
+                TILE_SIZE * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI))
+            );
+        }
+</script>
+

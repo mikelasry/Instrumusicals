@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Instrumusicals.Data;
 using Instrumusicals.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
+using System.Net;
+using System.Xml.Linq;
 
 namespace Instrumusicals.Controllers
 {
@@ -44,6 +47,27 @@ namespace Instrumusicals.Controllers
         // @@ -- Read -- @@ //
         public async Task<IActionResult> Index()
         {
+            List<Store> stores = _context.Store.ToList();
+            List<List<double>> geolocations = new();
+            stores.ForEach((st =>
+            {
+                string requestUri = string.Format("https://maps.googleapis.com/maps/api/geocode/xml?key={1}&address={0}&sensor=false", Uri.EscapeDataString(st.Address), "AIzaSyBAAgBPty6vBndlH-lOqUDLq1cfPeDpuFI");
+                WebRequest request = WebRequest.Create(requestUri);
+                WebResponse response = request.GetResponse();
+                XDocument xdoc = XDocument.Load(response.GetResponseStream());
+
+                XElement result = xdoc.Element("GeocodeResponse").Element("result");
+                XElement locationElement = result.Element("geometry").Element("location");
+                XElement lat = locationElement.Element("lat");
+                XElement lng = locationElement.Element("lng");
+
+                geolocations.Add(new List<double> { Convert.ToDouble(lng.Value), Convert.ToDouble(lat.Value) });
+
+            }
+            ));
+
+            ViewData["Geolocations"] = JsonSerializer.Serialize(geolocations);//Json(geolocations.ToArray()).Value.ToString();
+            ViewData["Stores"] = JsonSerializer.Serialize(stores.ToArray().Select(st => st.Name).ToArray());
             return View(await _context.Store.ToListAsync());
         }
 
@@ -57,9 +81,9 @@ namespace Instrumusicals.Controllers
             return View(store);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Lat,Lng")] Store store)
         {
             if (id != store.Id) return RedirectToMalfunction();
@@ -84,6 +108,7 @@ namespace Instrumusicals.Controllers
 
         // @@ -- Delete -- @@ //
         [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0) return RedirectToMalfunction();
@@ -93,9 +118,10 @@ namespace Instrumusicals.Controllers
             return View(store);
         }
 
-        [Authorize]
-        [HttpPost, ActionName("Delete")]
+
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var store = await _context.Store.FindAsync(id);
@@ -105,9 +131,10 @@ namespace Instrumusicals.Controllers
         }
 
     // @@ -- Details -- @@ //
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string name)
         {
-            if (id == 0) return RedirectToMalfunction();
+            if (id == 0 && String.IsNullOrEmpty(name)) return RedirectToMalfunction();
+            if (id == 0) id = await _context.Store.Where(s => s.Name.Contains(name)).Select(s => s.Id).FirstOrDefaultAsync();
             var store = await _context.Store.FirstOrDefaultAsync(m => m.Id == id);
             if (store == null)return RedirectToMalfunction();
             return View(store);
