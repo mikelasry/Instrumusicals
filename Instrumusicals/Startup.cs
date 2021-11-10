@@ -74,7 +74,7 @@ namespace Instrumusicals
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Users}/{action=Profile}/{id?}"
+                    pattern: "{controller=Users}/{action=Index}/{id?}"
                 );
             });
 

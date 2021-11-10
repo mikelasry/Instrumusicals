@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Instrumusicals.Controllers
 {
@@ -379,7 +380,21 @@ namespace Instrumusicals.Controllers
         }
 
         // @@ @@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@ @@ //
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Search(bool all, string email, string fName, string lName, string address)
+        {
+            if (all) return JsonSuccess(true, await _context.User.ToListAsync());
+            
+            List<User> dbUsers = await _context.User
+                    .Where(u => String.IsNullOrEmpty(email) ? true : u.Email.Contains(email))
+                    .Where(u => String.IsNullOrEmpty(fName) ? true : u.FirstName.Contains(fName))
+                    .Where(u => String.IsNullOrEmpty(lName) ? true : u.LastName.Contains(lName))
+                    .Where(u => String.IsNullOrEmpty(address) ? true : u.Address.Contains(address))
+                    .ToListAsync();
+            if (dbUsers == null) return JsonSuccess(false, new { msg = "m" }); // -m-alfunction
+            return JsonSuccess(true, dbUsers);
 
+        }
         private bool IsUserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
@@ -433,7 +448,8 @@ namespace Instrumusicals.Controllers
             }
         }
 
-        private SelectList GetDirectionsSelectList(){
+        private SelectList GetDirectionsSelectList()
+        {
             return new SelectList(new[] {
                         new SelectListItem{Selected = true, Text =  "Center", Value = "c"},
                         new SelectListItem{Selected = false, Text = "North", Value = "n"},
