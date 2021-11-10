@@ -19,10 +19,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1 justify-content-center">
                         <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
-                            <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Instruments" asp-action="Index">Instruments</a>
-                        </li>
-                        <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
-                            <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Instruments" asp-action="Index">Brands</a>
+                            <a style="transition: width 1s, height 1s;" class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Instruments" asp-action="Index">Instruments</a>
                         </li>
                         <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                             <a class="nav-link text-light bg-dark border-warning" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
@@ -101,16 +98,9 @@
                                             </svg>
                                         </h1>
                                         &nbsp;
-
-                                    </div><div class="d-flex align-items-center">Hello, @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()</div>
-
-
+                                    </div>
+                                    <div class="d-flex align-items-center" style="font-family: myFirstFont!important;">Hello, @Context.User.Claims.Where(c => c.Type == "FullName").Select(c => c.Value).SingleOrDefault()</div>
                                 </div>
-
-
-
-
-                                @* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ *@
 
                                 <li class="nav-item" style="align-items: center!important; display: flex; justify-content: center;">
                                     <a class="nav-link text-light bg-transparent border-light" style="font-weight: bold;" asp-area="" asp-controller="Users" asp-action="Profile" asp-route-id="0">My Profile</a>

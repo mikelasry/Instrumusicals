@@ -47,7 +47,6 @@ namespace Instrumusicals.Controllers
 
             ViewData["Geolocations"] = JsonSerializer.Serialize(geolocations);//Json(geolocations.ToArray()).Value.ToString();
             ViewData["Stores"] = JsonSerializer.Serialize(stores.ToArray().Select(st => st.Name).ToArray());
-
             
             return View();
         }

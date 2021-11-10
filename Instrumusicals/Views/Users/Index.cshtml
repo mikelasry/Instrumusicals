@@ -9,18 +9,19 @@
         <a class="text-primary" asp-action="Index" asp-controller="Home">Homepage</a> |
         <a class="text-success" asp-action="Register">Register a New User</a>
         <hr />
-        <button id="btnSearchUsersView" class="btn text-primary border border-primary m-2" style="border-radius:100px;">Search for Users</button>
+        <button id="btnSearchUsersView" class="btn text-primary border border-primary w-25 m-2" style="border-radius:100px; transition: width 2s;">Search for Users</button>
     </div>
 </div>
-<div id="userSearchView" class="row justify-content-center d-none">
+
+<div id="userSearchView" class="row justify-content-center d-none"">
     <div class="w-75 row justify-content-center">
         <div class="d-flex justify-content-around">
-            <input id="emailParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="Email Contains"   autocomplete="off"/>
-            <input id="fNameParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="First Name"  autocomplete="off"/>   
-            <input id="lNameParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="LastName"  autocomplete="off"/>    
+            <input id="emailParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="Email Contains" autocomplete="off" />
+            <input id="fNameParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="First Name" autocomplete="off" />
+            <input id="lNameParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="LastName" autocomplete="off" />
         </div>
         <div class="row justify-content-center">
-            <input id="addressParam" type="text" class="form-control w-50 bg-dark text-light text-center m-2 border border-primary" autocomplete="off" style="border-radius:100px;" placeholder="Address"/>                                              
+            <input id="addressParam" type="text" class="form-control w-50 bg-dark text-light text-center m-2 border border-primary" autocomplete="off" style="border-radius:100px;" placeholder="Address" />
         </div>
 
         <div class="w-25 d-flex justify-content-around m-2">
@@ -68,6 +69,7 @@ else
     <h5>No Users Yet</h5>
 }
 
+<link rel="stylesheet" href="~/css/instruVisual.css">
 <script type="text/template" id="userRowTemplate">
     <tr>
         <td class="align-middle">${email}</td>
@@ -76,7 +78,7 @@ else
         <td class="align-middle">
             <a class="text-warning" href="/Users/Edit/${id}">Edit</a> |
             <a class="text-primary" href="/Users/Details/${id}">Details</a> |
-            <a class="text-danger" href="/Users/Delete/${id}">Delete</a> 
+            <a class="text-danger" href="/Users/Delete/${id}">Delete</a>
         </td>
     </tr>
 </script>

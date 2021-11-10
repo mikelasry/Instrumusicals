@@ -30,6 +30,9 @@ a {
     margin-right: 5px;
 }
 
+nav-link:hover{
+    background: red !important;
+}
 
 /* Sticky footer styles
 -------------------------------------------------- */
