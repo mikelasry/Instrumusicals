@@ -6,17 +6,36 @@
 <div class="row justify-content-center text-center">
     <div class="w-50">
         <h1>Instrumusicals Users</h1>
-        <a class="text-primary" asp-action="Index" asp-controller="Home">Homepage</a> | 
+        <a class="text-primary" asp-action="Index" asp-controller="Home">Homepage</a> |
         <a class="text-success" asp-action="Register">Register a New User</a>
         <hr />
+        <button id="btnSearchUsersView" class="btn text-primary border border-primary m-2" style="border-radius:100px;">Search for Users</button>
+    </div>
+</div>
+<div id="userSearchView" class="row justify-content-center d-none">
+    <div class="w-75 row justify-content-center">
+        <div class="d-flex justify-content-around">
+            <input id="emailParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="Email Contains"   autocomplete="off"/>
+            <input id="fNameParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="First Name"  autocomplete="off"/>   
+            <input id="lNameParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="LastName"  autocomplete="off"/>    
+        </div>
+        <div class="row justify-content-center">
+            <input id="addressParam" type="text" class="form-control w-50 bg-dark text-light text-center m-2 border border-primary" autocomplete="off" style="border-radius:100px;" placeholder="Address"/>                                              
+        </div>
 
+        <div class="w-25 d-flex justify-content-around m-2">
+            <button id="btnUsersSearch" class="btn text-success m-1" style="border-radius:100px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg>
+            </button>
+            <div id="usersLoader" class="spinner-border text-light d-none" role="status"></div>
+            <button id="btnUsersClear" class="btn m-1 btn-sm text-danger border-0" style="border-radius:100px;">Clear</button>
+        </div>
     </div>
 </div>
 
-
-
-
-@if ( Model.Count() != 0 )
+@if (Model.Count() != 0)
 {
     <table class="table text-light text-center">
         <thead>
@@ -24,30 +43,43 @@
                 <th class="text-info">Email</th>
                 <th class="text-info">Name</th>
                 <th class="text-info">Address</th>
-                <th class="text-info">Orders</th>
-                <th class="text-info">Reviews</th>
                 <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="usersTable">
             @foreach (var item in Model)
             {
-            <tr class="">
-                <td class="align-middle">@item.Email</td>
-                <td class="align-middle">@item.FirstName @item.LastName</td>
-                <td class="align-middle">@item.Address</td>
-                <td class="align-middle">@item.Orders.Count()</td>
-                <td class="align-middle">@item.Reviews.Count()</td>
-                <td class="align-middle">
-                    <a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> | 
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
+                <tr>
+                    <td class="align-middle">@item.Email</td>
+                    <td class="align-middle">@item.FirstName @item.LastName</td>
+                    <td class="align-middle">@item.Address</td>
+                    <td class="align-middle">
+                        <a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+
+                    </td>
+                </tr>
             }
         </tbody>
     </table>}
 else
 {
     <h5>No Users Yet</h5>
+}
+
+<script type="text/template" id="userRowTemplate">
+    <tr>
+        <td class="align-middle">${email}</td>
+        <td class="align-middle">${firstName} ${lastName}</td>
+        <td class="align-middle">${address}</td>
+        <td class="align-middle">
+            <a class="text-warning" href="/Users/Edit/${id}">Edit</a> |
+            <a class="text-primary" href="/Users/Details/${id}">Details</a> |
+            <a class="text-danger" href="/Users/Delete/${id}">Delete</a> 
+        </td>
+    </tr>
+</script>
+@section Scripts{
+    <script src="~/js/Users/SearchUsers.js"></script>
 }
