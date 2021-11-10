@@ -51,20 +51,20 @@
                 }
             </div>
             <div class="form-group m-1 row justify-content-center">
-                <input asp-for="Password" class="form-control bg-dark text-light w-50 text-center" placeholder="Password" style="border-radius:100px;"  autocomplete="off" />
+                <input asp-for="Password" class="form-control bg-dark text-light w-50 text-center" placeholder="Password" style="border-radius:100px;" autocomplete="off" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group m-1 row justify-content-center">
                 <input type="password" name="cPassword" class="form-control bg-dark text-light w-50 text-center" placeholder="Confirm Password" style="border-radius:100px;" autocomplete="off" />
             </div>
-            <div >
+            <div>
                 @if (ViewBag.PwMatchErr != null)
                 {
                     <span class="text-danger">@ViewBag.PwMatchErr</span>
                 }
             </div>
             <div class="form-group m-1">
-                <input type="submit" value="SIGN UP" class="btn text-primary border border-primary m-3 w-25" style="border-radius:100px;" />
+                <input type="submit" value="SIGN UP" class="btn text-warning border border-warning m-3 w-25" style="border-radius:100px;" />
             </div>
             @if (!String.IsNullOrEmpty(ViewBag.Error))
             {
@@ -73,7 +73,10 @@
         </form>
     </div>
     <h5 class="text-light">Already a member?</h5>
-    <h6 class="text-light"><a asp-action="Login">Click here</a> to Login!</h6>
+    <h6 class="text-light"><a class="text-primary" asp-action="Login">Skip it & Login!</a></h6>
+    <h6><a class="text-secondary " asp-action="Index" asp-controller="Home">Homepage</a></h6>
+    <br />
+    <span style='font-size:50px;'>&#128526;</span>
 </div>
 
 @section Scripts {

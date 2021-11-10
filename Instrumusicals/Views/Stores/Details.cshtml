@@ -15,22 +15,26 @@
         <table class="table text-center text-light">
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.Address)</th>
-                    <th>@Html.DisplayNameFor(model => model.Lat)</th>
-                    <th>@Html.DisplayNameFor(model => model.Lng)</th>
-                    <th></th>
-                    <th></th>
-                </tr>
+                        <th></th>
+                    <th class="text-info">@Html.DisplayNameFor(model => model.Address)</th>
+                    @if (Context != null && Context.User != null && Context.User.IsInRole("Admin"))
+                    {
+                        <th></th>
+                    }
+                        <th></th>
+                    </tr>
             </thead>
             <tbody>
-                <tr>                    
+                <tr>
+                    <td></td>
                     <td>@Html.DisplayFor(model => model.Address)</td>
-                    <td>@Html.DisplayFor(model => model.Lat)</td>
-                    <td>@Html.DisplayFor(model => model.Lng)</td>
-                    <td>
-                        <a class="text-warning" asp-action="Edit"  asp-route-id="@Model.Id" >Edit</a> |
-                        <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id" >Delete</a>
-                    </td>
+                    @if (Context != null && Context.User != null && Context.User.IsInRole("Admin"))
+                    { 
+                        <td>
+                            <a class="text-warning" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+                            <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+                        </td>
+                    }
                     <td></td>
                 </tr>
             </tbody>
