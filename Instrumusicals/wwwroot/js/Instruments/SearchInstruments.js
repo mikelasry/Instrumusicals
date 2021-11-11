@@ -96,12 +96,13 @@ function renderInstrumentsTable(result) {
             let template = $('#rowTemplate').html();
 
             $.each(_instrument, function (_property, _value) {
+                if (_property == "price")
+                    _value = _value.toLocaleString(undefined, { minimumFractionDigits: 2 });
                 if (_property == IMAGE) {
                     template = (_value != null) ?
                         template.replaceAll('${' + _property + '}', '<img src="data:image/png;base64,' + _value + '" style="height:100px; width:100px; border-radius:100px" />') :
                         template.replaceAll('${' + _property + '}', '<span class="text-danger">No available image.</span>');
-                }
-                else template = template.replaceAll('${' + _property + '}', _value);
+                } else template = template.replaceAll('${' + _property + '}', _value);
             });
             tableBody.append(template);
         });

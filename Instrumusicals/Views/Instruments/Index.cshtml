@@ -15,8 +15,8 @@
 
 <div class="align-middle" style="display:flex; justify-content:space-around; ">
     <input id="nameInput" name="Name" placeholder="Name" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
-    <input id="categoryInput" name="Category" placeholder="Category" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
-    <input id="brandInput" name="Brand" placeholder="Brand" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
+    <select id="categoryInput" name="Category" placeholder="Category" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" asp-items="@ViewBag.Categories" ></select>
+    <select id="brandInput" name="Brand" placeholder="Brand" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" asp-items="@ViewBag.Brands" ></select>
     <input id="lPriceInput" name="lPrice" placeholder="From $" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
     <input id="uPriceInput" name="uPrice" placeholder="To $" class="m-1 form-control text-center text-light bg-dark border border-primary" style="border-radius:100px;" autocomplete="off" />
     <button id="btnSearch" class="btn text-primary m-1" style="border-radius:100px;">
@@ -51,7 +51,7 @@
                         <td class="align-middle">@Html.DisplayFor(modelItem => item.Name)</td>
                         <td class="align-middle">@Html.DisplayFor(modelItem => item.Brand)</td>
                         <td class="align-middle">@Html.DisplayFor(modelItem => item.Description)</td>
-                        <td class="align-middle">@Html.DisplayFor(modelItem => item.Price)$</td>
+                        <td class="align-middle">@String.Format("{0:n}", item.Price)<span>$</span></td>
                         <td class="align-middle">
                             @if (item.Image != null)
                             {
@@ -89,7 +89,7 @@
             ${image}
         </td>
         <td class="align-middle">
-            <a href="/Instruments/Details/${id}">ABOUT</a>
+            <a class="text-warning" href="/Instruments/Details/${id}">ABOUT</a>
         </td>
     </tr>
 </script>
