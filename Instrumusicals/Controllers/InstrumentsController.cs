@@ -72,11 +72,27 @@ namespace Instrumusicals.Controllers
         // @@ -- Read -- @@ //
         public async Task<IActionResult> Index()
         {
+            List<string> categories = new();
+            categories.Add("All Categories");
+            foreach (string category in await _context.Category.Select(c => c.Name).Distinct().ToListAsync())
+            { categories.Add(category); }
+            
+            SelectList slCategories= new(categories);
+            ViewData["Categories"] = slCategories;
+
+            List<string> brands = new();
+            brands.Add("All Brands");
+            foreach (string brand in await _context.Instrument.Select(i => i.Brand).Distinct().ToListAsync())
+            { brands.Add(brand); }
+
+            SelectList slBrands = new(brands);
+            ViewData["Brands"] = slBrands;
+            
             var instrumentsContext = _context.Instrument.Include(i => i.Category);
-            List<Instrument> l = null;
-            try { l = await instrumentsContext.ToListAsync(); }
+            List<Instrument> allInstruments = null;
+            try { allInstruments = await instrumentsContext.ToListAsync(); }
             catch { return RedirectToMalfunction(); }
-            return View(l);
+            return View(allInstruments);
         }
 
         // @@ -- Update -- @@ //
@@ -354,12 +370,12 @@ namespace Instrumusicals.Controllers
         {
             if (all) return Json(await _context.Instrument.ToListAsync());
             int catId = 0;
-            if(!String.IsNullOrEmpty(category))
+            if(!category.Equals("All Categories"))
                 catId = await _context.Category.Where(c => c.Name.Contains(category)).Select(c => c.Id).FirstOrDefaultAsync();
             List<Instrument> instruments = await _context.Instrument
                 .Where(i => !String.IsNullOrEmpty(name) ? i.Name.Contains(name) : true)
                 .Where(i => catId==0 ? true: i.CategoryId == catId)
-                .Where(i => !String.IsNullOrEmpty(brand) ? i.Brand.Contains(brand) : true)
+                .Where(i => !brand.Equals("All Brands") ? i.Brand.Contains(brand) : true)
                 .Where(i => lPrice != -1 ? i.Price >= lPrice : true)
                 .Where(i => uPrice != -1 ? i.Price <= uPrice : true)
                 .ToListAsync();

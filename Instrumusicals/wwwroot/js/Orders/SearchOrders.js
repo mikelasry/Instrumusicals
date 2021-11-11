@@ -182,6 +182,7 @@ function renderOrders(result) {
             let template = orderRowTemplate;
 
             $.each(_orderItem, function (_prop, _val) {
+                if (_prop == "totalPrice") _val = _val.toLocaleString(undefined, { minimumFractionDigits: 2 });
                 if (_prop == "create" || _prop == "shipping")
                     _val = formatDate(_val);
                 template = template.replaceAll('${' + _prop + '}', _val);

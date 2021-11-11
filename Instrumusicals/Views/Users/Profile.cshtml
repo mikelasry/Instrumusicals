@@ -140,13 +140,13 @@
                     <tr>
                         <td>@item.Create.ToString("dd/MM/yyyy")</td>
                         <td>@Html.DisplayFor(modelItem => item.Address)</td>
-                        <td>@Html.DisplayFor(modelItem => item.TotalPrice)$</td>
+                        <td>@String.Format("{0:n}", item.TotalPrice)$</td>
                         <td>@item.Shipping.ToString("dd/MM/yyyy")</td>
                         <td>
                             <a class="text-warning" asp-controller="Orders" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                             <a class="text-primary" asp-controller="Orders" asp-action="Details" asp-route-id="@item.Id">Details</a>
                             @if (Context.User != null && Context.User.IsInRole("Admin"))
-                            {<span> | </span><a class="text-danger" asp-controller="Reviews" asp-action="Delete" asp-route-id="@item.Id">Delete</a>}
+                            {<span> | </span><a class="text-danger" asp-controller="Orders" asp-action="Delete" asp-route-id="@item.Id">Delete</a>}
                         </td>
                     </tr>
 
@@ -186,7 +186,7 @@
 
     <div id="securityContent" class="d-none m-3">
         <h3>Keep Safe!</h3>
-        <button id="btnToggleChangePw" class="btn btn-danger btn-sm m-3" style="border-radius:100px">
+        <button id="btnToggleChangePw" class="btn btn-primary btn-sm m-3" style="border-radius:100px">
             Change Password
         </button>
         <div class=" row text-center justify-content-center">
@@ -203,11 +203,15 @@
                     </div>
                 </div>
                 <button id="submitChangePw" onclick="changePassword(@Context.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault())"
-                        class="w-25 btn bg-transparent text-danger border border-2 border-danger btn-sm m-1" style="border-radius:100px;">
+                        class="w-25 btn bg-transparent text-primary border border-2 border-primary btn-sm m-3" style="border-radius:100px;">
                     submit
                 </button>
             </div>
+            <hr />
         </div>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn text-danger border border-danger btn-sm m-3" style="border-radius:100px">
+            Delete My Profile
+        </a>
     </div>
 </div>
 

@@ -6,8 +6,7 @@
 
 <div class="row justify-content-center text-center">
     <div class="w-50">
-        <h3>Edit @Model.User.FirstName's Order</h3>
-        <br />
+        <h3>Edit <a class="text-light" asp-action="Details" asp-route-id="@Model.Id">@Model.User.FirstName's Order</a></h3>
         <a class="text-secondary" asp-action="Profile" asp-controller="Users">My Profile</a> | 
         <a class="text-secondary" asp-action="Index" asp-controller="Home">Homepage</a> 
     </div>
@@ -17,18 +16,22 @@
     <div class="w-75">
         <table class="table text-light text-center">
             <thead>
-                <th class="text-info">Owner</th>
-                <th class="text-info">Price</th>
-                <th class="text-info">Instruments</th>
-                <th class="text-info">Created</th>
-                <th class="text-info">Shipping</th>
+                <tr>
+                    <th class="text-info">Owner</th>
+                    <th class="text-info">Total Price</th>
+                    <th class="text-info">Instruments</th>
+                    <th class="text-info">Created</th>
+                    <th class="text-info">Shipping</th>
+                </tr>
             </thead>
             <tbody>
-            <td>@Model.User.FirstName @Model.User.LastName</td>
-                <td>@Model.TotalPrice</td>
-                <td>@Model.Instruments.Count()</td>
-                <td>@Model.Create</td>
-                <td>@Model.Shipping</td>
+                <tr>
+                    <td>@Model.User.FirstName @Model.User.LastName</td>
+                    <td>@String.Format("{0:n}", Model.TotalPrice)$</td>
+                    <td>@Model.Instruments.Count()</td>
+                    <td>@Model.Create</td>
+                    <td>@Model.Shipping</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -41,8 +44,8 @@
                 <label asp-for="Address" class="form-control bg-dark text-light text-center border-0"></label>
                 <input asp-for="Address" class="form-control bg-dark text-light text-center" style="border-radius:100px;" />
             </div>
-            <div class="">
-
+            <div class="form-group justify-content-center m-3">
+                <input type="submit" value="Update" class="btn text-success border border-success" style="border-radius:100px;" />
             </div>
         </form>
     </div>

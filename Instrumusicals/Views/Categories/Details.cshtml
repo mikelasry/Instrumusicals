@@ -46,7 +46,7 @@
         <div class="row justify-content-center">
             @foreach (Instrument inst in ViewBag.CategoryInstruments)
             {
-                <div class="card m-2 bg-dark border border-primary col col-md-5 col-lg-6" style="width: 18rem; border-radius:15px;">
+                <div class="card m-2 bg-dark border border-primary col col-md-5 col-lg-6" style="width: 18rem; ">
                     @if (inst.Image != null && inst.Image != null)
                     {
                         string img = Convert.ToBase64String(inst.Image);

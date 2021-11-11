@@ -5,7 +5,7 @@
 }
 
 <div class="row text-center justify-content-center">
-    <h2>Delete @Model.User.FirstName's Order</h2>
+    <h2>Delete <a class="text-light" asp-action="Details" asp-route-id="@Model.Id">@Model.User.FirstName's Order</a></h2>
     <h5>Are you sure you want to delete this order?</h5>
     <a asp-action="Index" class="text-secondary">All Orders</a>
 </div>
@@ -39,10 +39,10 @@
                             <span>No Instruments in this order</span>
                         }
                         else
-                        {@Model.Instruments.Count() }
-                                    </td>
-                    <td>Address       </td>
-                    <td>Total Price   </td>
+                        {@Model.Instruments.Count()}
+                    </td>
+                    <td>@Model.Address</td>
+                    <td>@String.Format("{0:n}", Model.TotalPrice)$</td>
                     <td></td>
                 </tr>
             </tbody>

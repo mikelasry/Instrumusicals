@@ -104,9 +104,8 @@ function placeOrder(_uid) {
     let dataDict = { uid: _uid };
     $.ajax({ url: PLACE_ORDER_URL, data: dataDict }).done(function (result) {
         if (result != null && result.success != null) 
-            popOrderPlacedModal(result);
+            popOrderPlacedModal(result, PROFILE_URL);
         loadPlaceOrder(false);
-        Redirect(PROFILE_URL);
     });
 }
 
@@ -196,7 +195,7 @@ function popModal(header, content, closeMsg, color, redirectUrl) {
     btnModalClose.focus();
 }
 
-function popOrderPlacedModal(result) {
+function popOrderPlacedModal(result, returnUrl) {
     if (result.success) {
         popModal(GRATZ, ORDER_SUCCESS, OK, "g", PROFILE_URL);
         return;
@@ -206,19 +205,19 @@ function popOrderPlacedModal(result) {
         case "o": // -o-ut of stock
             let content = TOO_FEW + ((result.data.left != null && result.data.left > 0) ?
                 ("<br/>" + result.data.left + " left!") : "");
-            popModal(result.data.inst.name, content, OK, "r", null);
+            popModal(result.data.inst.name, content, OK, "r", returnUrl);
             break;
 
         // not -a-uthrorized
-        case "a": popModal(AW, NON_AUTH, OK, "r", null); break;
+        case "a": popModal(AW, NON_AUTH, OK, "r", returnUrl); break;
 
         // -m-alfunction
-        case "m": popModal(AW, ERR, OK, "r", null); break;
+        case "m": popModal(AW, ERR, OK, "r", returnUrl); break;
 
         // -u-pdate exception
         case "u": popModal(AW, DB_UPDATE_ERR, OK, "r", null); break;
 
-        default: popModal(AW, ERR, OK, "y", null);
+        default: popModal(AW, ERR, OK, "y", returnUrl);
     }
 }
 

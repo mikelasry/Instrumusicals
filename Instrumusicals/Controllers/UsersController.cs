@@ -448,7 +448,7 @@ namespace Instrumusicals.Controllers
             }
         }
 
-        private SelectList GetDirectionsSelectList()
+        private SelectList GetDirectionsSelectList()    
         {
             return new SelectList(new[] {
                         new SelectListItem{Selected = true, Text =  "Center", Value = "c"},
