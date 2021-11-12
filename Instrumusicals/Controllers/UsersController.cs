@@ -237,10 +237,7 @@ namespace Instrumusicals.Controllers
             var claimsIdentity = new ClaimsIdentity(
                 claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-            var authProperties = new AuthenticationProperties
-            {
-                // Cookie lifetime declared in startup file
-            };
+            var authProperties = new AuthenticationProperties {/* Cookie lifetime declared in startup file*/ };
 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
