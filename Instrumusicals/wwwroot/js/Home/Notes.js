@@ -32,10 +32,11 @@ const YELLOW = "yellow";
 const WHITE = "white";
 const BLACK = "black";
 const ORANGE = "orange";
-
+const TEAL= "teal";
+const DARK = "#212529";
 
 var lines = [LINE1, LINE2, LINE3, LINE4, LINE5];
-var colors = [RED, GREEN, BLUE, YELLOW, RED, GREEN, BLUE, YELLOW, RED, GREEN, BLUE, YELLOW, ORANGE, WHITE, BLACK];
+var colors = [RED, GREEN, BLUE, YELLOW, ORANGE, RED, WHITE, GREEN, BLACK, BLUE, TEAL, YELLOW];
 
 var btnPlay;
 
@@ -43,7 +44,7 @@ var canvasIntervalId;
 var notesIntervalId;
 
 var notes;
-var frames = 0;
+var i = -1;
 
 var playing = false;
 var rendering = false;
@@ -54,14 +55,11 @@ $(function () {
     ctx = canvas.getContext("2d");
     notes = [];
 
-    btnPlay = $("#btnsPlayCanvas");
+    btnPlay = $("#btnPlayCanvas");
     btnPlay.on("click", function () {
-        if (rendering && !pushingNotes) {            
-            return;
-        } if (!playing) {
-            canvasStart();
-        } else { canvasEnd(); }
-
+        if (isBusy()) return;
+        if (!playing) playCanvas();
+        else stopCanvas();
         playing = !playing;
     });
 
@@ -69,58 +67,6 @@ $(function () {
 });
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@ Canvas Fns @@@@@@@@@@@@@@@@@@@@@@@@ //
-
-function canvasStart() {
-    setRenderCanvasInterval();
-    setPushingNotesInterval();
-    changeBtnView(Status.STOP);
-}
-
-function canvasEnd() {
-    clearInterval(notesIntervalId);
-    // console.log("Shutting notes pushing....");
-    pushingNotes = false;
-    changeBtnView(Status.WAIT);
-}
-
-function setRenderCanvasInterval() {
-    if (!rendering && !pushingNotes) {
-        // console.log("Starting rendering ....");  
-        canvasIntervalId = setInterval(function () {
-            clearCanvas();
-            if (notes.length < 1 && !pushingNotes) {
-                clearInterval(canvasIntervalId)
-                // console.log("Shutting rendering ....");  
-                rendering = false;
-                changeBtnView(Status.PLAY);
-            }
-            for (var i = 0; i < notes.length; i++) {
-                let note = notes[i];
-                if (note.x < LEFT) {
-                    notes.shift();
-                    continue;
-                }
-                renderNote(note);
-                note.x -= 5;
-            }
-        }, 333);
-        rendering = true;
-    }
-}
-
-function setPushingNotesInterval() {
-    if (!pushingNotes) {
-        // console.log("Starting notes pushing....");  
-        notesIntervalId = setInterval(
-            function () {
-                notes.push(newNote(randBool(), randColor(), randSpace(), randLevels()));
-            },
-            2500
-        );
-        pushingNotes = true;
-    }
-}
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 function drawLine(xStart, yStart, xEnd, yEnd, width, color) {
     ctx.beginPath();
@@ -140,6 +86,8 @@ function drawCircle(x, y, color) {
     ctx.stroke();
 }
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
 function drawCanvasBaseLines() {
     for (var i = 0; i < lines.length; i++)
         drawLine(LEFT, lines[i], RIGHT, lines[i], 1, '#000');
@@ -148,6 +96,55 @@ function drawCanvasBaseLines() {
 function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawCanvasBaseLines();
+}
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+function playCanvas() {
+    setRenderCanvasInterval();
+    setPushingNotesInterval();
+    changeBtnView(Status.STOP);
+}
+
+function stopCanvas() {
+    clearInterval(notesIntervalId);
+    pushingNotes = false;
+    changeBtnView(Status.WAIT);
+}
+
+function setRenderCanvasInterval() {
+    if (!rendering && !pushingNotes) { 
+        canvasIntervalId = setInterval(function () {
+            clearCanvas();
+            if (notes.length < 1 && !pushingNotes) {
+                clearInterval(canvasIntervalId)
+                rendering = false;
+                changeBtnView(Status.PLAY);
+            }
+            for (var i = 0; i < notes.length; i++) {
+                let note = notes[i];
+                if (note.x < LEFT) {
+                    notes.shift();
+                    continue;
+                }
+                renderNote(note);
+                note.x -= 5;
+            }
+        }, 333);
+        rendering = true;
+    }
+}
+
+function setPushingNotesInterval() {
+    if (!pushingNotes) {
+        notesIntervalId = setInterval(
+            function () {
+                notes.push(newNote(randBool(), colors[++i % colors.length], randSpace(), randLevels()));
+            },
+            2500
+        );
+        pushingNotes = true;
+    }
 }
 
 // @@@@@@@@@@@@@@@@@@@@ Render Notes Fns @@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -279,4 +276,8 @@ function changeBtnView(status) {
             break;
     }
 
+}
+
+function isBusy() {
+    return rendering && !pushingNotes;
 }
