@@ -1,0 +1,12 @@
+@font-face {
+    font-family: custom-font;
+    src: url(../Images/Intro_Inline.otf); 
+}
+
+a.custom-font {
+    font-family: custom-font;
+    color: rgb(83 167 77);
+    text-decoration: none;
+    
+}
+
