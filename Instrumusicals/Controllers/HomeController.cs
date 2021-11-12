@@ -25,7 +25,13 @@ namespace Instrumusicals.Controllers
         }
 
         public IActionResult Index() {
+            List<Instrument> bestSellers = _context.Instrument
+                .OrderByDescending(i => i.Sold).Take(3).ToList();
+            ViewData["BestSellers"] = bestSellers;
 
+            List<Instrument> mostReviewed = _context.Instrument
+                .OrderByDescending(i => i.Reviews.Count()).Take(3).ToList();
+            ViewData["MostReviewed"] = mostReviewed;
             
             return View();
         }
