@@ -104,8 +104,9 @@
 
     <script type="text/javascript">
         function post() {
-            var accessToken = 'EAAIm0oHeZC40BANDdDvdV0ni8Rwsxd8L9B3B0HxEgfxMkZC4X6anouLoRKlPUSqERmZB28ZAkmc5w7McJfhNrq0Po0eSPb0BK0BBX8HpXl3cBZBS3AUlYv0l7eusymAXRjw97Yi2RZCgWG0riQxZCR1Mnpra3fJixHt2iQygIF8eoB0vxOJ7rYCWEFLJWFFhZCqcLU4YMaqnvxq1GF71RSw6';
-            //var accessToken = 'EAAIm0oHeZC40BABTfXo16gZBC1vzqPm6Pp0zST0cCQvaIDZB2UpTREVar8YFVBTEy3tJWfxzm2bSancCd0L9UHZCHAQco5n6OYZBSWmHZCP7v7zm37hgO3mZBXW5ZAVFa8tZBJRiVOjaRZBdTMBgA4ujzZCTUZCHAI3scrDCBeNgoj7ntJw7TLGCHRLx2l6o6hDkpBPvCzioSstF0aC9iaUtZAyFX';
+
+            var accessToken = 'EAAIm0oHeZC40BAOKHyMbcYUwr15WT4ZA0jjs47gAmTSv0fzDuEe2Fwc5DVNf3eDZCpSh9U504JR7sljCAFPpRnuGHenBplZBUz9NeqRtFdcYMQr2ZCHHNUXaNYmWZB2ZCOKqiezUAd9ZA9tWdZBtspAoWTwP7C315frqHZB9PwpKNrld5KjUnH6Bev0TuZBcsg6oNzj0gxzC6DQBhF5w0DxQBQT';
+            
             var body = String(document.getElementById("msg").value);
             if (body && body != "") {
                 FB.api('/me/feed', 'post', { message: body, access_token: accessToken }, function (response) {

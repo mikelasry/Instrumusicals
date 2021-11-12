@@ -38,7 +38,7 @@ namespace Instrumusicals.Controllers
                 .OrderByDescending(i => i.Reviews.Count()).Take(3).ToList();
             ViewData["MostReviewed"] = mostReviewed;
             // Retreive Top 10 Albums of all times using RapidAPI documentation and TheAudioDB open source project.
-            var client = new HttpClient();
+            /*var client = new HttpClient();
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
@@ -69,7 +69,7 @@ namespace Instrumusicals.Controllers
                 topTen.Add(item);
             }
             topTen.Sort((TopTenItem it1, TopTenItem it2) => { return Int32.Parse(it2.Sales) - Int32.Parse(it1.Sales); });
-            ViewData["TopAlbums"] = topTen.GetRange(0,5);
+            ViewData["TopAlbums"] = topTen.GetRange(0,5);*/
 
             return View();
         }
