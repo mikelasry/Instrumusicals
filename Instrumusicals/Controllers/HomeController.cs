@@ -48,22 +48,30 @@ namespace Instrumusicals.Controllers
 
             // Retreive best sellers from remote DB            
             List<Instrument> bestSellers = _context.Instrument
-                .OrderByDescending(i => i.Sold).Take(3).ToList();
+                .Where(i => i.Image != null)
+                .OrderByDescending(i => i.Sold)
+                .Take(3).ToList();
             ViewData["BestSellers"] = bestSellers;
             
             // Retreive most reviewed instruments from remote DB
             List<Instrument> mostReviewed = _context.Instrument
-                .OrderByDescending(i => i.Reviews.Count()).Take(3).ToList();
+                .Where(i => i.Image != null)
+                .OrderByDescending(i => i.Reviews.Count())
+                .Take(3).ToList();
             ViewData["MostReviewed"] = mostReviewed;
 
             // Retreive prestige instruments from remote DB
             List<Instrument> prestige = _context.Instrument
-                .OrderByDescending(i => i.Price).Take(3).ToList();
+                .Where(i => i.Image != null)
+                .OrderByDescending(i => i.Price)
+                .Take(3).ToList();
             ViewData["Prestige"] = prestige;
 
             // Retreive lowcost instruments from remote DB
             List<Instrument> lowCost = _context.Instrument
-                .OrderBy(i => i.Price).Take(3).ToList();
+                .Where(i => i.Image != null)
+                .OrderBy(i => i.Price)
+                .Take(3).ToList();
             ViewData["LowCost"] = lowCost;
 
             // Retreive Top 10 Albums of all times using RapidAPI documentation and TheAudioDB open source project.

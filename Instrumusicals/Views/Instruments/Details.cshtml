@@ -20,8 +20,7 @@
 
 <div>
     <div class="text-center" id="header">
-        <h1  style="text-shadow: 2px 2px 20px #00FFFF;">@Html.DisplayFor(model => model.Name)</h1>
-        <h5>@Html.DisplayFor(model => model.Description)</h5>
+        <h1 style="text-shadow: 2px 2px 20px #00FFFF;">@Html.DisplayFor(model => model.Name)</h1>
 
         <div class="text-center mt-3" id="ctrlButtons">
             <a class="text-light" asp-action="Index">Instruments</a> |
@@ -40,8 +39,15 @@
         {
             string img = Convert.ToBase64String(Model.Image);
             <img src="data:image/png;base64,@img" style="margin:10px; border:5px solid white; width:500px; border-radius:30px" />
-        }
+            }
+            else
+            {
+                <span class="text-danger">No Available Image</span>
+            }
+    <hr />
+    <h5>@Html.DisplayFor(model => model.Description)</h5>
     </div>
+
     <hr />
     <table class="table text-center text-light">
         <thead>

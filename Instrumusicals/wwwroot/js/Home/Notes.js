@@ -152,8 +152,8 @@ function setPushingNotesInterval() {
 // @@@@@@@@@@@@@@@@@@@@ Render Notes Fns @@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 function renderNote(note) {
-    if (note.isSingular) drawSingleNote(note.x, note.y, note.color);
-    else drawDoubleNote(note.x, note.y, note.color, note.space, note.levels);
+    if (note.isSingular) renderSingleNote(note.x, note.y, note.color);
+    else renderDoubleNote(note.x, note.y, note.color, note.space, note.levels);
 }
 
 function baseNote(x, baseLine, color, isStandAlone) {
@@ -172,11 +172,11 @@ function baseNote(x, baseLine, color, isStandAlone) {
     }
 }
 
-function drawSingleNote(x, y, color) {
+function renderSingleNote(x, y, color) {
     baseNote(x, y, color, true);
 }
 
-function drawDoubleNote(x, y, color, _space, _levels) {
+function renderDoubleNote(x, y, color, _space, _levels) {
     _space = fixNoteSpace(_space);
     _levels = fixNoteLevels(_levels);
     baseNote(x, y, color, false);
@@ -185,7 +185,7 @@ function drawDoubleNote(x, y, color, _space, _levels) {
         getTopNoteX(x),
         getTopNoteY(y),
         getTopNoteX(x + _space * NOTE_RADIUS),
-        getTopNoteY(y + (_levels * STEP)), NOTE_WIDTH + 1.5,
+        getTopNoteY(y + (_levels * STEP)), NOTE_WIDTH,
         color
     );
 }

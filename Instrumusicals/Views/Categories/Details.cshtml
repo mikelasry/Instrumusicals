@@ -10,13 +10,13 @@
         <br />
         @if (Context.User != null && Context.User.IsInRole("Admin"))
         {
-
+            <br />
             <a class="text-warning" asp-action="Edit" asp-route-id="@Model.Id">Edit @Model.Name</a><span>&nbsp; | &nbsp;</span>
             <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete @Model.Name</a><span>&nbsp; | &nbsp;</span>
-            if (@Model.CategoryImage != null)
+            if(Model.CategoryImage != null)
             {<a class="w-50 text-success" asp-action="Edit" asp-controller="CategoryImages" asp-route-id="@Model.CategoryImage.Id">Change Image</a>}
             else
-            { <a class="w-50 text-success" asp-action="Create" asp-controller="CategoryImages">Create a Category Image</a>}
+            { <a class="w-50 text-secondary" asp-action="Create" asp-controller="CategoryImages">Create a Category Image</a>}
         }
     </div>
 </div>

@@ -17,6 +17,7 @@ namespace Instrumusicals.Models
         [MaxLength(64)]
         public string Name { get; set; }
 
+        [Required]
         [MinLength(2)]
         [MaxLength(64)]
         public string Brand { get; set; }

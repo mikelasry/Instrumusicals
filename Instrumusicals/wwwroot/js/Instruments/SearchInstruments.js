@@ -6,17 +6,25 @@
 }); => equivalent to: */
 
 // consts
-const NO_RESULTS_HEADING = "<h2>No results found.</h2>";
+const NO_RESULTS_HEADING = "No Instruments Found!";
 const DISPLAY_NONE = 'd-none';
+const ADMIN_DATA = '${admin-data}';
 const IMAGE = "image";
 const EMPTY = "";
-const SEARCH_JSON_URL = "/Instruments/SearchJson";
+const INSTS_FOUND = " Instruments Found!";
+const ALL_CTGRS = "All Categories";
+const ALL_BRNDS = "All Brands";
+const SEARCH_INSTRUMENTS_URL = "/Instruments/SearchJson";
 
 // @@ -- elements -- @@ //
 var tableBody;
 var btnSearch;
 var btnClear;
 var loader;
+
+var instCounter;
+var rowTemplate;
+var adminDataTemplate;
 
 // Search Inputs
 var nameInput;
@@ -37,6 +45,11 @@ $(function () {
     brandInput = $("#brandInput");
     lPriceInput = $("#lPriceInput");
     uPriceInput = $("#uPriceInput");
+
+    instCounter = $('#instCounter');
+
+    rowTemplate = $('#rowTemplate').html();
+    adminDataTemplate = $('#adminDataTemplate').html();
 
     btnSearch.click(function () {
         nameInputVal = nameInput.val();
@@ -69,18 +82,17 @@ $(function () {
                 uPriceInputVal
             )
         );
-
     });
 
     btnClear.on("click", function () {
         sendAJAX({ all: true });
-        clearSearchFields();
+        clearInputFields();
     });
 });
 
 function sendAJAX(dataDict) {
     loader.removeClass(DISPLAY_NONE);
-    $.ajax({ url: SEARCH_JSON_URL, data: dataDict })
+    $.ajax({ url: SEARCH_INSTRUMENTS_URL, data: dataDict })
         .done(function (result) {
             if (result != null)
                 renderInstrumentsTable(result);
@@ -89,30 +101,53 @@ function sendAJAX(dataDict) {
 }
 
 function renderInstrumentsTable(result) {
-    let resLen = result != null ? result.length : 0;
-    if (resLen != 0 && resLen > 0) {
-        tableBody.html('');
-        $.each(result, function (_ix, _instrument) {
-            let template = $('#rowTemplate').html();
+
+    let condA = result != null;
+    let condB = result.success;
+    let condC = result.data != null;
+    let condD = result.data.insts != null;
+
+    let valid = condA && condB && condC && condD;
+    if (!valid) {
+        alert("something went wrong!");
+        return;
+    }
+
+    let resLen = result.data.insts.length;
+    var instruments = result.data.insts;
+    var isSearcherAdmin = result.data.isAdmin;
+
+    tableBody.html('');
+
+    if (resLen > 0) {
+        instCounter.html(resLen + INSTS_FOUND);
+        $.each(instruments, function (_ix, _instrument) {
+
+            let userRow = rowTemplate;
+            let adminCols = adminDataTemplate;
+
+            userRow = isSearcherAdmin ?
+                userRow.replaceAll(ADMIN_DATA, adminCols) :
+                userRow.replaceAll(ADMIN_DATA, EMPTY);            
 
             $.each(_instrument, function (_property, _value) {
                 if (_property == "price")
                     _value = _value.toLocaleString(undefined, { minimumFractionDigits: 2 });
                 if (_property == IMAGE) {
-                    template = (_value != null) ?
-                        template.replaceAll('${' + _property + '}', '<img src="data:image/png;base64,' + _value + '" style="height:100px; width:100px; border-radius:100px" />') :
-                        template.replaceAll('${' + _property + '}', '<span class="text-danger">No available image.</span>');
-                } else template = template.replaceAll('${' + _property + '}', _value);
+                    userRow = (_value != null) ?
+                        userRow.replaceAll('${' + _property + '}', '<img src="data:image/png;base64,' + _value + '" style="height:100px; width:100px; border-radius:100px" />') :
+                        userRow.replaceAll('${' + _property + '}', '<span class="text-danger">No available image.</span>');
+                } else userRow = userRow.replaceAll('${' + _property + '}', _value);
             });
-            tableBody.append(template);
+            tableBody.append(userRow);
         });
-    } else tableBody.html(NO_RESULTS_HEADING);
+    } else instCounter.html(NO_RESULTS_HEADING);
 }
 
 function clearInputFields() {
     nameInput = nameInput.val(EMPTY);
-    categoryInput = categoryInput.val(EMPTY);
-    brandInput = brandInput = nameInput.val(EMPTY);
+    categoryInput = categoryInput.val(ALL_CTGRS).change();
+    brandInput = brandInput.val(ALL_BRNDS).change();
     lPriceInput = lPriceInput.val(EMPTY);
     uPriceInput = uPriceInput.val(EMPTY);
 }
@@ -131,8 +166,8 @@ function getSearchDict(_name, _category, _brand, _lPrice, _uPrice) {
 function isAllEmpty(_name, _category, _brand, _lPrice, _uPrice) {
     return (
         _name == EMPTY
-        && _category == EMPTY
-        && _brand == EMPTY
+        && _category == "All Categories"
+        && _brand == "All Brands"
         && _lPrice == EMPTY
         && _uPrice == EMPTY
     );
