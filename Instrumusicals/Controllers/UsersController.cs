@@ -121,26 +121,35 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken] // Update: Post
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Hash,Salt")] User user)
+        [ValidateAntiForgeryToken]  
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,Address,Hash,Salt")] User user)
         {
             if (id != user.Id) return RedirectToMalfunction();
+            User dbUser = await _context.User
+                .Where(u => u.Id == id)
+                .Include(u => u.Orders)
+                .Include(u => u.Reviews)
+                .FirstOrDefaultAsync();
+            if (dbUser == null) return RedirectToMalfunction();
 
-            if (ModelState.IsValid)
+            if (!String.IsNullOrEmpty(user.FirstName))
+                dbUser.FirstName = user.FirstName;
+            if (!String.IsNullOrEmpty(user.LastName))
+                dbUser.LastName = user.LastName;
+            if (!String.IsNullOrEmpty(user.Address))
+                dbUser.Address = user.Address;
+
+            try
             {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!IsUserExists(user.Id)) return RedirectToMalfunction();
-                    else throw;
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(dbUser);
+                await _context.SaveChangesAsync();
             }
-            return View(user);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!IsUserExists(user.Id)) return RedirectToMalfunction();
+                else throw;
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // @@ -- Delete -- @@ //
@@ -156,7 +165,7 @@ namespace Instrumusicals.Controllers
             return View(user);
         }
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken] // Delete: Post
+        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _context.User.FindAsync(id);
@@ -243,6 +252,34 @@ namespace Instrumusicals.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeAccess(int uid, bool isAdmin)
+        {
+            List<User> dbUsers = await _context.User.ToListAsync();
+            if (dbUsers == null)  // -m-alfunction
+                return JsonSuccess(false, new { msg = "m" });
+
+            User changedUser = null;
+            UserType newType = isAdmin ? UserType.Admin : UserType.Client;
+            foreach (User u in dbUsers) 
+                if (u.Id == uid)
+                {
+                    u.UserType = newType;
+                    changedUser = u;
+                }
+            if (changedUser == null) // -n-ot found
+                return JsonSuccess(false, new { msg = "n" }); 
+
+            try
+            {
+                _context.Update(changedUser);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            { return JsonSuccess(false, new { msg = 'e' }); } // -e-xeption
+            return JsonSuccess(true, dbUsers); // -s-uccess
         }
 
         // @@ @@@@@@@@@@@@@@@@@@ Profile & Admin Panel @@@@@@@@@@@@@@@@@@ @@ //
@@ -381,7 +418,7 @@ namespace Instrumusicals.Controllers
         public async Task<IActionResult> Search(bool all, string email, string fName, string lName, string address)
         {
             if (all) return JsonSuccess(true, await _context.User.ToListAsync());
-            
+
             List<User> dbUsers = await _context.User
                     .Where(u => String.IsNullOrEmpty(email) ? true : u.Email.Contains(email))
                     .Where(u => String.IsNullOrEmpty(fName) ? true : u.FirstName.Contains(fName))
@@ -445,7 +482,7 @@ namespace Instrumusicals.Controllers
             }
         }
 
-        private SelectList GetDirectionsSelectList()    
+        private SelectList GetDirectionsSelectList()
         {
             return new SelectList(new[] {
                         new SelectListItem{Selected = true, Text =  "Center", Value = "c"},

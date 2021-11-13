@@ -13,7 +13,7 @@
     </div>
 </div>
 
-<div id="userSearchView" class="row justify-content-center d-none"">
+<div id="userSearchView" class="row justify-content-center d-none">
     <div class="w-75 row justify-content-center">
         <div class="d-flex justify-content-around">
             <input id="emailParam" type="text" class="form-control w-25 bg-dark text-light text-center m-2 border border-primary" style="border-radius:100px;" placeholder="Email Contains" autocomplete="off" />
@@ -36,28 +36,44 @@
     </div>
 </div>
 
+<div class="row justify-content-center">
+    <div style="width:30px; height:30px;">
+        <div id="adminateLoader" class="spinner-grow d-none" style="width:15px; height:15px;" role="status"></div>
+    </div>
+</div>
+
 @if (Model.Count() != 0)
 {
     <table class="table text-light text-center">
         <thead>
             <tr>
                 <th class="text-info">Email</th>
+                <th class="text-warning">God Mode</th>
                 <th class="text-info">Name</th>
                 <th class="text-info">Address</th>
                 <th></th>
             </tr>
         </thead>
         <tbody id="usersTable">
-            @foreach (var item in Model)
+            @foreach (var user in Model)
             {
                 <tr>
-                    <td class="align-middle">@item.Email</td>
-                    <td class="align-middle">@item.FirstName @item.LastName</td>
-                    <td class="align-middle">@item.Address</td>
+                    <td class="align-middle">@user.Email</td>
                     <td class="align-middle">
-                        <a class="text-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        @{
+                            bool isAdmin = user.UserType == UserType.Admin;
+                            if (isAdmin)
+                            {<button onclick="adminate(false, @user.Id)" id="godModeBtn-@user.Id" class="btn border border-danger text-danger" style="border-radius:100px;">Deadminate</button>}
+                            else
+                            { <button onclick="adminate(true, @user.Id)" id="godModeBtn-@user.Id" class="btn border border-warning text-warning" style="border-radius:100px;">Adminate</button>}
+                        }
+                    </td>
+                    <td class="align-middle">@user.FirstName @user.LastName</td>
+                    <td class="align-middle">@user.Address</td>
+                    <td class="align-middle">
+                        <a class="text-warning" asp-action="Edit" asp-route-id="@user.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@user.Id">Details</a> |
+                        <a class="text-danger" asp-action="Delete" asp-route-id="@user.Id">Delete</a>
 
                     </td>
                 </tr>
@@ -73,6 +89,12 @@ else
 <script type="text/template" id="userRowTemplate">
     <tr>
         <td class="align-middle">${email}</td>
+        <td class="align-middle">
+            <button id="godModeBtn-${id}" style="border-radius:100px;"
+                     class="btn border border-${btnColor} text-${btnColor}" 
+                        onclick="adminate(${isAdmin}, ${id})">${action}
+            </button>
+        </td>
         <td class="align-middle">${firstName} ${lastName}</td>
         <td class="align-middle">${address}</td>
         <td class="align-middle">
@@ -82,6 +104,7 @@ else
         </td>
     </tr>
 </script>
+
 @section Scripts{
     <script src="~/js/Users/SearchUsers.js"></script>
 }
