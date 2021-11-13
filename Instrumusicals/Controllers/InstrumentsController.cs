@@ -9,6 +9,7 @@ using Instrumusicals.Data;
 using Instrumusicals.Models;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
+using System.Globalization;
 
 namespace Instrumusicals.Controllers
 {
@@ -58,7 +59,12 @@ namespace Instrumusicals.Controllers
                         instrument.Image = ms.ToArray();
                     }
                 }
-
+                if (!String.IsNullOrEmpty(instrument.Brand))
+                {
+                    TextInfo ti = new CultureInfo("en-US", false).TextInfo;
+                    instrument.Brand = ti.ToTitleCase(instrument.Brand.ToLower());
+                }
+                
                 instrument.Sold = 0;
 
                 _context.Add(instrument);
@@ -82,16 +88,24 @@ namespace Instrumusicals.Controllers
 
             List<string> brands = new();
             brands.Add("All Brands");
-            foreach (string brand in await _context.Instrument.Select(i => i.Brand).Distinct().ToListAsync())
-            { brands.Add(brand); }
+
+            List<string> dbBrands = await _context.Instrument
+                .Where(i => !String.IsNullOrEmpty(i.Brand))
+                .Select(i => i.Brand)
+                .Distinct().ToListAsync();
+
+            foreach (string brand in dbBrands)
+            { 
+                brands.Add(brand); 
+            }
 
             SelectList slBrands = new(brands);
             ViewData["Brands"] = slBrands;
+
             
-            var instrumentsContext = _context.Instrument.Include(i => i.Category);
-            List<Instrument> allInstruments = null;
-            try { allInstruments = await instrumentsContext.ToListAsync(); }
-            catch { return RedirectToMalfunction(); }
+            List<Instrument> allInstruments = await _context.Instrument.Include(i => i.Category).ToListAsync();
+            if (allInstruments == null) return RedirectToMalfunction();
+        
             return View(allInstruments);
         }
 
@@ -352,6 +366,29 @@ namespace Instrumusicals.Controllers
 
 
         /* @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ */
+        
+        public async Task<IActionResult> SearchJson(bool all, String name , string category, string brand, float lPrice, float uPrice)
+        {
+            bool isAdmin = IsAuthUserAdmin();
+            List<Instrument> instruments = new();
+            if (all) {
+                instruments = await _context.Instrument.ToListAsync();
+                return JsonSuccess(true, new { msg="s", insts = instruments, isAdmin = isAdmin }) ; 
+            }
+
+            int catId = 0;
+            if(!category.Equals("All Categories"))
+                catId = await _context.Category.Where(c => c.Name.Contains(category)).Select(c => c.Id).FirstOrDefaultAsync();
+            instruments = await _context.Instrument
+                .Where(i => !String.IsNullOrEmpty(name) ? i.Name.Contains(name) : true)
+                .Where(i => catId==0 ? true: i.CategoryId == catId)
+                .Where(i => !brand.Equals("All Brands") ? i.Brand.Contains(brand) : true)
+                .Where(i => lPrice != -1 ? i.Price >= lPrice : true)
+                .Where(i => uPrice != -1 ? i.Price <= uPrice : true)
+                .ToListAsync();
+            if (instruments == null) return JsonSuccess(false, new {msg="e", isAdmin = false });
+            return JsonSuccess(true, new { msg = "s", insts = instruments, isAdmin = isAdmin });
+        }
 
         private bool InstrumentExists(int id)
         {
@@ -367,23 +404,13 @@ namespace Instrumusicals.Controllers
         {
             return Int32.Parse(HttpContext.User.Claims.Where(c => c.Type == "Uid").Select(c => c.Value).SingleOrDefault()) == uid;
         }
-
-       
-        public async Task<IActionResult> SearchJson(bool all, String name , string category, string brand, float lPrice, float uPrice)
+        private bool IsUserAuthenticated()
         {
-            if (all) return Json(await _context.Instrument.ToListAsync());
-            int catId = 0;
-            if(!category.Equals("All Categories"))
-                catId = await _context.Category.Where(c => c.Name.Contains(category)).Select(c => c.Id).FirstOrDefaultAsync();
-            List<Instrument> instruments = await _context.Instrument
-                .Where(i => !String.IsNullOrEmpty(name) ? i.Name.Contains(name) : true)
-                .Where(i => catId==0 ? true: i.CategoryId == catId)
-                .Where(i => !brand.Equals("All Brands") ? i.Brand.Contains(brand) : true)
-                .Where(i => lPrice != -1 ? i.Price >= lPrice : true)
-                .Where(i => uPrice != -1 ? i.Price <= uPrice : true)
-                .ToListAsync();
-               
-            return Json(instruments);
+            return HttpContext.User != null && HttpContext.User.Identity != null;
+        }
+        private bool IsAuthUserAdmin()
+        {
+            return IsUserAuthenticated() && HttpContext.User.IsInRole("Admin");
         }
 
         // @@ @@@@@@@@@@@@@@@@@@@@ Reditection functions @@@@@@@@@@@@@@@@@@@@ @@ //
@@ -397,9 +424,6 @@ namespace Instrumusicals.Controllers
         {
             return RedirectToAction("AccessDenied", "Users");
         }
-
-
-
 
     }
 
