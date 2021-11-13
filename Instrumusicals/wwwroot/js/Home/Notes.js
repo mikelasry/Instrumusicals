@@ -11,11 +11,12 @@ const RESOLUTION = 7;
 const MAX_LEVELS = 1.5;
 const FLOOR = 72;
 const CIEL = 0;
-const RIGHT = 172;
-const LEFT = 0;
-const CENTER = RIGHT / 2;
+const RIGHT_CANV_BORDER = 172;
+const LEFT_CANV_BORDER = 0;
+const CENTER = RIGHT_CANV_BORDER / 2;
 const MIDDLE = FLOOR / 2;
 const STEP = FLOOR / RESOLUTION;
+const NOTE_STEP = 10;
 const NOTE_RADIUS = STEP / 3;
 const NOTE_HEIGHT = STEP * 1.75;
 const NOTE_WIDTH = 2;
@@ -33,6 +34,7 @@ const WHITE = "white";
 const BLACK = "black";
 const ORANGE = "orange";
 const TEAL= "teal";
+const LIGHT_GRAY = "lightgray";
 const DARK = "#212529";
 
 var lines = [LINE1, LINE2, LINE3, LINE4, LINE5];
@@ -63,10 +65,10 @@ $(function () {
         playing = !playing;
     });
 
-    drawCanvasBaseLines();
+    initCanvas();
 });
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@ Canvas Fns @@@@@@@@@@@@@@@@@@@@@@@@ //
+// @@@@@@@@@@@@@@@@@@@@@@@@@ Canvas Basic Fns @@@@@@@@@@@@@@@@@@@@@@@@ //
 
 function drawLine(xStart, yStart, xEnd, yEnd, width, color) {
     ctx.beginPath();
@@ -88,14 +90,14 @@ function drawCircle(x, y, color) {
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-function drawCanvasBaseLines() {
+function initCanvas() {
     for (var i = 0; i < lines.length; i++)
-        drawLine(LEFT, lines[i], RIGHT, lines[i], 1, '#000');
+        drawLine(LEFT_CANV_BORDER, lines[i], RIGHT_CANV_BORDER, lines[i], 1, LIGHT_GRAY);
 }
 
-function clearCanvas() {
+function clearNotes() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawCanvasBaseLines();
+    initCanvas();
 }
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -115,7 +117,7 @@ function stopCanvas() {
 function setRenderCanvasInterval() {
     if (!rendering && !pushingNotes) { 
         canvasIntervalId = setInterval(function () {
-            clearCanvas();
+            clearNotes();
             if (notes.length < 1 && !pushingNotes) {
                 clearInterval(canvasIntervalId)
                 rendering = false;
@@ -123,12 +125,12 @@ function setRenderCanvasInterval() {
             }
             for (var i = 0; i < notes.length; i++) {
                 let note = notes[i];
-                if (note.x < LEFT) {
+                if (note.x < LEFT_CANV_BORDER) {
                     notes.shift();
                     continue;
                 }
                 renderNote(note);
-                note.x -= 5;
+                note.x -= NOTE_STEP;
             }
         }, 333);
         rendering = true;
@@ -193,7 +195,7 @@ function drawDoubleNote(x, y, color, _space, _levels) {
 function newNote(_isSingular, _color, _space = 4, _levels = 1) {
     var line = randLine();
     return {
-        x: RIGHT,
+        x: RIGHT_CANV_BORDER,
         y: line,
         isSingular: _isSingular,
         color: _color,

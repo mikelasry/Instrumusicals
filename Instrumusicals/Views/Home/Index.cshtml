@@ -4,23 +4,36 @@
 <link rel="stylesheet" href="~/css/customFont.css" type="text/css" />
 <div id="homeContainer" class="container justify-content-center">
     <div class="d-flex justify-content-center text-center">
-        <div id="leftAdide" class="bg-black w-25 border border-5 border-secondary" style="border-radius: 100px; overflow: scroll; height: 72vh;">
-            <h5 class="m-3">Top Sellers Albums</h5>
-            <ol>
-                @foreach (var item in (List<TopTenItem>)ViewBag.TopAlbums)
+        <div id="leftAdide" class="bg-black w-25 border border-5 border-secondary" style="border-radius: 100px; height: 72vh; overflow: scroll; ">
+            @if (ViewBag.TopAlbums != null)
+            {
+                <h5 class="m-3">Top Albums</h5>
+                <ol>
+                    @foreach (var item in (List<TopTenItem>)ViewBag.TopAlbums)
+                    {
+                        <li class="align-middle">
+                            <div>
+                                <img src="@item.Case3D" width="100" height="100"><br>
+                                <a class="custom-font">Album: @item.AlbumName</a><br>
+                                <a class="custom-font">Artist: @item.ArtistName</a><br>
+                                <a class="custom-font">Year Released: @item.YearReleased</a><br>
+                                <a class="custom-font">Genre: @item.Style</a><br>
+                                <a class="custom-font">Sales: @item.Sales</a>
+                            </div>
+                        </li>
+                    }
+                </ol>
+            }
+            else
+            {
+                <div style="height:50px;"></div>
+                <span class="text-danger">Top Albums N/A</span>
+                for (int i = 0; i < 100; i++)
                 {
-                    <li class="align-middle">
-                        <div>
-                            <img src="@item.Case3D" width="100" height="100"><br>
-                            <a class="custom-font">Album: @item.AlbumName</a><br>
-                            <a class="custom-font">Artist: @item.ArtistName</a><br>
-                            <a class="custom-font">Year Released: @item.YearReleased</a><br>
-                            <a class="custom-font">Genre: @item.Style</a><br>
-                            <a class="custom-font">Sales: @item.Sales</a>
-                        </div>
-                    </li>
-                }
-            </ol>
+                    if (i % 7 == 0)
+                    { <div style="height:50px;"></div> }
+                    <div class="row"><h5><span>content @i</span></h5></div>}
+            }
         </div>
 
         <div id="homeContent" class="w-50 bg-dark p-3" style="width:80%; height:72vh; overflow: scroll;">
@@ -29,17 +42,41 @@
                     <img id="testImg" src="~/Images/Instrumusicals-logos.jpeg" style="width:80%; border-radius:100px; border: 5px solid darkblue" />
                 </div>
 
-                <div style="height:50px;"></div>
+                <div style="height:100px;"></div>
+
                 @if (ViewBag.BestSellers != null)
                 {
-                    <h3 class="text-warning"><cite>BestSellers</cite></h3>
+                    <h3 class="text-warning" style="text-shadow: 2px 2px 20px #00e0ff;"><cite>Best-Sellers</cite></h3>
                     <div class="d-flex text-center w-75 justify-content-center" style="height:150px;">
                         @foreach (Instrument inst in ViewBag.BestSellers)
                         {@if (inst.Image != null)
                             {
                                 string img = Convert.ToBase64String(inst.Image);
                                 <div class="align-middle m-3">
-                                    <a href="/Instruments/Details/@inst.Id"><img class="d-block" src="data:image/png;base64,@img" alt="@inst.Name" style="height:100px; width:100px; border-radius:100px; border: 3px solid white" /></a>
+                                    <a href="/Instruments/Details/@inst.Id"><img class="d-block" src="data:image/png;base64,@img" alt="@inst.Name" style="height:100px; width:100px; border-radius:100px; border: 3px solid lightgreen" /></a>
+                                </div>
+                            }
+                    }
+                    </div>
+                }
+
+
+                <div style="height:50px;"></div>
+                @if (ViewBag.InstrumentsCount != null)
+                {<h3 class="text-primary" style="text-shadow: 2px 2px 20px #fff;"><cite>@ViewBag.InstrumentsCount Instruments</cite></h3>}
+
+
+                <div style="height:50px;"></div>
+                @if (ViewBag.MostReviewed != null)
+                {
+                    <h3 class="text-warning" style="text-shadow: 2px 2px 20px #00e0ff;"><cite>Most Reviewed</cite></h3>
+                    <div class="d-flex text-center w-75 justify-content-center" style="height:150px;">
+                        @foreach (Instrument inst in ViewBag.MostReviewed)
+                        {@if (inst.Image != null)
+                            {
+                                string img = Convert.ToBase64String(inst.Image);
+                                <div class="align-middle m-3">
+                                    <a href="/Instruments/Details/@inst.Id"><img class="d-block" src="data:image/png;base64,@img" alt="@inst.Name" style="height:100px; width:100px; border-radius:100px; border: 3px solid teal" /></a>
                                 </div>
                             }
                     }
@@ -47,41 +84,84 @@
                 }
 
                 <div style="height:50px;"></div>
-                @if (ViewBag.MostReviewed != null)
+                @if (ViewBag.OrdersCount != null)
+                {<h3 class="text-primary" style="text-shadow: 2px 2px 20px #fff;"><cite>@ViewBag.OrdersCount Orders</cite></h3>}
+
+                <div style="height:50px;"></div>
+                @if (ViewBag.Prestige != null)
                 {
-                    <h3 class="text-warning"><cite>Most Reviewed</cite></h3>
+                    <h3 class="text-warning" style="text-shadow: 2px 2px 20px #00e0ff;"><cite>Our Prestige</cite></h3>
                     <div class="d-flex text-center w-75 justify-content-center" style="height:150px;">
-                        @foreach (Instrument inst in ViewBag.MostReviewed)
+                        @foreach (Instrument inst in ViewBag.Prestige)
                         {@if (inst.Image != null)
                             {
                                 string img = Convert.ToBase64String(inst.Image);
                                 <div class="align-middle m-3">
-                                    <a href="/Instruments/Details/@inst.Id"><img class="d-block" src="data:image/png;base64,@img" alt="@inst.Name" style="height:100px; width:100px; border-radius:100px; border: 3px solid white" /></a>
+                                    <a href="/Instruments/Details/@inst.Id"><img class="d-block" src="data:image/png;base64,@img" alt="@inst.Name" style="height:100px; width:100px; border-radius:100px; border: 3px solid blue" /></a>
                                 </div>
                             }
                     }
                     </div>
                 }
+
+                <div style="height:50px;"></div>
+                @if (ViewBag.UsersCount != null)
+                {<h3 class="text-primary" style="text-shadow: 2px 2px 20px #fff;"><cite>@ViewBag.UsersCount Registered Users</cite></h3>}
+
+                <div style="height:50px;"></div>
+                @if (ViewBag.LowCost != null)
+                {
+                    <h3 class="text-warning" style="text-shadow: 2px 2px 20px #00e0ff;"><cite>Low-Cost Instruments</cite></h3>
+                    <div class="d-flex text-center w-75 justify-content-center" style="height:150px;">
+                        @foreach (Instrument inst in ViewBag.LowCost)
+                        {@if (inst.Image != null)
+                            {
+                                string img = Convert.ToBase64String(inst.Image);
+                                <div class="align-middle m-3">
+                                    <a href="/Instruments/Details/@inst.Id"><img class="d-block" src="data:image/png;base64,@img" alt="@inst.Name" style="height:100px; width:100px; border-radius:100px; border: 3px solid red" /></a>
+                                </div>
+                            }
+                    }
+                    </div>
+                }
+
+                <div style="height:50px;"></div>
+                @if (ViewBag.ReviewsCount != null)
+                {<h3 class="text-primary" style="text-shadow: 2px 2px 20px #fff;"><cite>@ViewBag.ReviewsCount Reviews</cite></h3>}
+
+
             </div>
         </div>
 
-        <div id="rightAdide" class="bg-black w-25 border border-5 border-secondary" style="border-radius:100px;">
+        <div id="rightAdide" class="bg-black w-25 border border-5 border-secondary" style="border-radius: 100px; height: 72vh; overflow: scroll;">
+
             <div class="d-flex justify-content-center text-center">
                 <div class="row justify-content-center">
                     <h5 class="m-3"><a class="text-light" href="https://www.youtube.com/c/nprmusic"><cite>NPR Music</cite></a></h5>
-                    <div class="d-flex justify-content-center  mt-4 w-75">
-                        <iframe id="youTubeVideo" class="w-100 border border-3 border-light" src="https://www.youtube.com/embed/ferZnZ0_rSM" style="height:100%; border-radius:50px;"></iframe>
+                    <div class="row justify-content-center">
+                        <div class="d-flex justify-content-center w-100">
+                            <iframe id="youTubeVideo" class="w-100 border border-3 border-light" src="https://www.youtube.com/embed/ferZnZ0_rSM" style="height:100%; border-radius:50px;"></iframe>
+                        </div>
                     </div>
+                    <h5 class="mt-2 text-light"><cite>Notes of our lives</cite></h5>
+                    <div class="d-flex justify-content-center w-75">
+                        <canvas id="notesCanvas" width=172 height=82 class="border bg-secondary border-3 border-white" style="border-radius:100px;"></canvas>
+                    </div>
+                    <a class="btn text-success" style="border-radius:100px;" id="btnPlayCanvas">PLAY</a>
                 </div>
             </div>
             <div class="row justify-content-center">
-                <h5 class="mt-5 text-light"><cite>Notes of our lives</cite></h5>
-                <div class="d-flex justify-content-center w-75">
-                    <canvas id="notesCanvas" width=172 height=82 class="border bg-secondary border-3 border-white" style="border-radius:100px;"></canvas>
-                </div>
-                <a class="btn text-success" style="border-radius:100px;" id="btnPlayCanvas">PLAY</a>
+
 
             </div>
+
+
+            @for (int i = 0; i < 100; i++)
+            {
+                if (i % 7 == 0)
+                {<div style="height:50px;"></div> }
+                <div class="row"><h5><span>content @i</span></h5></div>
+            }
         </div>
     </div>
 

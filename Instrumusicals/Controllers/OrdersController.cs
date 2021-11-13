@@ -145,7 +145,7 @@ namespace Instrumusicals.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Address,TotalPrice,Create,LastUpdate")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Address,TotalPrice,Create,Shipping")] Order order)
         {
             if (id != order.Id) return RedirectToMalfunction();
             Order dbOrder = await _context.Order.Where(o => o.Id == id).FirstOrDefaultAsync();

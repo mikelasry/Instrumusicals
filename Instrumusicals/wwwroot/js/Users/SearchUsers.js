@@ -3,6 +3,11 @@ const DISP_NONE = "d-none";
 const EMPTY = "";
 const SEARCH_USERS_URL = "/Users/Search";
 
+const UserType = {
+    CLIENT: 1001,
+    ADMIN: 1004
+};
+
 var btnSearchUsersView;
 var userSearchView;
 
@@ -14,7 +19,6 @@ var emailParam;
 var fNameParam;
 var lNameParam;
 var addressParam;
-
 
 var searchUserViewVisible = false;
 
@@ -66,8 +70,8 @@ function toggleSearchView() {
     } else {
         userSearchView.removeClass(DISP_NONE);
         btnSearchUsersView.html('X close search');
-        btnSearchUsersView.removeClass("text-primary");
-        btnSearchUsersView.removeClass("border-primary");
+        btnSearchUsersView.removeClass("text-primary border-primary");
+        btnSearchUsersView.removeClass("");
         btnSearchUsersView.addClass("text-danger");
         btnSearchUsersView.addClass("border-danger");
     }
@@ -112,14 +116,56 @@ function renderUsers(result) {
         $.each(result.data, function (_ix, _userItem) {
             let template = userRowTemplate;
             $.each(_userItem, function (_prop, _val) {
-                console.log(_prop);
-
-                template = template.replaceAll('${' + _prop + '}', _val);
+               template = template.replaceAll('${' + _prop + '}', _val);
             });
+
+            var isAdmin = _userItem.userType == UserType.ADMIN;
+            var btnColor = isAdmin ? 'danger' : 'warning';
+            var action = isAdmin ? 'Deadminate' : 'Adminate';
+
+            template = template.replaceAll("${btnColor}", btnColor);
+            template = template.replaceAll("${action}", action);
+            template = template.replaceAll("${isAdmin}", !isAdmin);
 
             usersTable.append(template);
         });
-    } else {
-        // ....
     }
+}
+
+function toggleAdminateBtn(isAdmin, uid) {
+    var btnid = "#godModeBtn-" + uid;
+    let godModeBtn = $(btnid);
+    if (isAdmin) {
+        godModeBtn.removeClass("text-warning");
+        godModeBtn.removeClass("border-warning");
+        godModeBtn.addClass("text-danger");
+        godModeBtn.addClass("border-danger");
+        godModeBtn.html("Deadminate");
+    } else{
+        godModeBtn.removeClass("text-danger");
+        godModeBtn.removeClass("border-danger");
+        godModeBtn.addClass("text-warning");
+        godModeBtn.addClass("border-warning");
+        godModeBtn.html("Adminate");
+    }
+    godModeBtn.prop("onclick", null).off("click");
+    godModeBtn.on("click", function () {
+        adminate(!isAdmin, uid);
+    });
+}
+
+function adminate(_isAdmin, _uid) {
+    var url = "/Users/ChangeAccess";
+    loadAdminating(true);
+    $.ajax({ url: url, type: "POST", data: { uid: _uid, isAdmin: _isAdmin } })
+        .done(function (result) {
+            toggleAdminateBtn(_isAdmin, _uid);
+            loadAdminating(false);
+        });
+}
+
+function loadAdminating(isLoading) {
+    var adminateLoader = $("#adminateLoader");
+    if (isLoading) adminateLoader.removeClass('d-none');
+    else adminateLoader.addClass('d-none');
 }

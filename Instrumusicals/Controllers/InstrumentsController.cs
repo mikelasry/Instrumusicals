@@ -111,7 +111,7 @@ namespace Instrumusicals.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Quantity,Price")] Instrument instrument)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Brand,CategoryId,ImageFile,Description,Sold,Quantity,Price")] Instrument instrument)
         {
             if (id != instrument.Id) return RedirectToMalfunction();
 
@@ -129,7 +129,10 @@ namespace Instrumusicals.Controllers
                 {
                     if (instrument.Image == null)
                     {
-                        byte[] image = await _context.Instrument.Where(i => i.Id == id).Select(i => i.Image).SingleOrDefaultAsync();
+                        byte[] image = await _context.Instrument
+                            .Where(i => i.Id == id)
+                            .Select(i => i.Image)
+                            .SingleOrDefaultAsync();
                         if (image == null) return RedirectToMalfunction();
                         instrument.Image = image;
                     }
