@@ -6,7 +6,7 @@
 
 <div class="row text-center justify-content-center">
     <div class="w-50">
-        <h1>Instrumusicals' Categories</h1>
+        <h1>Instrumusicals' Category Images</h1>
         <a class="text-light" asp-action="Inndex"> All Category Images</a>  
         <br />
         <a class="btn border border-success text-success m-3" asp-action="Create" style="border-radius:100px;">New</a>  
@@ -23,7 +23,7 @@
                 <div id="header" class="d-flex text-center justify-content-center">
                     <h5 class="card-title text-info">
                         <cite>
-                            <a class=" text-info" asp-action="Details" asp-route-id="@ci.Id">@ci.Category.Name</a>
+                            <a class=" text-info" asp-action="Details" asp-controller="Categories" asp-route-id="@ci.Id">@ci.Category.Name</a>
                             Image
                         </cite>
                     </h5>

@@ -8,16 +8,25 @@
 
 
 <div class="row justify-content-center text-center">
-    <img src="https://img.icons8.com/ios-filled/100/000000/add-administrator.png" style="height: 100px; object-fit: contain; " />    <br />
+    <img src="https://img.icons8.com/ios-filled/100/000000/add-administrator.png" style="height: 100px; object-fit: contain; " />
+    <br />
     <h1 class="text-danger" style="text-shadow: 2px 2px 40px #fff;">
         <cite><u>Admin's Panel</u></cite>
     </h1>
 </div>
+
 <hr />
 <br />
-<div class="d-flex text-center justify-content-center">
-    <button id="populateBtn" onclick="populateDB()" class="btn-danger d-none border border-2" style="border-radius:100px;">Populate DB</button>
+
+<div class="d-none text-center justify-content-center">
+    <button id="populateBtn" onclick="populateDB()" class="btn-danger border border-2" style="border-radius:100px;">
+        Populate DB
+    </button>
+    <pre id="output"></pre>
 </div>
+
+
+
 @*<div class="d-none" id="tmpCanvas"></div>*@
 <br />
 <div class="row text-center justify-content-center">
@@ -132,7 +141,6 @@
                             <td class="align-middle">
                                 @item.Shipping
                             </td>
-
                         </tr>
                     }
                 }
@@ -310,4 +318,7 @@
     }
 </script>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js"></script>
-<script src="~/js/Home/PopulateDB.js"></script>
+
+@* Populating DB*@
+<script type="text/javascript" src="~/JsonFiles/instruments.js"></script>
+<script type="text/javascript" src="~/js/Home/PopulateDB.js"></script>

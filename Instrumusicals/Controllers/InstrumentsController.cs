@@ -367,6 +367,26 @@ namespace Instrumusicals.Controllers
 
         /* @@ @@@@@@@@@@@@@@@@@@@@ Util functions @@@@@@@@@@@@@@@@@@@@ @@ */
         
+        [HttpPost]
+        public async Task<IActionResult> Populate(string name, string brand, int categoryId, string description, int sold, int quantity, int price)
+        {
+            Instrument i = new();
+            i.Name = name;
+            i.Brand = brand;
+            i.CategoryId = categoryId;
+            i.Description = description;
+            i.Quantity = quantity;
+            i.Price = price;
+            try
+            {
+                _context.Add(i);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            { return JsonSuccess(false, null); }
+            return JsonSuccess(true, null);
+        }
+
         public async Task<IActionResult> SearchJson(bool all, String name , string category, string brand, float lPrice, float uPrice)
         {
             bool isAdmin = IsAuthUserAdmin();
